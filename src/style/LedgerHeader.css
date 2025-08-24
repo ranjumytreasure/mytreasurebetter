@@ -1,0 +1,88 @@
+/* Container styling */
+.account-header-section {
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    max-width: 100%;
+  }
+  
+  /* Top bar with heading and button */
+  .account-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .account-header-top h2 {
+    margin: 0;
+  }
+  
+  .add-entry-btn {
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-entry-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Grid headers and rows */
+  .account-grid-header,
+  .account-grid-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+  }
+  
+  .account-grid-header {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .total-row {
+    background-color: #fafafa;
+  }
+  
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    .account-grid-header {
+      display: none; /* Hide table header on mobile */
+    }
+  
+    .account-grid-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background-color: #f9f9f9;
+    }
+  
+    .account-grid-row span {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #ddd;
+    }
+  
+    .account-grid-row span:last-child {
+      border-bottom: none;
+    }
+  
+    .account-grid-row span::before {
+      content: attr(data-label);
+      font-weight: bold;
+      color: #333;
+    }
+  }
+  

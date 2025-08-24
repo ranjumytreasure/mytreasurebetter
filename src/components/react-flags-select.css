@@ -1,0 +1,61 @@
+/* Custom CSS for react-flags-select */
+
+/* Style the dropdown container */
+.react-flags-select {
+    width: 100%;
+}
+
+/* Style the dropdown trigger button */
+.react-flags-select__trigger {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    color: #333;
+    width: 100%;
+}
+
+/* Style the dropdown options */
+.react-flags-select__options {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    /* Ensure the dropdown appears above other elements */
+}
+
+/* Style individual dropdown items */
+.react-flags-select__option {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Style the selected item */
+.react-flags-select__selected {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    color: #333;
+    width: 100%;
+}
+
+/* Style the search input, if applicable */
+.react-flags-select__search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+/* Highlight the selected item */
+.react-flags-select__option--selected {
+    background-color: #007bff;
+    color: #fff;
+}

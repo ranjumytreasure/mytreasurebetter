@@ -1,0 +1,41 @@
+{
+    "roles": {
+        "User": [
+            "viewSubscribers",
+            "viewPersonalSettings",
+            "viewPayables",
+            "viewDashboard",
+            "viewAdminSettings",
+            "viewReceivables",
+            "viewHome",
+            "editPersonalSetting",
+            "startCompany"
+        ],
+        "Collector": [
+            "viewPersonalSettings",
+            "viewReceivables"
+        ],
+        "Subscriber": [
+            "viewMenu"
+        ],
+        "Accountant": [
+            "viewSubscribers",
+            "viewPersonalSettings",
+            "viewPayables",
+            "viewDashboard",
+            "viewAdminSettings",
+            "viewReceivables"
+        ],
+        "Manager": [
+            "viewDashboard",
+            "viewSubscribers",
+            "viewPersonalSettings",
+            "viewPayables",
+            "viewDashboard",
+            "viewAdminSettings",
+            "viewReceivables",
+            "viewHome",
+            "editPersonalSetting"
+        ]
+    }
+}

@@ -1,0 +1,295 @@
+/* ---------- Container ---------- */
+.subscriber-profile-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    background: #f9f9f9;
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    /* Limit container width */
+    margin: 0 auto;
+    /* Center the entire container */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}
+
+/* ---------- Sidebar ---------- */
+/* ---------- Sidebar Container ---------- */
+.subscriber-profile-sidebar {
+    width: 240px;
+    background: #cd3240;
+    color: #fff;
+    padding: 1.5rem;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* ---------- Top Section (Image + Buttons) ---------- */
+.sidebar-top {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.sidebar-upload-button,
+.sidebar-download-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 10px 14px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-upload-button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.sidebar-upload-button:hover {
+    background-color: #0056b3;
+}
+
+.sidebar-download-button {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.sidebar-download-button:hover {
+    background-color: #1e7e34;
+}
+
+/* ---------- Section Title ---------- */
+.sidebar-title {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-bottom: 2px solid #fff;
+    padding-bottom: 6px;
+}
+
+/* ---------- Sidebar Navigation ---------- */
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    padding: 10px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    font-size: 0.95rem;
+}
+
+.sidebar-nav li:hover,
+.sidebar-nav li.active {
+    background-color: #444;
+}
+
+/* ---------- Profile Content ---------- */
+.profile-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* ---------- Section ---------- */
+.sections {
+    position: relative;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* ---------- Edit Button ---------- */
+.edit-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background: #0056b3;
+}
+
+.section-content {
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ---------- Metrics Cards ---------- */
+.metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    flex: 1 1 200px;
+    background: #fff;
+    padding: 1rem;
+    border-left: 6px solid;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.blue {
+    border-color: #3b82f6;
+}
+
+.green {
+    border-color: #10b981;
+}
+
+.gray {
+    border-color: #6b7280;
+}
+
+.red {
+    border-color: #ef4444;
+}
+
+.orange {
+    border-color: #f97316;
+}
+
+.purple {
+    border-color: #8b5cf6;
+}
+
+
+.card.yellow {
+    background-color: #fdb913;
+    /* Wolves yellow */
+    border: 2px solid #000;
+
+    padding: 1.2rem;
+    color: #111;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+    text-align: center;
+    cursor: pointer;
+}
+
+.card.yellow:hover {
+    transform: translateY(-4px);
+}
+
+.card.yellow h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card.yellow .big-number {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    color: #111;
+}
+
+
+/* ---------- Wish Container ---------- */
+.wish-container {
+    margin: 2rem 0;
+}
+
+.wish-card {
+    background: #fff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+}
+
+.green-border {
+    border-left-color: #10b981;
+}
+
+/* ---------- Responsive Design ---------- */
+@media (max-width: 768px) {
+    .subscriber-profile-container {
+        flex-direction: column;
+        /* Stack sidebar on top */
+    }
+
+    .subscriber-profile-sidebar {
+        width: 100vw;
+        /* Full screen width */
+        padding: 1rem;
+        position: relative;
+
+    }
+
+    .subscriber-profile-main {
+        padding: 1rem;
+    }
+
+    .sidebar-title,
+    .subscriber-profile-sidebar ul li {
+        text-align: center;
+        font-size: 1rem;
+    }
+}
+
+/* ---------- Form Input Fields ---------- */
+/* ---------- Form Input Fields ---------- */
+.sections input,
+.sections select,
+.sections textarea {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    transition: border 0.2s ease;
+}
+
+.sections input:focus,
+.sections select:focus,
+.sections textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    background-color: #fff;
+}

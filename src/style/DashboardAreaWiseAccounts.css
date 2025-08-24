@@ -1,0 +1,152 @@
+/* Wrapper */
+.area-wise-wrapper {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+/* Header */
+.area-wise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Filter Section */
+.area-wise-filter-section {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.area-wise-filter-section input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 220px;
+}
+
+.area-wise-clear-filter-btn {
+  background-color: #757575;
+  color: #ffffff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.area-wise-clear-filter-btn:hover {
+  background-color: #616161;
+}
+
+/* Download Section */
+.area-wise-download-section {
+  display: flex;
+  align-items: center;
+}
+
+/* Download Button */
+.area-wise-download-btn {
+  background-color: #d32f2f;
+  color: #ffffff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.area-wise-download-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Table Header */
+.area-wise-header-row {
+  background-color: #d32f2f;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1.8fr 1.8fr 1.5fr 1fr 1fr 1fr;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 14px;
+}
+
+/* Table Row */
+.area-wise-data-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1.8fr 1.5fr 1fr 1fr 1fr;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  align-items: center;
+  color: #333;
+}
+
+.area-wise-data-row:hover {
+  background-color: #f9f9f9;
+}
+
+/* Paid Row Highlight */
+.area-wise-paid-row {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* List Container */
+.area-wise-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional Account Grid Row */
+.area-wise-account-grid-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  background-color: #f7f7f7;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+  .area-wise-header-row,
+  .area-wise-data-row {
+    grid-template-columns: repeat(2, 1fr);
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .area-wise-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .area-wise-filter-section input {
+    width: 100%;
+  }
+
+  .area-wise-download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .area-wise-account-grid-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

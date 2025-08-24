@@ -1,0 +1,2379 @@
+[
+  {
+    "product": 100000,
+    "noofmonths": 15,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 34000,
+        "prize": 66000,
+        "comm": 3000,
+        "bal": 31000,
+        "profit": 2000,
+        "due": 4600
+      },
+      {
+        "sequence": 2,
+        "bid": 31000,
+        "prize": 69000,
+        "comm": 3000,
+        "bal": 28000,
+        "profit": 1800,
+        "due": 4800
+      },
+      {
+        "sequence": 3,
+        "bid": 28000,
+        "prize": 72000,
+        "comm": 3000,
+        "bal": 25000,
+        "profit": 1600,
+        "due": 5000
+      },
+      {
+        "sequence": 4,
+        "bid": 25000,
+        "prize": 75000,
+        "comm": 3000,
+        "bal": 22000,
+        "profit": 1400,
+        "due": 5200
+      },
+      {
+        "sequence": 5,
+        "bid": 22000,
+        "prize": 78000,
+        "comm": 3000,
+        "bal": 19000,
+        "profit": 1200,
+        "due": 5400
+      },
+      {
+        "sequence": 6,
+        "bid": 19000,
+        "prize": 81000,
+        "comm": 3000,
+        "bal": 16000,
+        "profit": 1000,
+        "due": 5600
+      },
+      {
+        "sequence": 7,
+        "bid": 16000,
+        "prize": 84000,
+        "comm": 3000,
+        "bal": 13000,
+        "profit": 800,
+        "due": 5800
+      },
+      {
+        "sequence": 8,
+        "bid": 14500,
+        "prize": 85500,
+        "comm": 3000,
+        "bal": 11500,
+        "profit": 700,
+        "due": 5900
+      },
+      {
+        "sequence": 9,
+        "bid": 13000,
+        "prize": 87000,
+        "comm": 3000,
+        "bal": 10000,
+        "profit": 600,
+        "due": 6000
+      },
+      {
+        "sequence": 10,
+        "bid": 11500,
+        "prize": 88500,
+        "comm": 3000,
+        "bal": 8500,
+        "profit": 500,
+        "due": 6100
+      },
+      {
+        "sequence": 11,
+        "bid": 10000,
+        "prize": 90000,
+        "comm": 3000,
+        "bal": 7000,
+        "profit": 400,
+        "due": 6200
+      },
+      {
+        "sequence": 12,
+        "bid": 8500,
+        "prize": 91500,
+        "comm": 3000,
+        "bal": 5500,
+        "profit": 300,
+        "due": 6300
+      },
+      {
+        "sequence": 13,
+        "bid": 7000,
+        "prize": 93000,
+        "comm": 3000,
+        "bal": 4000,
+        "profit": 200,
+        "due": 6400
+      },
+      {
+        "sequence": 14,
+        "bid": 5500,
+        "prize": 94500,
+        "comm": 3000,
+        "bal": 2500,
+        "profit": 100,
+        "due": 6500
+      },
+      {
+        "sequence": 15,
+        "bid": 4000,
+        "prize": 96000,
+        "comm": 3000,
+        "bal": 1000,
+        "profit": 0,
+        "due": 6600
+      }
+    ]
+  },
+  {
+    "product": 50000,
+    "noofmonths": 10,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 16500,
+        "prize": 33500,
+        "comm": 1500,
+        "bal": 15000,
+        "profit": 1500,
+        "due": 3500
+      },
+      {
+        "sequence": 2,
+        "bid": 15500,
+        "prize": 34500,
+        "comm": 1500,
+        "bal": 14000,
+        "profit": 1400,
+        "due": 3600
+      },
+      {
+        "sequence": 3,
+        "bid": 14500,
+        "prize": 35500,
+        "comm": 1500,
+        "bal": 13000,
+        "profit": 1300,
+        "due": 3700
+      },
+      {
+        "sequence": 4,
+        "bid": 13500,
+        "prize": 36500,
+        "comm": 1500,
+        "bal": 12000,
+        "profit": 1200,
+        "due": 3800
+      },
+      {
+        "sequence": 5,
+        "bid": 11500,
+        "prize": 38500,
+        "comm": 1500,
+        "bal": 10000,
+        "profit": 1000,
+        "due": 4000
+      },
+      {
+        "sequence": 6,
+        "bid": 9000,
+        "prize": 41000,
+        "comm": 1500,
+        "bal": 7500,
+        "profit": 750,
+        "due": 4250
+      },
+      {
+        "sequence": 7,
+        "bid": 6500,
+        "prize": 43500,
+        "comm": 1500,
+        "bal": 5000,
+        "profit": 500,
+        "due": 4500
+      },
+      {
+        "sequence": 8,
+        "bid": 4000,
+        "prize": 46000,
+        "comm": 1500,
+        "bal": 2500,
+        "profit": 250,
+        "due": 4750
+      },
+      {
+        "sequence": 9,
+        "bid": 2500,
+        "prize": 47500,
+        "comm": 1500,
+        "bal": 1000,
+        "profit": 100,
+        "due": 4900
+      },
+      {
+        "sequence": 10,
+        "bid": 1500,
+        "prize": 48500,
+        "comm": 1500,
+        "bal": 0,
+        "profit": 0,
+        "due": 5000
+      }
+    ]
+  },
+  {
+    "product": 200000,
+    "noofmonths": 15,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 68000,
+        "prize": 132000,
+        "comm": 6000,
+        "bal": 62000,
+        "profit": 4000,
+        "due": 9200
+      },
+      {
+        "sequence": 2,
+        "bid": 62000,
+        "prize": 138000,
+        "comm": 6000,
+        "bal": 56000,
+        "profit": 3600,
+        "due": 9600
+      },
+      {
+        "sequence": 3,
+        "bid": 56000,
+        "prize": 144000,
+        "comm": 6000,
+        "bal": 50000,
+        "profit": 3200,
+        "due": 10000
+      },
+      {
+        "sequence": 4,
+        "bid": 50000,
+        "prize": 150000,
+        "comm": 6000,
+        "bal": 44000,
+        "profit": 2800,
+        "due": 10400
+      },
+      {
+        "sequence": 5,
+        "bid": 44000,
+        "prize": 156000,
+        "comm": 6000,
+        "bal": 38000,
+        "profit": 2400,
+        "due": 10800
+      },
+      {
+        "sequence": 6,
+        "bid": 38000,
+        "prize": 162000,
+        "comm": 6000,
+        "bal": 32000,
+        "profit": 2000,
+        "due": 11200
+      },
+      {
+        "sequence": 7,
+        "bid": 32000,
+        "prize": 168000,
+        "comm": 6000,
+        "bal": 26000,
+        "profit": 1600,
+        "due": 11600
+      },
+      {
+        "sequence": 8,
+        "bid": 29000,
+        "prize": 171000,
+        "comm": 6000,
+        "bal": 23000,
+        "profit": 1400,
+        "due": 11800
+      },
+      {
+        "sequence": 9,
+        "bid": 26000,
+        "prize": 174000,
+        "comm": 6000,
+        "bal": 20000,
+        "profit": 1200,
+        "due": 12000
+      },
+      {
+        "sequence": 10,
+        "bid": 23000,
+        "prize": 177000,
+        "comm": 6000,
+        "bal": 17000,
+        "profit": 1000,
+        "due": 12200
+      },
+      {
+        "sequence": 11,
+        "bid": 20000,
+        "prize": 180000,
+        "comm": 6000,
+        "bal": 14000,
+        "profit": 800,
+        "due": 12400
+      },
+      {
+        "sequence": 12,
+        "bid": 17000,
+        "prize": 183000,
+        "comm": 6000,
+        "bal": 11000,
+        "profit": 600,
+        "due": 12600
+      },
+      {
+        "sequence": 13,
+        "bid": 14000,
+        "prize": 186000,
+        "comm": 6000,
+        "bal": 8000,
+        "profit": 400,
+        "due": 12800
+      },
+      {
+        "sequence": 14,
+        "bid": 11000,
+        "prize": 189000,
+        "comm": 6000,
+        "bal": 5000,
+        "profit": 200,
+        "due": 13000
+      },
+      {
+        "sequence": 15,
+        "bid": 8000,
+        "prize": 192000,
+        "comm": 6000,
+        "bal": 2000,
+        "profit": 0,
+        "due": 13200
+      }
+    ]
+  },
+  {
+    "product": 200000,
+    "noofmonths": 20,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 68400,
+        "prize": 131600,
+        "comm": 6000,
+        "bal": 62400,
+        "profit": 3120,
+        "due": 6880
+      },
+      {
+        "sequence": 2,
+        "bid": 65600,
+        "prize": 134400,
+        "comm": 6000,
+        "bal": 59600,
+        "profit": 2980,
+        "due": 7020
+      },
+      {
+        "sequence": 3,
+        "bid": 62400,
+        "prize": 137600,
+        "comm": 6000,
+        "bal": 56400,
+        "profit": 2820,
+        "due": 7180
+      },
+      {
+        "sequence": 4,
+        "bid": 59200,
+        "prize": 140800,
+        "comm": 6000,
+        "bal": 53200,
+        "profit": 2660,
+        "due": 7340
+      },
+      {
+        "sequence": 5,
+        "bid": 56000,
+        "prize": 144000,
+        "comm": 6000,
+        "bal": 50000,
+        "profit": 2500,
+        "due": 7500
+      },
+      {
+        "sequence": 6,
+        "bid": 52800,
+        "prize": 147200,
+        "comm": 6000,
+        "bal": 46800,
+        "profit": 2320,
+        "due": 7660
+      },
+      {
+        "sequence": 7,
+        "bid": 50000,
+        "prize": 150000,
+        "comm": 6000,
+        "bal": 44000,
+        "profit": 2200,
+        "due": 7800
+      },
+      {
+        "sequence": 8,
+        "bid": 46400,
+        "prize": 153600,
+        "comm": 6000,
+        "bal": 40400,
+        "profit": 2020,
+        "due": 7980
+      },
+      {
+        "sequence": 9,
+        "bid": 43200,
+        "prize": 156800,
+        "comm": 6000,
+        "bal": 37200,
+        "profit": 1860,
+        "due": 8140
+      },
+      {
+        "sequence": 10,
+        "bid": 40000,
+        "prize": 160000,
+        "comm": 6000,
+        "bal": 34000,
+        "profit": 1700,
+        "due": 8300
+      },
+      {
+        "sequence": 11,
+        "bid": 36800,
+        "prize": 163200,
+        "comm": 6000,
+        "bal": 30800,
+        "profit": 1540,
+        "due": 8460
+      },
+      {
+        "sequence": 12,
+        "bid": 33600,
+        "prize": 166400,
+        "comm": 6000,
+        "bal": 27600,
+        "profit": 1380,
+        "due": 8620
+      },
+      {
+        "sequence": 13,
+        "bid": 30400,
+        "prize": 169600,
+        "comm": 6000,
+        "bal": 24400,
+        "profit": 1220,
+        "due": 8780
+      },
+      {
+        "sequence": 14,
+        "bid": 27200,
+        "prize": 172800,
+        "comm": 6000,
+        "bal": 21200,
+        "profit": 1060,
+        "due": 8940
+      },
+      {
+        "sequence": 15,
+        "bid": 24000,
+        "prize": 176000,
+        "comm": 6000,
+        "bal": 18000,
+        "profit": 900,
+        "due": 9100
+      },
+      {
+        "sequence": 16,
+        "bid": 20800,
+        "prize": 179200,
+        "comm": 6000,
+        "bal": 14800,
+        "profit": 740,
+        "due": 9260
+      },
+      {
+        "sequence": 17,
+        "bid": 17600,
+        "prize": 182400,
+        "comm": 6000,
+        "bal": 11600,
+        "profit": 580,
+        "due": 9420
+      },
+      {
+        "sequence": 18,
+        "bid": 14400,
+        "prize": 185600,
+        "comm": 6000,
+        "bal": 8400,
+        "profit": 420,
+        "due": 9580
+      },
+      {
+        "sequence": 19,
+        "bid": 11200,
+        "prize": 188800,
+        "comm": 6000,
+        "bal": 5200,
+        "profit": 260,
+        "due": 9740
+      },
+      {
+        "sequence": 20,
+        "bid": 8000,
+        "prize": 192000,
+        "comm": 6000,
+        "bal": 2000,
+        "profit": 100,
+        "due": 9900
+      }
+    ]
+  },
+  {
+    "product": 300000,
+    "noofmonths": 15,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 102000,
+        "prize": 198000,
+        "comm": 9000,
+        "bal": 93000,
+        "profit": 6000,
+        "due": 13800
+      },
+      {
+        "sequence": 2,
+        "bid": 93000,
+        "prize": 207000,
+        "comm": 9000,
+        "bal": 84000,
+        "profit": 5400,
+        "due": 14400
+      },
+      {
+        "sequence": 3,
+        "bid": 84000,
+        "prize": 216000,
+        "comm": 9000,
+        "bal": 75000,
+        "profit": 4800,
+        "due": 15000
+      },
+      {
+        "sequence": 4,
+        "bid": 75000,
+        "prize": 225000,
+        "comm": 9000,
+        "bal": 66000,
+        "profit": 4200,
+        "due": 15600
+      },
+      {
+        "sequence": 5,
+        "bid": 66000,
+        "prize": 234000,
+        "comm": 9000,
+        "bal": 57000,
+        "profit": 3600,
+        "due": 16200
+      },
+      {
+        "sequence": 6,
+        "bid": 57000,
+        "prize": 243000,
+        "comm": 9000,
+        "bal": 48000,
+        "profit": 3000,
+        "due": 16800
+      },
+      {
+        "sequence": 7,
+        "bid": 48000,
+        "prize": 252000,
+        "comm": 9000,
+        "bal": 39000,
+        "profit": 2400,
+        "due": 17400
+      },
+      {
+        "sequence": 8,
+        "bid": 43500,
+        "prize": 256500,
+        "comm": 9000,
+        "bal": 34500,
+        "profit": 2100,
+        "due": 17700
+      },
+      {
+        "sequence": 9,
+        "bid": 39000,
+        "prize": 261000,
+        "comm": 9000,
+        "bal": 30000,
+        "profit": 1800,
+        "due": 18000
+      },
+      {
+        "sequence": 10,
+        "bid": 34500,
+        "prize": 265500,
+        "comm": 9000,
+        "bal": 25500,
+        "profit": 1500,
+        "due": 18300
+      },
+      {
+        "sequence": 11,
+        "bid": 30000,
+        "prize": 270000,
+        "comm": 9000,
+        "bal": 21000,
+        "profit": 1200,
+        "due": 18600
+      },
+      {
+        "sequence": 12,
+        "bid": 25500,
+        "prize": 274500,
+        "comm": 9000,
+        "bal": 16500,
+        "profit": 900,
+        "due": 18900
+      },
+      {
+        "sequence": 13,
+        "bid": 21000,
+        "prize": 279000,
+        "comm": 9000,
+        "bal": 12000,
+        "profit": 600,
+        "due": 19200
+      },
+      {
+        "sequence": 14,
+        "bid": 16500,
+        "prize": 283500,
+        "comm": 9000,
+        "bal": 7500,
+        "profit": 300,
+        "due": 19500
+      },
+      {
+        "sequence": 15,
+        "bid": 12000,
+        "prize": 288000,
+        "comm": 9000,
+        "bal": 3000,
+        "profit": 0,
+        "due": 19800
+      }
+    ]
+  },
+  {
+    "product": 500000,
+    "noofmonths": 15,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 170000,
+        "prize": 330000,
+        "comm": 15000,
+        "bal": 155000,
+        "profit": 10000,
+        "due": 23000
+      },
+      {
+        "sequence": 2,
+        "bid": 155000,
+        "prize": 345000,
+        "comm": 15000,
+        "bal": 140000,
+        "profit": 9000,
+        "due": 24000
+      },
+      {
+        "sequence": 3,
+        "bid": 140000,
+        "prize": 360000,
+        "comm": 15000,
+        "bal": 125000,
+        "profit": 8000,
+        "due": 25000
+      },
+      {
+        "sequence": 4,
+        "bid": 125000,
+        "prize": 375000,
+        "comm": 15000,
+        "bal": 110000,
+        "profit": 7000,
+        "due": 26000
+      },
+      {
+        "sequence": 5,
+        "bid": 110000,
+        "prize": 390000,
+        "comm": 15000,
+        "bal": 95000,
+        "profit": 6000,
+        "due": 27000
+      },
+      {
+        "sequence": 6,
+        "bid": 95000,
+        "prize": 405000,
+        "comm": 15000,
+        "bal": 80000,
+        "profit": 5000,
+        "due": 28000
+      },
+      {
+        "sequence": 7,
+        "bid": 80000,
+        "prize": 420000,
+        "comm": 15000,
+        "bal": 65000,
+        "profit": 4000,
+        "due": 29000
+      },
+      {
+        "sequence": 8,
+        "bid": 72500,
+        "prize": 427500,
+        "comm": 15000,
+        "bal": 57500,
+        "profit": 3500,
+        "due": 29500
+      },
+      {
+        "sequence": 9,
+        "bid": 65000,
+        "prize": 435000,
+        "comm": 15000,
+        "bal": 50000,
+        "profit": 3000,
+        "due": 30000
+      },
+      {
+        "sequence": 10,
+        "bid": 57500,
+        "prize": 442500,
+        "comm": 15000,
+        "bal": 42500,
+        "profit": 2500,
+        "due": 30500
+      },
+      {
+        "sequence": 11,
+        "bid": 50000,
+        "prize": 450000,
+        "comm": 15000,
+        "bal": 35000,
+        "profit": 2000,
+        "due": 31000
+      },
+      {
+        "sequence": 12,
+        "bid": 42500,
+        "prize": 457500,
+        "comm": 15000,
+        "bal": 27500,
+        "profit": 1500,
+        "due": 31500
+      },
+      {
+        "sequence": 13,
+        "bid": 35000,
+        "prize": 465000,
+        "comm": 15000,
+        "bal": 20000,
+        "profit": 1000,
+        "due": 32000
+      },
+      {
+        "sequence": 14,
+        "bid": 27500,
+        "prize": 472500,
+        "comm": 15000,
+        "bal": 12500,
+        "profit": 500,
+        "due": 32500
+      },
+      {
+        "sequence": 15,
+        "bid": 20000,
+        "prize": 480000,
+        "comm": 15000,
+        "bal": 5000,
+        "profit": 0,
+        "due": 33000
+      }
+    ]
+  },
+  {
+    "product": 500000,
+    "noofmonths": 20,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 171000,
+        "prize": 329000,
+        "comm": 15000,
+        "bal": 156000,
+        "profit": 7800,
+        "due": 17200
+      },
+      {
+        "sequence": 2,
+        "bid": 164001,
+        "prize": 336000,
+        "comm": 15000,
+        "bal": 149001,
+        "profit": 7450,
+        "due": 17550
+      },
+      {
+        "sequence": 3,
+        "bid": 156002,
+        "prize": 344000,
+        "comm": 15000,
+        "bal": 141002,
+        "profit": 7050,
+        "due": 17950
+      },
+      {
+        "sequence": 4,
+        "bid": 148003,
+        "prize": 352000,
+        "comm": 15000,
+        "bal": 133003,
+        "profit": 6650,
+        "due": 18350
+      },
+      {
+        "sequence": 5,
+        "bid": 140004,
+        "prize": 360000,
+        "comm": 15000,
+        "bal": 125004,
+        "profit": 6250,
+        "due": 18750
+      },
+      {
+        "sequence": 6,
+        "bid": 132005,
+        "prize": 368000,
+        "comm": 15000,
+        "bal": 117005,
+        "profit": 5800,
+        "due": 19150
+      },
+      {
+        "sequence": 7,
+        "bid": 125006,
+        "prize": 375000,
+        "comm": 15000,
+        "bal": 110006,
+        "profit": 5500,
+        "due": 19500
+      },
+      {
+        "sequence": 8,
+        "bid": 116007,
+        "prize": 384000,
+        "comm": 15000,
+        "bal": 101007,
+        "profit": 5050,
+        "due": 19950
+      },
+      {
+        "sequence": 9,
+        "bid": 108008,
+        "prize": 392000,
+        "comm": 15000,
+        "bal": 93008,
+        "profit": 4650,
+        "due": 20350
+      },
+      {
+        "sequence": 10,
+        "bid": 100009,
+        "prize": 400000,
+        "comm": 15000,
+        "bal": 85009,
+        "profit": 4250,
+        "due": 20750
+      },
+      {
+        "sequence": 11,
+        "bid": 92010,
+        "prize": 408000,
+        "comm": 15000,
+        "bal": 77010,
+        "profit": 3850,
+        "due": 21150
+      },
+      {
+        "sequence": 12,
+        "bid": 84011,
+        "prize": 416000,
+        "comm": 15000,
+        "bal": 69011,
+        "profit": 3450,
+        "due": 21550
+      },
+      {
+        "sequence": 13,
+        "bid": 76012,
+        "prize": 424000,
+        "comm": 15000,
+        "bal": 61012,
+        "profit": 3050,
+        "due": 21950
+      },
+      {
+        "sequence": 14,
+        "bid": 68013,
+        "prize": 432000,
+        "comm": 15000,
+        "bal": 53013,
+        "profit": 2650,
+        "due": 22350
+      },
+      {
+        "sequence": 15,
+        "bid": 60014,
+        "prize": 440000,
+        "comm": 15000,
+        "bal": 45014,
+        "profit": 2250,
+        "due": 22750
+      },
+      {
+        "sequence": 16,
+        "bid": 52015,
+        "prize": 448000,
+        "comm": 15000,
+        "bal": 37015,
+        "profit": 1850,
+        "due": 23150
+      },
+      {
+        "sequence": 17,
+        "bid": 44016,
+        "prize": 456000,
+        "comm": 15000,
+        "bal": 29016,
+        "profit": 1450,
+        "due": 23550
+      },
+      {
+        "sequence": 18,
+        "bid": 36017,
+        "prize": 464000,
+        "comm": 15000,
+        "bal": 21017,
+        "profit": 1050,
+        "due": 23950
+      },
+      {
+        "sequence": 19,
+        "bid": 28018,
+        "prize": 472000,
+        "comm": 15000,
+        "bal": 13018,
+        "profit": 650,
+        "due": 24350
+      },
+      {
+        "sequence": 20,
+        "bid": 20019,
+        "prize": 480000,
+        "comm": 15000,
+        "bal": 5019,
+        "profit": 250,
+        "due": 24750
+      }
+    ]
+  },
+  {
+    "product": 1000000,
+    "noofmonths": 20,
+    "membershipid": 1,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 342000,
+        "prize": 658000,
+        "comm": 30000,
+        "bal": 312000,
+        "profit": 15600,
+        "due": 34400
+      },
+      {
+        "sequence": 2,
+        "bid": 328000,
+        "prize": 672000,
+        "comm": 30000,
+        "bal": 298000,
+        "profit": 14900,
+        "due": 35100
+      },
+      {
+        "sequence": 3,
+        "bid": 312000,
+        "prize": 688000,
+        "comm": 30000,
+        "bal": 282000,
+        "profit": 14100,
+        "due": 35900
+      },
+      {
+        "sequence": 4,
+        "bid": 296000,
+        "prize": 704000,
+        "comm": 30000,
+        "bal": 266000,
+        "profit": 13300,
+        "due": 36700
+      },
+      {
+        "sequence": 5,
+        "bid": 280000,
+        "prize": 720000,
+        "comm": 30000,
+        "bal": 250000,
+        "profit": 12500,
+        "due": 37500
+      },
+      {
+        "sequence": 6,
+        "bid": 264000,
+        "prize": 736000,
+        "comm": 30000,
+        "bal": 234000,
+        "profit": 11600,
+        "due": 38300
+      },
+      {
+        "sequence": 7,
+        "bid": 250000,
+        "prize": 750000,
+        "comm": 30000,
+        "bal": 220000,
+        "profit": 11000,
+        "due": 39000
+      },
+      {
+        "sequence": 8,
+        "bid": 232000,
+        "prize": 768000,
+        "comm": 30000,
+        "bal": 202000,
+        "profit": 10100,
+        "due": 39900
+      },
+      {
+        "sequence": 9,
+        "bid": 216000,
+        "prize": 784000,
+        "comm": 30000,
+        "bal": 186000,
+        "profit": 9300,
+        "due": 40700
+      },
+      {
+        "sequence": 10,
+        "bid": 200000,
+        "prize": 800000,
+        "comm": 30000,
+        "bal": 170000,
+        "profit": 8500,
+        "due": 41500
+      },
+      {
+        "sequence": 11,
+        "bid": 184000,
+        "prize": 816000,
+        "comm": 30000,
+        "bal": 154000,
+        "profit": 7700,
+        "due": 42300
+      },
+      {
+        "sequence": 12,
+        "bid": 168000,
+        "prize": 832000,
+        "comm": 30000,
+        "bal": 138000,
+        "profit": 6900,
+        "due": 43100
+      },
+      {
+        "sequence": 13,
+        "bid": 152000,
+        "prize": 848000,
+        "comm": 30000,
+        "bal": 122000,
+        "profit": 6100,
+        "due": 43900
+      },
+      {
+        "sequence": 14,
+        "bid": 136000,
+        "prize": 864000,
+        "comm": 30000,
+        "bal": 106000,
+        "profit": 5300,
+        "due": 44700
+      },
+      {
+        "sequence": 15,
+        "bid": 120000,
+        "prize": 880000,
+        "comm": 30000,
+        "bal": 90000,
+        "profit": 4500,
+        "due": 45500
+      },
+      {
+        "sequence": 16,
+        "bid": 104000,
+        "prize": 896000,
+        "comm": 30000,
+        "bal": 74000,
+        "profit": 3700,
+        "due": 46300
+      },
+      {
+        "sequence": 17,
+        "bid": 88000,
+        "prize": 912000,
+        "comm": 30000,
+        "bal": 58000,
+        "profit": 2900,
+        "due": 47100
+      },
+      {
+        "sequence": 18,
+        "bid": 72000,
+        "prize": 928000,
+        "comm": 30000,
+        "bal": 42000,
+        "profit": 2100,
+        "due": 47900
+      },
+      {
+        "sequence": 19,
+        "bid": 56000,
+        "prize": 944000,
+        "comm": 30000,
+        "bal": 26000,
+        "profit": 1300,
+        "due": 48700
+      },
+      {
+        "sequence": 20,
+        "bid": 40000,
+        "prize": 960000,
+        "comm": 30000,
+        "bal": 10000,
+        "profit": 500,
+        "due": 49500
+      }
+    ]
+  },
+  {
+    "product": 500000,
+    "noofmonths": 20,
+    "commission": 20000,
+    "membershipid": 54,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "chitAmount": 25000,
+        "profit": 5750,
+        "due": 19250,
+        "comm": 20000,
+        "prize": 365000,
+        "bid": 135000,
+        "bal": 115000
+      },
+      {
+        "sequence": 2,
+        "chitAmount": 25000,
+        "profit": 5500,
+        "due": 19500,
+        "comm": 20000,
+        "prize": 370000,
+        "bid": 130000,
+        "bal": 110000
+      },
+      {
+        "sequence": 3,
+        "chitAmount": 25000,
+        "profit": 5250,
+        "due": 19750,
+        "comm": 20000,
+        "prize": 375000,
+        "bid": 125000,
+        "bal": 105000
+      },
+      {
+        "sequence": 4,
+        "chitAmount": 25000,
+        "profit": 5000,
+        "due": 20000,
+        "comm": 20000,
+        "prize": 380000,
+        "bid": 120000,
+        "bal": 100000
+      },
+      {
+        "sequence": 5,
+        "chitAmount": 25000,
+        "profit": 4700,
+        "due": 20300,
+        "comm": 20000,
+        "prize": 386000,
+        "bid": 114000,
+        "bal": 94000
+      },
+      {
+        "sequence": 6,
+        "chitAmount": 25000,
+        "profit": 4400,
+        "due": 20600,
+        "comm": 20000,
+        "prize": 392000,
+        "bid": 108000,
+        "bal": 88000
+      },
+      {
+        "sequence": 7,
+        "chitAmount": 25000,
+        "profit": 4100,
+        "due": 20900,
+        "comm": 20000,
+        "prize": 398000,
+        "bid": 102000,
+        "bal": 82000
+      },
+      {
+        "sequence": 8,
+        "chitAmount": 25000,
+        "profit": 3800,
+        "due": 21200,
+        "comm": 20000,
+        "prize": 404000,
+        "bid": 96000,
+        "bal": 76000
+      },
+      {
+        "sequence": 9,
+        "chitAmount": 25000,
+        "profit": 3450,
+        "due": 21550,
+        "comm": 20000,
+        "prize": 411000,
+        "bid": 89000,
+        "bal": 69000
+      },
+      {
+        "sequence": 10,
+        "chitAmount": 25000,
+        "profit": 3100,
+        "due": 21900,
+        "comm": 20000,
+        "prize": 418000,
+        "bid": 82000,
+        "bal": 62000
+      },
+      {
+        "sequence": 11,
+        "chitAmount": 25000,
+        "profit": 2750,
+        "due": 22250,
+        "comm": 20000,
+        "prize": 425000,
+        "bid": 75000,
+        "bal": 55000
+      },
+      {
+        "sequence": 12,
+        "chitAmount": 25000,
+        "profit": 2400,
+        "due": 22600,
+        "comm": 20000,
+        "prize": 432000,
+        "bid": 68000,
+        "bal": 48000
+      },
+      {
+        "sequence": 13,
+        "chitAmount": 25000,
+        "profit": 2100,
+        "due": 22900,
+        "comm": 20000,
+        "prize": 438000,
+        "bid": 62000,
+        "bal": 42000
+      },
+      {
+        "sequence": 14,
+        "chitAmount": 25000,
+        "profit": 1800,
+        "due": 23200,
+        "comm": 20000,
+        "prize": 444000,
+        "bid": 56000,
+        "bal": 36000
+      },
+      {
+        "sequence": 15,
+        "chitAmount": 25000,
+        "profit": 1500,
+        "due": 23500,
+        "comm": 20000,
+        "prize": 450000,
+        "bid": 50000,
+        "bal": 30000
+      },
+      {
+        "sequence": 16,
+        "chitAmount": 25000,
+        "profit": 1200,
+        "due": 23800,
+        "comm": 20000,
+        "prize": 456000,
+        "bid": 44000,
+        "bal": 24000
+      },
+      {
+        "sequence": 17,
+        "chitAmount": 25000,
+        "profit": 900,
+        "due": 24100,
+        "comm": 20000,
+        "prize": 462000,
+        "bid": 38000,
+        "bal": 18000
+      },
+      {
+        "sequence": 18,
+        "chitAmount": 25000,
+        "profit": 600,
+        "due": 24400,
+        "comm": 20000,
+        "prize": 468000,
+        "bid": 32000,
+        "bal": 12000
+      },
+      {
+        "sequence": 19,
+        "chitAmount": 25000,
+        "profit": 300,
+        "due": 24700,
+        "comm": 20000,
+        "prize": 474000,
+        "bid": 26000,
+        "bal": 6000
+      },
+      {
+        "sequence": 20,
+        "chitAmount": 25000,
+        "profit": 0,
+        "due": 25000,
+        "comm": 20000,
+        "prize": 480000,
+        "bid": 20000,
+        "bal": 0
+      }
+    ]
+  },
+  {
+    "product": 100000,
+    "noofmonths": 20,
+    "commission": 4000,
+    "membershipid": 54,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "chitAmount": 5000,
+        "profit": 1150,
+        "due": 3850,
+        "comm": 4000,
+        "prize": 73000,
+        "bid": 27000,
+        "bal": 23000
+      },
+      {
+        "sequence": 2,
+        "chitAmount": 5000,
+        "profit": 1100,
+        "due": 3900,
+        "comm": 4000,
+        "prize": 74000,
+        "bid": 26000,
+        "bal": 22000
+      },
+      {
+        "sequence": 3,
+        "chitAmount": 5000,
+        "profit": 1050,
+        "due": 3950,
+        "comm": 4000,
+        "prize": 75000,
+        "bid": 25000,
+        "bal": 21000
+      },
+      {
+        "sequence": 4,
+        "chitAmount": 5000,
+        "profit": 1000,
+        "due": 4000,
+        "comm": 4000,
+        "prize": 76000,
+        "bid": 24000,
+        "bal": 20000
+      },
+      {
+        "sequence": 5,
+        "chitAmount": 5000,
+        "profit": 940,
+        "due": 4060,
+        "comm": 4000,
+        "prize": 77200,
+        "bid": 22800,
+        "bal": 18800
+      },
+      {
+        "sequence": 6,
+        "chitAmount": 5000,
+        "profit": 880,
+        "due": 4120,
+        "comm": 4000,
+        "prize": 78400,
+        "bid": 21600,
+        "bal": 17600
+      },
+      {
+        "sequence": 7,
+        "chitAmount": 5000,
+        "profit": 820,
+        "due": 4180,
+        "comm": 4000,
+        "prize": 79600,
+        "bid": 20400,
+        "bal": 16400
+      },
+      {
+        "sequence": 8,
+        "chitAmount": 5000,
+        "profit": 760,
+        "due": 4240,
+        "comm": 4000,
+        "prize": 80800,
+        "bid": 19200,
+        "bal": 15200
+      },
+      {
+        "sequence": 9,
+        "chitAmount": 5000,
+        "profit": 690,
+        "due": 4310,
+        "comm": 4000,
+        "prize": 82200,
+        "bid": 17800,
+        "bal": 13800
+      },
+      {
+        "sequence": 10,
+        "chitAmount": 5000,
+        "profit": 620,
+        "due": 4380,
+        "comm": 4000,
+        "prize": 83600,
+        "bid": 16400,
+        "bal": 12400
+      },
+      {
+        "sequence": 11,
+        "chitAmount": 5000,
+        "profit": 550,
+        "due": 4450,
+        "comm": 4000,
+        "prize": 85000,
+        "bid": 15000,
+        "bal": 11000
+      },
+      {
+        "sequence": 12,
+        "chitAmount": 5000,
+        "profit": 480,
+        "due": 4520,
+        "comm": 4000,
+        "prize": 86400,
+        "bid": 13600,
+        "bal": 9600
+      },
+      {
+        "sequence": 13,
+        "chitAmount": 5000,
+        "profit": 420,
+        "due": 4580,
+        "comm": 4000,
+        "prize": 87600,
+        "bid": 12400,
+        "bal": 8400
+      },
+      {
+        "sequence": 14,
+        "chitAmount": 5000,
+        "profit": 360,
+        "due": 4640,
+        "comm": 4000,
+        "prize": 88800,
+        "bid": 11200,
+        "bal": 7200
+      },
+      {
+        "sequence": 15,
+        "chitAmount": 5000,
+        "profit": 300,
+        "due": 4700,
+        "comm": 4000,
+        "prize": 90000,
+        "bid": 10000,
+        "bal": 6000
+      },
+      {
+        "sequence": 16,
+        "chitAmount": 5000,
+        "profit": 240,
+        "due": 4760,
+        "comm": 4000,
+        "prize": 91200,
+        "bid": 8800,
+        "bal": 4800
+      },
+      {
+        "sequence": 17,
+        "chitAmount": 5000,
+        "profit": 180,
+        "due": 4820,
+        "comm": 4000,
+        "prize": 92400,
+        "bid": 7600,
+        "bal": 3600
+      },
+      {
+        "sequence": 18,
+        "chitAmount": 5000,
+        "profit": 120,
+        "due": 4880,
+        "comm": 4000,
+        "prize": 93600,
+        "bid": 6400,
+        "bal": 2400
+      },
+      {
+        "sequence": 19,
+        "chitAmount": 5000,
+        "profit": 60,
+        "due": 4940,
+        "comm": 4000,
+        "prize": 94800,
+        "bid": 5200,
+        "bal": 1200
+      },
+      {
+        "sequence": 20,
+        "chitAmount": 5000,
+        "profit": 0,
+        "due": 5000,
+        "comm": 4000,
+        "prize": 96000,
+        "bid": 4000,
+        "bal": 0
+      }
+    ]
+  },
+  {
+    "product": 50000,
+    "noofmonths": 10,
+    "membershipid": 161,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 16500,
+        "prize": 33500,
+        "comm": 1500,
+        "bal": 15000,
+        "profit": 1500,
+        "due": 3500
+      },
+      {
+        "sequence": 2,
+        "bid": 15500,
+        "prize": 34500,
+        "comm": 1500,
+        "bal": 14000,
+        "profit": 1400,
+        "due": 3600
+      },
+      {
+        "sequence": 3,
+        "bid": 14500,
+        "prize": 35500,
+        "comm": 1500,
+        "bal": 13000,
+        "profit": 1300,
+        "due": 3700
+      },
+      {
+        "sequence": 4,
+        "bid": 13500,
+        "prize": 36500,
+        "comm": 1500,
+        "bal": 12000,
+        "profit": 1200,
+        "due": 3800
+      },
+      {
+        "sequence": 5,
+        "bid": 11500,
+        "prize": 38500,
+        "comm": 1500,
+        "bal": 10000,
+        "profit": 1000,
+        "due": 4000
+      },
+      {
+        "sequence": 6,
+        "bid": 9000,
+        "prize": 41000,
+        "comm": 1500,
+        "bal": 7500,
+        "profit": 750,
+        "due": 4250
+      },
+      {
+        "sequence": 7,
+        "bid": 6500,
+        "prize": 43500,
+        "comm": 1500,
+        "bal": 5000,
+        "profit": 500,
+        "due": 4500
+      },
+      {
+        "sequence": 8,
+        "bid": 4000,
+        "prize": 46000,
+        "comm": 1500,
+        "bal": 2500,
+        "profit": 250,
+        "due": 4750
+      },
+      {
+        "sequence": 9,
+        "bid": 2500,
+        "prize": 47500,
+        "comm": 1500,
+        "bal": 1000,
+        "profit": 100,
+        "due": 4900
+      },
+      {
+        "sequence": 10,
+        "bid": 1500,
+        "prize": 48500,
+        "comm": 1500,
+        "bal": 0,
+        "profit": 0,
+        "due": 5000
+      }
+    ]
+  },
+  {
+    "product": 500000,
+    "noofmonths": 20,
+    "membershipid": 188,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 180000,
+        "prize": 320000,
+        "comm": 20000,
+        "bal": 160000,
+        "profit": 8000,
+        "due": 17000
+      },
+      {
+        "sequence": 2,
+        "bid": 173000,
+        "prize": 327000,
+        "comm": 20000,
+        "bal": 153000,
+        "profit": 7650,
+        "due": 17350
+      },
+      {
+        "sequence": 3,
+        "bid": 166000,
+        "prize": 334000,
+        "comm": 20000,
+        "bal": 146000,
+        "profit": 7300,
+        "due": 17700
+      },
+      {
+        "sequence": 4,
+        "bid": 159000,
+        "prize": 341000,
+        "comm": 20000,
+        "bal": 139000,
+        "profit": 6950,
+        "due": 18050
+      },
+      {
+        "sequence": 5,
+        "bid": 152000,
+        "prize": 348000,
+        "comm": 20000,
+        "bal": 132000,
+        "profit": 6600,
+        "due": 18400
+      },
+      {
+        "sequence": 6,
+        "bid": 144000,
+        "prize": 356000,
+        "comm": 20000,
+        "bal": 124000,
+        "profit": 6200,
+        "due": 18800
+      },
+      {
+        "sequence": 7,
+        "bid": 137000,
+        "prize": 363000,
+        "comm": 20000,
+        "bal": 117000,
+        "profit": 5850,
+        "due": 19150
+      },
+      {
+        "sequence": 8,
+        "bid": 130000,
+        "prize": 370000,
+        "comm": 20000,
+        "bal": 110000,
+        "profit": 5500,
+        "due": 19500
+      },
+      {
+        "sequence": 9,
+        "bid": 123000,
+        "prize": 377000,
+        "comm": 20000,
+        "bal": 103000,
+        "profit": 5150,
+        "due": 19850
+      },
+      {
+        "sequence": 10,
+        "bid": 116000,
+        "prize": 384000,
+        "comm": 20000,
+        "bal": 96000,
+        "profit": 4800,
+        "due": 20200
+      },
+      {
+        "sequence": 11,
+        "bid": 110000,
+        "prize": 390000,
+        "comm": 20000,
+        "bal": 90000,
+        "profit": 4500,
+        "due": 20500
+      },
+      {
+        "sequence": 12,
+        "bid": 103000,
+        "prize": 397000,
+        "comm": 20000,
+        "bal": 83000,
+        "profit": 4150,
+        "due": 20850
+      },
+      {
+        "sequence": 13,
+        "bid": 96000,
+        "prize": 404000,
+        "comm": 20000,
+        "bal": 76000,
+        "profit": 3800,
+        "due": 21200
+      },
+      {
+        "sequence": 14,
+        "bid": 89000,
+        "prize": 411000,
+        "comm": 20000,
+        "bal": 69000,
+        "profit": 3450,
+        "due": 21550
+      },
+      {
+        "sequence": 15,
+        "bid": 80000,
+        "prize": 420000,
+        "comm": 20000,
+        "bal": 60000,
+        "profit": 3000,
+        "due": 22000
+      },
+      {
+        "sequence": 16,
+        "bid": 70000,
+        "prize": 430000,
+        "comm": 20000,
+        "bal": 50000,
+        "profit": 2500,
+        "due": 22500
+      },
+      {
+        "sequence": 17,
+        "bid": 60000,
+        "prize": 440000,
+        "comm": 20000,
+        "bal": 40000,
+        "profit": 2000,
+        "due": 23000
+      },
+      {
+        "sequence": 18,
+        "bid": 47000,
+        "prize": 453000,
+        "comm": 20000,
+        "bal": 27000,
+        "profit": 1350,
+        "due": 23650
+      },
+      {
+        "sequence": 19,
+        "bid": 35000,
+        "prize": 465000,
+        "comm": 20000,
+        "bal": 15000,
+        "profit": 750,
+        "due": 24250
+      },
+      {
+        "sequence": 20,
+        "bid": 20000,
+        "prize": 480000,
+        "comm": 20000,
+        "bal": 0,
+        "profit": 0,
+        "due": 25000
+      }
+    ]
+  },
+  {
+    "product": 100000,
+    "noofmonths": 10,
+    "membershipid": 267,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 18400,
+        "prize": 81600,
+        "comm": 4000,
+        "bal": 14400,
+        "profit": 1440,
+        "due": 8560
+      },
+      {
+        "sequence": 2,
+        "bid": 16800,
+        "prize": 83200,
+        "comm": 4000,
+        "bal": 12800,
+        "profit": 1280,
+        "due": 8720
+      },
+      {
+        "sequence": 3,
+        "bid": 15200,
+        "prize": 84800,
+        "comm": 4000,
+        "bal": 11200,
+        "profit": 1120,
+        "due": 8880
+      },
+      {
+        "sequence": 4,
+        "bid": 13600,
+        "prize": 86400,
+        "comm": 4000,
+        "bal": 9600,
+        "profit": 960,
+        "due": 9040
+      },
+      {
+        "sequence": 5,
+        "bid": 12000,
+        "prize": 88000,
+        "comm": 4000,
+        "bal": 8000,
+        "profit": 800,
+        "due": 9200
+      },
+      {
+        "sequence": 6,
+        "bid": 10400,
+        "prize": 89600,
+        "comm": 4000,
+        "bal": 6400,
+        "profit": 640,
+        "due": 9360
+      },
+      {
+        "sequence": 7,
+        "bid": 8800,
+        "prize": 91200,
+        "comm": 4000,
+        "bal": 4800,
+        "profit": 480,
+        "due": 9520
+      },
+      {
+        "sequence": 8,
+        "bid": 7200,
+        "prize": 92800,
+        "comm": 4000,
+        "bal": 3200,
+        "profit": 320,
+        "due": 9680
+      },
+      {
+        "sequence": 9,
+        "bid": 5600,
+        "prize": 94400,
+        "comm": 4000,
+        "bal": 1600,
+        "profit": 160,
+        "due": 9840
+      },
+      {
+        "sequence": 10,
+        "bid": 4000,
+        "prize": 96000,
+        "comm": 4000,
+        "bal": 0,
+        "profit": 0,
+        "due": 10000
+      }
+    ]
+  },
+  {
+    "product": 100000,
+    "noofmonths": 20,
+    "membershipid": 267,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 27000,
+        "prize": 73000,
+        "comm": 4000,
+        "bal": 23000,
+        "profit": 1150,
+        "due": 8850
+      },
+      {
+        "sequence": 2,
+        "bid": 26000,
+        "prize": 74000,
+        "comm": 4000,
+        "bal": 22000,
+        "profit": 1100,
+        "due": 8900
+      },
+      {
+        "sequence": 3,
+        "bid": 25000,
+        "prize": 75000,
+        "comm": 4000,
+        "bal": 21000,
+        "profit": 1050,
+        "due": 8950
+      },
+      {
+        "sequence": 4,
+        "bid": 24000,
+        "prize": 76000,
+        "comm": 4000,
+        "bal": 20000,
+        "profit": 1000,
+        "due": 9000
+      },
+      {
+        "sequence": 5,
+        "bid": 22800,
+        "prize": 77200,
+        "comm": 4000,
+        "bal": 18800,
+        "profit": 940,
+        "due": 9060
+      },
+      {
+        "sequence": 6,
+        "bid": 21600,
+        "prize": 78400,
+        "comm": 4000,
+        "bal": 17600,
+        "profit": 880,
+        "due": 9120
+      },
+      {
+        "sequence": 7,
+        "bid": 20400,
+        "prize": 79600,
+        "comm": 4000,
+        "bal": 16400,
+        "profit": 820,
+        "due": 9180
+      },
+      {
+        "sequence": 8,
+        "bid": 19200,
+        "prize": 80800,
+        "comm": 4000,
+        "bal": 15200,
+        "profit": 760,
+        "due": 9240
+      },
+      {
+        "sequence": 9,
+        "bid": 17800,
+        "prize": 82200,
+        "comm": 4000,
+        "bal": 13800,
+        "profit": 690,
+        "due": 9310
+      },
+      {
+        "sequence": 10,
+        "bid": 16400,
+        "prize": 83600,
+        "comm": 4000,
+        "bal": 12400,
+        "profit": 620,
+        "due": 9380
+      },
+      {
+        "sequence": 11,
+        "bid": 15000,
+        "prize": 85000,
+        "comm": 4000,
+        "bal": 11000,
+        "profit": 550,
+        "due": 9450
+      },
+      {
+        "sequence": 12,
+        "bid": 13600,
+        "prize": 86400,
+        "comm": 4000,
+        "bal": 9600,
+        "profit": 480,
+        "due": 9520
+      },
+      {
+        "sequence": 13,
+        "bid": 12400,
+        "prize": 87600,
+        "comm": 4000,
+        "bal": 8400,
+        "profit": 420,
+        "due": 9580
+      },
+      {
+        "sequence": 14,
+        "bid": 11200,
+        "prize": 88800,
+        "comm": 4000,
+        "bal": 7200,
+        "profit": 360,
+        "due": 9640
+      },
+      {
+        "sequence": 15,
+        "bid": 10000,
+        "prize": 90000,
+        "comm": 4000,
+        "bal": 6000,
+        "profit": 300,
+        "due": 9700
+      },
+      {
+        "sequence": 16,
+        "bid": 8800,
+        "prize": 91200,
+        "comm": 4000,
+        "bal": 4800,
+        "profit": 240,
+        "due": 9760
+      },
+      {
+        "sequence": 17,
+        "bid": 7600,
+        "prize": 92400,
+        "comm": 4000,
+        "bal": 3600,
+        "profit": 180,
+        "due": 9820
+      },
+      {
+        "sequence": 18,
+        "bid": 6400,
+        "prize": 93600,
+        "comm": 4000,
+        "bal": 2400,
+        "profit": 120,
+        "due": 9880
+      },
+      {
+        "sequence": 19,
+        "bid": 5200,
+        "prize": 94800,
+        "comm": 4000,
+        "bal": 1200,
+        "profit": 60,
+        "due": 9940
+      },
+      {
+        "sequence": 20,
+        "bid": 4000,
+        "prize": 96000,
+        "comm": 4000,
+        "bal": 0,
+        "profit": 0,
+        "due": 10000
+      }
+    ]
+  },
+  {
+    "product": 500000,
+    "noofmonths": 20,
+    "membershipid": 267,
+    "groupAccounts": [
+      {
+        "sequence": 1,
+        "bid": 135000,
+        "prize": 365000,
+        "comm": 20000,
+        "bal": 5750,
+        "profit": 19250
+      },
+      {
+        "sequence": 2,
+        "bid": 130000,
+        "prize": 370000,
+        "comm": 20000,
+        "bal": 5500,
+        "profit": 19500
+      },
+      {
+        "sequence": 3,
+        "bid": 125000,
+        "prize": 375000,
+        "comm": 20000,
+        "bal": 5250,
+        "profit": 19750
+      },
+      {
+        "sequence": 4,
+        "bid": 120000,
+        "prize": 380000,
+        "comm": 20000,
+        "bal": 5000,
+        "profit": 20000
+      },
+      {
+        "sequence": 5,
+        "bid": 114000,
+        "prize": 386000,
+        "comm": 20000,
+        "bal": 4700,
+        "profit": 20300
+      },
+      {
+        "sequence": 6,
+        "bid": 108000,
+        "prize": 392000,
+        "comm": 20000,
+        "bal": 4400,
+        "profit": 20600
+      },
+      {
+        "sequence": 7,
+        "bid": 102000,
+        "prize": 398000,
+        "comm": 20000,
+        "bal": 4100,
+        "profit": 20900
+      },
+      {
+        "sequence": 8,
+        "bid": 96000,
+        "prize": 404000,
+        "comm": 20000,
+        "bal": 3800,
+        "profit": 21200
+      },
+      {
+        "sequence": 9,
+        "bid": 89000,
+        "prize": 411000,
+        "comm": 20000,
+        "bal": 3450,
+        "profit": 21550
+      },
+      {
+        "sequence": 10,
+        "bid": 82000,
+        "prize": 418000,
+        "comm": 20000,
+        "bal": 3100,
+        "profit": 21900
+      },
+      {
+        "sequence": 11,
+        "bid": 75000,
+        "prize": 425000,
+        "comm": 20000,
+        "bal": 2750,
+        "profit": 22250
+      },
+      {
+        "sequence": 12,
+        "bid": 68000,
+        "prize": 432000,
+        "comm": 20000,
+        "bal": 2400,
+        "profit": 22600
+      },
+      {
+        "sequence": 13,
+        "bid": 62000,
+        "prize": 438000,
+        "comm": 20000,
+        "bal": 2100,
+        "profit": 22900
+      },
+      {
+        "sequence": 14,
+        "bid": 56000,
+        "prize": 444000,
+        "comm": 20000,
+        "bal": 1800,
+        "profit": 23200
+      },
+      {
+        "sequence": 15,
+        "bid": 50000,
+        "prize": 450000,
+        "comm": 20000,
+        "bal": 1500,
+        "profit": 23500
+      },
+      {
+        "sequence": 16,
+        "bid": 44000,
+        "prize": 456000,
+        "comm": 20000,
+        "bal": 1200,
+        "profit": 23800
+      },
+      {
+        "sequence": 17,
+        "bid": 38000,
+        "prize": 462000,
+        "comm": 20000,
+        "bal": 900,
+        "profit": 24100
+      },
+      {
+        "sequence": 18,
+        "bid": 32000,
+        "prize": 468000,
+        "comm": 20000,
+        "bal": 600,
+        "profit": 24400
+      },
+      {
+        "sequence": 19,
+        "bid": 26000,
+        "prize": 474000,
+        "comm": 20000,
+        "bal": 300,
+        "profit": 24700
+      },
+      {
+        "sequence": 20,
+        "bid": 20000,
+        "prize": 480000,
+        "comm": 20000,
+        "bal": 0,
+        "profit": 25000
+      }
+    ]
+  }
+]

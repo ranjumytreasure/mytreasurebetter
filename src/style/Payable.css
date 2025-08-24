@@ -1,0 +1,277 @@
+.payable-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+}
+
+.payables-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+/* Filter Header */
+.payables-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 1rem;
+}
+
+.payables-header input {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 200px;
+    font-size: 0.9rem;
+}
+
+.clear-btn {
+    padding: 0.6rem 1.2rem;
+    background-color: #ed0f0f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.clear-btn:hover {
+    background-color: #d63031;
+}
+
+/* Individual Cards */
+.payable-card {
+    display: flex;
+    width: 95%;
+    max-width: 700px;
+    min-height: 160px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+    margin-bottom: 1rem;
+}
+
+.payable-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Left Side: Subscriber Info */
+.payable-left {
+    flex: 1;
+    background-color: #c41313;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.payable-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f8d7da;
+    margin-bottom: 0.5rem;
+}
+
+.payable-info {
+    text-align: center;
+}
+
+.payable-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f6f5f5;
+    margin: 0.25rem 0;
+}
+
+.payable-info p {
+    font-size: 0.85rem;
+    color: #f4f1f1;
+    margin: 0.15rem 0;
+}
+
+/* Right Side: Finance Details */
+.payable-right {
+    flex: 2;
+    background-color: #ffffff;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.payable-financials {
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.payable-financials p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #2d3436;
+}
+
+.payable-paid {
+    color: #0077b6;
+}
+
+.payable-due {
+    color: #d00000;
+}
+
+.payable-financials button {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #00b894;
+    color: white;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.3s;
+}
+
+.payable-financials button:hover {
+    background-color: #019875;
+}
+
+/* Tooltip Styling */
+.tooltip-box {
+    background-color: #2d3436;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    max-width: 220px;
+}
+
+.tooltip-payments ul {
+    list-style-type: disc;
+    padding-left: 1.2rem;
+    margin-top: 6px;
+}
+
+.tooltip-payments li {
+    margin-bottom: 4px;
+}
+
+.payment-summary-bar {
+    display: flex;
+    justify-content: space-around;
+    margin: 1.5rem 0;
+    background: #f8f9fa;
+    padding: 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.summary-item {
+    text-align: center;
+    flex: 1;
+}
+
+.summary-item .label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.summary-item .value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.value.total {
+    color: #007bff;
+}
+
+.value.paid {
+    color: #28a745;
+}
+
+.value.due {
+    color: #dc3545;
+}
+
+.payment-button-container {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.pay-button {
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+}
+
+.pay-button:hover {
+    background-color: #0056b3;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 600px) {
+    .payable-card {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .payable-right {
+        padding: 1rem;
+    }
+
+    .payables-header input {
+        width: 100%;
+    }
+}
+
+.area-dropdown {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 200px;
+    font-size: 0.9rem;
+    background-color: #fff;
+    color: #333;
+    appearance: none;
+    /* Removes default arrow in some browsers */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23333" d="M2 0L0 2h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.65rem auto;
+    cursor: pointer;
+}
+
+.area-dropdown:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}

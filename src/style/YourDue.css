@@ -1,0 +1,139 @@
+.your-due-container {
+    margin: 40px auto;
+    padding: 20px;
+    max-width: 1200px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #ccc;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.your-due-title {
+    display: flex;
+    align-items: center;
+    background-color: #cd3240;
+    border-left: 6px solid #ecda13;
+    padding: 12px 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(205, 50, 64, 0.15);
+    animation: fadeSlideIn 0.6s ease-out;
+    margin-bottom: 20px;
+}
+
+
+
+.summary-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.summary-cards .item {
+    flex: 1;
+    min-width: 150px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f7f7f7;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.summary-cards .item span.icon {
+    font-size: 1.2rem;
+}
+
+.pink {
+    color: #e91e63;
+}
+
+.green {
+    color: #4caf50;
+}
+
+.purple {
+    color: #673ab7;
+}
+
+/* Grid view for desktop */
+.your-due-table {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    align-items: center;
+}
+
+/* Header styling for desktop */
+.your-due-header {
+    font-weight: bold;
+    border-bottom: 2px solid #444;
+    background-color: #cd3240;
+    color: #fff;
+    padding: 10px 0;
+}
+
+/* Circular image */
+.due-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .your-due-header {
+        display: none;
+    }
+
+    .your-due-row {
+        display: block;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 1rem;
+        background-color: #fff;
+    }
+
+    .your-due-row span {
+        display: flex;
+        align-items: center;
+        padding: 6px 0;
+        font-size: 0.95rem;
+        word-break: break-word;
+    }
+
+    .your-due-row span::before {
+        content: attr(data-label) " : ";
+        font-weight: 600;
+        width: 130px;
+        flex-shrink: 0;
+        color: #444;
+    }
+
+    .due-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 8px;
+    }
+}

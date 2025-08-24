@@ -1,0 +1,128 @@
+/* Container for the popup */
+.subscriber-popup-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.subscriber-popup-container h3 {
+  font-size: 1.5rem;
+  color: #cd3240;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Close button top right */
+.close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border: none;
+  color: #cd3240;
+  cursor: pointer;
+}
+
+/* Search bar styling */
+.search-bar {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+/* Subscriber list layout */
+.subscriber-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Each subscriber card */
+.person {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.person:hover {
+  background-color: #f1f1f1;
+}
+
+.person img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 16px;
+  border: 2px solid #cd3240;
+}
+
+.person h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.person p {
+  margin: 2px 0 0 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Clear button */
+.clear-button {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+}
+
+.clear-button:hover {
+  background-color: #b02a37;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .person {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .person img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .subscriber-popup-container {
+    padding: 16px;
+  }
+
+  .search-bar {
+    font-size: 0.95rem;
+  }
+
+  .close-button {
+    top: 12px;
+    right: 12px;
+  }
+}

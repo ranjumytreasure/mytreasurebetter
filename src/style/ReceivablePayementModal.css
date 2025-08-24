@@ -1,0 +1,400 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  /* REMOVE this */
+  overflow-y: auto;
+  /* REMOVE this */
+
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background-color: #c53030;
+  color: white;
+  border-radius: 8px 8px 0 0;
+  margin: -20px -20px 20px -20px;
+  min-height: 80px;
+}
+
+.subscriber-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid white;
+  flex-shrink: 0;
+}
+
+.subscriber-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.subscriber-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.pay-subscriber-detail {
+  margin: 2px 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #fdfdfd;
+}
+
+.modal-body {
+  padding: 10px 0;
+}
+
+.form-group {
+  margin-top: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.cancel-button,
+.pay-button,
+.close-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background-color: #ccc;
+  color: #333;
+}
+
+.pay-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.close-button {
+  background-color: #28a745;
+  color: white;
+  margin-top: 1rem;
+}
+
+.large-input {
+  font-size: 2rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.receipt-view {
+  text-align: center;
+  padding: 2rem;
+}
+
+.payment-summary-bar {
+  display: flex;
+  justify-content: space-around;
+  margin: 1.5rem 0;
+  background: #f8f9fa;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.summary-item {
+  text-align: center;
+  flex: 1;
+}
+
+.summary-item .label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.summary-item .value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.value.total {
+  color: #007bff;
+}
+
+.value.paid {
+  color: #28a745;
+}
+
+.value.due {
+  color: #dc3545;
+}
+
+.receipt-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fefefe;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+  color: green;
+}
+
+.receipt-divider {
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.receipt-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.receipt-value {
+  font-weight: 500;
+  color: #222;
+  text-align: right;
+}
+
+.receipt-footer {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.receipt-footer .close-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.receipt-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.action-button {
+  padding: 8px 16px;
+  margin: 5px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action-button:hover {
+  background-color: #218838;
+}
+
+.confirmation-screen {
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  /* To keep rounded top corners clean */
+}
+
+/* 🔴 Header with red background */
+.confirmation-header {
+  background-color: #c53030;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 10px 10px 0 0;
+}
+
+/* Rows section */
+.confirmation-body {
+  padding: 1.5rem;
+}
+
+.confirmation-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+.confirmation-row .receipt-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.confirmation-row .receipt-value {
+  font-weight: 500;
+  color: #222;
+  text-align: right;
+}
+
+/* Action buttons */
+.confirmation-actions {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.confirmation-actions .cancel-button {
+  background-color: #ccc;
+  color: #333;
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirmation-actions .pay-button {
+  background-color: #28a745;
+  color: white;
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .confirmation-body {
+    padding: 1rem;
+  }
+
+  .confirmation-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .confirmation-row .receipt-value {
+    margin-top: 4px;
+    text-align: left;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+  }
+}
+
+.group-advance-summary {
+  background-color: #fff3cd;
+  /* light yellow */
+  color: #212529;
+  /* black/dark text */
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #ffeeba;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-top: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.group-advance-summary .summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.group-advance-summary .summary-label {
+  min-width: 160px;
+}

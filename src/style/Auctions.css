@@ -1,0 +1,467 @@
+/* Base layout */
+.auctions-container {
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 700px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.auction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.auction-title {
+    font-size: 2rem;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.back-button,
+.open-auction-button {
+    padding: 8px 16px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #cd3240;
+    color: white;
+    cursor: pointer;
+}
+
+.auction-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.auction-actions-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.auction-icon {
+    font-size: 40px;
+    color: #cd3240;
+}
+
+.auction-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+/* Modal adjustments */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+    text-align: center;
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+}
+
+.form-group input[type="date"] {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.radio-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.radio-vertical label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pay-button,
+.cancel-button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.pay-button {
+    background-color: #cd3240;
+    color: white;
+}
+
+.cancel-button {
+    background-color: #ccc;
+    color: #333;
+}
+
+
+
+.form-control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.large-input {
+    font-size: 1.2rem;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.submit-btn,
+.close-button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #cd3240;
+    color: white;
+}
+
+.successBtn {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.cancelBtn {
+    padding: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.bidder-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #f4f6fa;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    max-width: 320px;
+    margin: 0 auto 20px auto;
+    /* <-- Centers horizontally */
+    text-align: center;
+}
+
+.bidder-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    margin-bottom: 12px;
+}
+
+.bidder-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.bidder-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.bidder-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.bidder-btn:hover {
+    background-color: #0056b3;
+}
+
+.bidder-close {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.bidder-close:hover {
+    background-color: #b02a37;
+}
+
+@media (max-width: 600px) {
+    .bidder-card {
+        width: 90%;
+    }
+
+    .bidder-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .bidder-btn,
+    .bidder-close {
+        width: 100%;
+    }
+}
+
+.subcriber-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subcriber-container h3 {
+    font-size: 1.5rem;
+    color: #cd3240;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.subscriber-list {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 16px;
+    padding: 10px 0;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.subscriber-list::-webkit-scrollbar {
+    height: 8px;
+}
+
+.subscriber-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.subscriber-list::-webkit-scrollbar-thumb {
+    background-color: #cd3240;
+    border-radius: 4px;
+}
+
+.bidsubscriber-item {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #fff;
+    border: 2px solid #cd3240;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bidsubscriber-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(205, 50, 64, 0.25);
+}
+
+.bid-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #cd3240;
+    flex-shrink: 0;
+}
+
+.bid-name {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #007bff;
+    text-align: left;
+}
+
+.bid-time {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: left;
+}
+
+.bid-amount {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #28a745;
+    min-width: 100px;
+    text-align: right;
+}
+
+
+.no-bids-message {
+    text-align: center;
+    color: #888;
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+.progress-bar {
+  margin-top: 10px;
+  width: 100%;
+  height: 6px;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-indicator {
+  width: 100%;
+  height: 100%;
+  background-color: #007bff;
+  animation: progressAnim 1s linear infinite;
+}
+
+@keyframes progressAnim {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .auction-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .subscriber-box {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .auction-banner,
+    .auction-actions-row {
+        flex-direction: column;
+    }
+
+    @media (max-width: 600px) {
+        .bidsubscriber-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .bid-name,
+        .bid-time,
+        .bid-amount {
+            text-align: left;
+            width: 100%;
+        }
+
+        .bid-amount {
+            font-size: 1.2rem;
+            text-align: left;
+            margin-top: 6px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .bidder-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .bidder-image {
+            margin-right: 0;
+            margin-bottom: 12px;
+        }
+
+        .bidder-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .bidder-btn,
+        .bidder-close {
+            width: 100%;
+        }
+    }
+
+
+
+
+
+
+
+
+}

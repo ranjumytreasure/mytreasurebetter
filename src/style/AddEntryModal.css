@@ -1,0 +1,210 @@
+/* Modal background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+/* Modal container */
+.modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* All input fields */
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100%;
+  margin: 0.5rem 0 1rem 0;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Label styling */
+.modal label {
+  font-weight: bold;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* Textarea height */
+.modal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Button section */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+/* Buttons */
+.modal-actions button {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #3498db;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.modal-actions button:hover {
+  background-color: #2980b9;
+}
+
+/* Cancel button */
+.modal-actions .cancel {
+  background-color: #ccc;
+  color: #333;
+}
+
+.modal-actions .cancel:hover {
+  background-color: #bbb;
+}
+
+/* Page overlay for loader */
+.page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Loader styles */
+.loader-container {
+  text-align: center;
+  color: white;
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.entry-date-display {
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.radio-group label {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.modal h2 {
+  background-color: #d32f2f;
+  /* red tone */
+  color: white;
+  padding: 10px;
+  margin: 0;
+  text-align: center;
+  border-radius: 4px 4px 0 0;
+}
+
+.confirmation-screen {
+  padding: 1rem;
+}
+
+.amount-highlight {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2e7d32;
+  /* green tone */
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-container {
+  text-align: center;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

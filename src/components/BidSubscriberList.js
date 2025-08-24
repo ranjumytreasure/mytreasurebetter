@@ -1,0 +1,56 @@
+import React, { useState } from 'react';
+
+// Subcomponent to show subscribers going to bid
+const BidSubscriberList = ({ people, onBidClick, onFilteredCount }) => {
+    const [searchText, setSearchText] = useState('');
+
+    const filteredPeople = people.filter(
+        (person) =>
+            person.group_won === 0 && person.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    onFilteredCount(filteredPeople.length);
+
+    const handleSearchChange = (e) => {
+        setSearchText(e.target.value);
+    };
+
+    return (
+        <>
+            <div>
+                <label htmlFor="search">Search by Name: </label>
+                <input
+                    type="text"
+                    id="search"
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    className="search-bar"
+                    placeholder="Enter name to search"
+                />
+            </div>
+            {filteredPeople.map((person) => {
+                const { group_subscriber_id, id, name, phone, user_image, user_image_from_s3 } = person;
+                return (
+                    <article
+                        key={group_subscriber_id}
+                        className="person"
+                        onClick={() =>
+                            onBidClick(group_subscriber_id, user_image_from_s3, name, phone, id)
+                        }
+                    >
+                        <img
+                            src={user_image_from_s3}
+                            onError={(e) => (e.target.src = "default-image.jpg")}
+                        />
+                        <div>
+                            <h4>{name}</h4>
+                            <p>{phone}</p>
+                        </div>
+                    </article>
+                );
+            })}
+        </>
+    );
+};
+
+export default BidSubscriberList;

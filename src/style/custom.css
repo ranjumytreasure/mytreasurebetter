@@ -1,0 +1,48 @@
+.popup-header-text {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #222222;
+}
+button {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+.successBtn {
+    height: 36px;
+    min-width: 80px;
+    padding: 4px 16px;
+    margin-right: 12px;
+    margin-top: 16px;
+    border-radius: 6px;
+    color: #ffffff;
+    border: none;
+    background-color: #2b5e2b;
+}
+.successBtn:hover {
+    background-color: #1f541f;
+}
+.cancelBtn {
+    height: 36px;
+    min-width: 80px;
+    padding: 4px 16px;
+    margin-top: 16px;
+    border-radius: 6px;
+    color: #ffffff;
+    border: none;
+    background-color: #ef4444;
+}
+.cancelBtn:hover {
+    background-color: #e23232;
+}
+.buttonStyleGreen {
+    border-radius: 5px;
+    background-color: green;
+    border: 2px solid transparent;
+    color: var(--clr-white);
+    width: 290px;
+    padding: 8px;
+    margin-top: 12px;
+    align-items: center;
+    cursor: pointer;
+}

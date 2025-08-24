@@ -1,0 +1,96 @@
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+}
+
+.filter-item label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* Normalize all inputs and selects */
+.filter-item input,
+.filter-item select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+
+  /* Set consistent height and line-height */
+  height: 38px;
+  line-height: 1.2;
+  vertical-align: middle;
+
+  /* Remove default appearance on select for consistency */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: white;
+}
+
+/* Add a little padding to the select for dropdown arrow */
+.filter-item select {
+  padding-right: 30px;
+  background-image:
+    url("data:image/svg+xml;charset=US-ASCII,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='gray'%3e%3cpath d='M4 6l4 4 4-4z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+/* Fix for select in Firefox */
+@-moz-document url-prefix() {
+  .filter-item select {
+    padding-right: 10px;
+  }
+}
+
+/* Clear button styling to align with inputs */
+.clear-button {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background-color: #cd3240;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 38px;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive behavior for mobile */
+@media (max-width: 600px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-item {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+
+  .clear-button {
+    width: 100%;
+    align-self: stretch;
+    margin-top: 8px;
+  }
+}
