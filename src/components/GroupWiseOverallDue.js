@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { GoRepo } from 'react-icons/go';
-import { FiUsers, FiUserPlus } from 'react-icons/fi';
+import { FiUsers, FiUserPlus, FiArrowLeft } from 'react-icons/fi';
+import { FaMoneyBillWave, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 
 const GroupWiseOverallDue = ({ GroupWiseOverallDuedata }) => {
@@ -41,33 +41,33 @@ const GroupWiseOverallDue = ({ GroupWiseOverallDuedata }) => {
         //     total_outstanding_balance,
         // });
 
-        setTotal_supposed_to_pay(total_supposed_to_pay);
-        setTotal_paid_amount(total_paid_amount);
-        setTotal_outstanding_balance(total_outstanding_balance);
+        setTotal_supposed_to_pay(total_supposed_to_pay || 0);
+        setTotal_paid_amount(total_paid_amount || 0);
+        setTotal_outstanding_balance(total_outstanding_balance || 0);
       }
     }
   }, [GroupWiseOverallDuedata]);
 
 
 
-  const items = [
+  const summaryItems = [
     {
       id: 1,
-      icon: <GoRepo className='icon' />,
+      icon: <FaMoneyBillWave className="w-6 h-6" />,
       label: 'Total Amount',
       value: total_supposed_to_pay,
       color: 'pink',
     },
     {
       id: 2,
-      icon: <FiUsers className='icon' />,
+      icon: <FaCheckCircle className="w-6 h-6" />,
       label: 'Total Paid',
       value: total_paid_amount,
       color: 'green',
     },
     {
       id: 3,
-      icon: <FiUserPlus className='icon' />,
+      icon: <FaExclamationCircle className="w-6 h-6" />,
       label: 'Total Outstanding',
       value: total_outstanding_balance,
       color: 'purple',
@@ -86,94 +86,34 @@ const GroupWiseOverallDue = ({ GroupWiseOverallDuedata }) => {
   };
 
   return (
-    <section className='section'>
-      <Wrapper className='section-center'>
-
-        {items.map((item) => {
-          return <Item key={item.id} {...item} />;
-        })}
-        <button className='button' onClick={handleBackButtonClick}>Back</button>
-      </Wrapper>
-    </section>
-  );
-};
-
-const Item = ({ icon, label, value, color }) => {
-  return (
-    <article className='item'>
-      <span className={color}>{icon}</span>
-      <div>
-        <h3>{value}</h3>
-        <p>{label}</p>
+    <div className="bg-white border border-gray-200 rounded-xl shadow-lg relative">
+      {/* Header */}
+      <div className="absolute -top-4 left-6 bg-custom-red text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
+        Financial Summary
       </div>
-    </article>
+
+      {/* Summary Cards */}
+      <div className="p-6 pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {summaryItems.map(({ id, icon, label, value, color }) => (
+            <div key={id} className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+              <div className="flex items-center gap-3">
+                <div className={`p-3 rounded-lg ${color === 'pink' ? 'bg-pink-100 text-pink-600' : color === 'green' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
+                  {icon}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">₹{value ?? 0}</h3>
+                  <p className="text-sm text-gray-600 font-medium">{label}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
-const Wrapper = styled.section`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem 2rem;
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
-  .item {
-    border-radius: var(--radius);
-    padding: 0.5rem 1rem;
-    background: var(--clr-white);
 
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 3rem;
-    align-items: center;
-    span {
-      width: 3rem;
-      height: 3rem;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-    }
-    .icon {
-      font-size: 1.5rem;
-    }
-    h3 {
-      margin-bottom: 0;
-      letter-spacing: 0;
-    }
-    p {
-      margin-bottom: 0;
-      text-transform: capitalize;
-    }
-    .pink {
-      background: #ffe0f0;
-      color: #da4a91;
-    }
-    .green {
-      background: var(--clr-primary-10);
-      color: var(--clr-primary-5);
-    }
-    .purple {
-      background: #e6e6ff;
-      color: #5d55fa;
-    }
-    .yellow {
-      background: #fffbea;
-      color: #f0b429;
-    }
-    
-  }
-  .button {
-    background-color: var(--clr-primary-1);
-    color: var(--clr-white);
-    padding: 0.5rem 1rem;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    width: 100%; /* Set a fixed width */
-    box-sizing: border-box; /* Include padding and border in the width calculation */
-    margin-bottom: 1.5rem;
-    margin-top: 2rem;
-  }
-`;
 
 export default GroupWiseOverallDue;

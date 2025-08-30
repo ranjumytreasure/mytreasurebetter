@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import GroupSubscriberWiseResult from './GroupSubscriberWiseResult';
 import GroupAccountWiseResult from './GroupAccountWiseResult';
 
 
 const GroupAccountWiseOverallDue = ({ data }) => {
 
- 
+
 
     const [accountWiseData, setAccountWiseData] = useState([]);// State to store group details
     const [subscriberWiseData, setSubscriberWiseData] = useState([]);// State 
@@ -23,7 +22,7 @@ const GroupAccountWiseOverallDue = ({ data }) => {
         }
     }, [data]); // Run this effect when data prop changes
     useEffect(() => {
-       
+
     }, [accountWiseData, subscriberWiseData]);
 
 
@@ -36,25 +35,14 @@ const GroupAccountWiseOverallDue = ({ data }) => {
 
 
 
-    return (<section className='section'>
-        <Wrapper className='section-center' >
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <GroupAccountWiseResult accountWiseData={accountWiseData} />
             <GroupSubscriberWiseResult subscriberWiseData={subscriberWiseData} />
-
-        </Wrapper>
-    </section>
-
+        </div>
     );
 };
-const Wrapper = styled.div`
-  padding-top: 2rem;
-  display: grid;
-  gap: 3rem 2rem;
-  @media (min-width: 992px) {
-    grid-template-columns: 1fr 1fr;
-  }
-  /* align-items: start; */
-`;
+
 
 export default GroupAccountWiseOverallDue;
 
