@@ -1,326 +1,3 @@
-// import React, { useState } from "react";
-// import { useLedgerAccountContext } from "../context/ledgerAccount_context";
-// import { useLedgerEntryContext } from "../context/ledgerEntry_context";
-
-// import { useUserContext } from "../context/user_context";
-// import "../style/ReceivablePayementModal.css";
-// import { API_BASE_URL } from '../utils/apiConfig';
-
-// import { PDFDownloadLink } from '@react-pdf/renderer';
-// import { FiDownload } from 'react-icons/fi';
-// import ReceivableReceitPdf from './PDF/ReceivableReceitPdf';
-
-
-// const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables }) => {
-//     //start of PDF generation code
-
-//     const [isDownloading, setIsDownloading] = useState(false);
-//     const { isLoggedIn, user } = useUserContext();
-//     const [isConfirming, setIsConfirming] = useState(false);
-
-
-//     const userCompany = user?.results?.userCompany;
-//     const { ledgerAccounts, fetchLedgerAccounts } = useLedgerAccountContext();
-
-//     const { fetchLedgerEntries } = useLedgerEntryContext();
-
-
-
-//     const [paymentMethod, setPaymentMethod] = useState("");
-//     const [paymentType, setPaymentType] = useState("full");
-//     const [partialAmount, setPartialAmount] = useState("");
-//     const [loading, setLoading] = useState(false);
-//     const [receiptData, setReceiptData] = useState(null);
-//     const [receivableDate, setReceivableDate] = useState(() => {
-//         const today = new Date().toISOString().split("T")[0]; // Format: yyyy-mm-dd
-//         return today;
-//     });
-//     const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
-
-//     if (!isOpen || !receivable) return null;
-
-
-//     const {
-//         name,
-//         phone,
-//         group_name,
-//         auct_date,
-//         user_image_from_s3,
-//         rbtotal,
-//         rbpaid,
-//         rbdue,
-//         total_wallet_balance,
-//         group_specific_balance
-//     } = receivable;
-
-//     const formatCurrency = (amt) => `₹${Number(amt).toLocaleString("en-IN")}`;
-//     const formatDate = (dateStr) => {
-//         const date = new Date(dateStr);
-//         return date.toLocaleDateString("en-GB", {
-//             day: "2-digit",
-//             month: "short",
-//             year: "numeric"
-//         });
-//     };
-
-//     const handlePartialAmountChange = (e) => {
-//         const value = e.target.value;
-//         if (!isNaN(value) && Number(value) >= 0) {
-//             setPartialAmount(value);
-//         }
-//     };
-
-//     const handleConfirmPayment = async () => {
-//         setLoading(true);
-
-//         const selectedAccount = ledgerAccounts.find(acc => acc.account_name === paymentMethod);
-//         const paymentMethodId = selectedAccount?.id || null;
-
-//         const paymentAmount = paymentType === 'full'
-//             ? rbdue > 0 ? rbdue : rbtotal
-//             : parseFloat(partialAmount || 0);
-
-//         const payload = {
-//             payableReceivalbeId: receivable.id,
-//             paymentMethod,
-//             paymentMethodId, // ✅ now properly assigned
-//             paymentStatus: "SUCCESS",
-//             paymentType,
-//             paymentTransactionRef: "FUTURE",
-//             payableCode: "001",
-//             paymentAmount: parseFloat(paymentAmount),
-//             subscriberId: receivable.subscriber_id,
-//             grpSubscriberId: receivable.group_subscriber_id,
-//             sourceSystem: "WEB",
-//             type: 2,
-//             groupId: receivable.group_id,
-//             grpAccountId: receivable.group_account_id,
-//             transactedDate: receivableDate,
-//             groupName: group_name,
-//             subscriberName: name,
-//             auctionDate: auct_date,
-//             membershipId
-//         };
-
-//         console.log(payload);
-//         const apiUrl = `${API_BASE_URL}/payments-receipts`;
-
-//         try {
-//             const response = await fetch(apiUrl, {
-//                 method: "POST",
-//                 headers: {
-//                     Authorization: `Bearer ${user?.results?.token}`,
-//                     "Content-Type": "application/json"
-//                 },
-//                 body: JSON.stringify(payload)
-//             });
-
-//             if (response.ok) {
-//                 const data = await response.json();
-//                 setReceiptData({ ...payload, subscriberName: receivable.name });
-//                 setTimeout(() => fetchReceivables(), 2000);
-//                 fetchLedgerAccounts();
-//                 fetchLedgerEntries();
-//             } else {
-//                 const err = await response.json();
-//                 console.error("Payment error:", err);
-
-//             }
-//         } catch (error) {
-//             console.error("Network error:", error);
-
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     const handleSubmit = async () => {
-
-//         setIsConfirming(true);
-//     };
-
-//     const handlePrint = () => {
-//         const printContents = document.querySelector('.receipt-container').innerHTML;
-//         const printWindow = window.open('', '', 'height=600,width=800');
-//         printWindow.document.write('<html><head><title>Receipt</title>');
-//         printWindow.document.write('<style>body { font-family: Arial; padding: 20px; } .receipt-row { display: flex; justify-content: space-between; padding: 4px 0; }</style>');
-//         printWindow.document.write('</head><body>');
-//         printWindow.document.write(printContents);
-//         printWindow.document.write('</body></html>');
-//         printWindow.document.close();
-//         printWindow.print();
-//     };
-
-
-
-
-//     return (
-//         <div className="modal-overlay">
-//             <div className="modal-content">
-
-//                 <button className="modal-close-button" onClick={onClose}>&times;</button>
-
-
-
-
-
-//                 {!receiptData ? (
-//                     isConfirming ? (
-//                         <div className="confirmation-screen">
-//                             <div className="confirmation-header">🔒 Confirm Payment</div>
-
-//                             <div className="confirmation-body">
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Subscriber Name:</span>
-//                                     <span className="receipt-value">{name}</span>
-//                                 </div>
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Group:</span>
-//                                     <span className="receipt-value">{group_name}</span>
-//                                 </div>
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Auction Date:</span>
-//                                     <span className="receipt-value">{formatDate(auct_date)}</span>
-//                                 </div>
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Receivable Date:</span>
-//                                     <span className="receipt-value">{formatDate(receivableDate)}</span>
-//                                 </div>
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Payment Method:</span>
-//                                     <span className="receipt-value">{paymentMethod}</span>
-//                                 </div>
-//                                 <div className="confirmation-row">
-//                                     <span className="receipt-label">Payment Type:</span>
-//                                     <span className="receipt-value">{paymentType === "full" ? "Full Payment" : "Partial Payment"}</span>
-//                                 </div>
-//                                 {paymentType === "partial" && (
-//                                     <div className="confirmation-row">
-//                                         <span className="receipt-label">Partial Amount:</span>
-//                                         <span className="receipt-value">{formatCurrency(partialAmount)}</span>
-//                                     </div>
-//                                 )}
-//                                 {paymentType === "full" && (
-//                                     <div className="confirmation-row">
-//                                         <span className="receipt-label">Paying Amount:</span>
-//                                         <span className="receipt-value">{formatCurrency(rbdue > 0 ? rbdue : rbtotal)}</span>
-//                                     </div>
-//                                 )}
-//                             </div>
-
-//                             <div className="confirmation-actions">
-//                                 <button className="cancel-button" onClick={() => setIsConfirming(false)}>Back</button>
-//                                 <button className="pay-button" onClick={handleConfirmPayment} disabled={loading}>
-//                                     {loading ? <span className="spinner" /> : "Confirm Payment"}
-//                                 </button>
-//                             </div>
-//                         </div>
-
-//                     ) : (
-//                         <>
-//                             <div className="modal-header">
-//                                 <img src={user_image_from_s3 || "/default.jpg"} alt={name} className="subscriber-img" onError={(e) => (e.target.src = "/default.jpg")} />
-//                                 <div className="subscriber-info">
-//                                     <h2 className="subscriber-name">{name}</h2>
-//                                     <p className="subscriber-detail">Group: {group_name}</p>
-//                                     <p className="subscriber-detail">Auction Date: {formatDate(auct_date)}</p>
-//                                 </div>
-//                             </div>
-
-//                             <div className="modal-body">
-
-
-//                                 <div className="form-group">
-//                                     <label>Receivable Date:</label>
-//                                     <input type="date" className="large-input" value={receivableDate} onChange={(e) => setReceivableDate(e.target.value)} />
-//                                 </div>
-
-//                                 <div className="form-group">
-//                                     <label>Payment Method:</label>
-//                                     <select className="payment-select" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-//                                         <option value="">Select Account</option>
-//                                         {ledgerAccounts.map(acc => <option key={acc.id} value={acc.account_name}>{acc.account_name}</option>)}
-//                                     </select>
-//                                 </div>
-//                                 <div className="payment-summary-bar">
-//                                     <div className="summary-item"><div className="label">Total</div><div className="value total">{formatCurrency(rbtotal)}</div></div>
-//                                     <div className="summary-item"><div className="label">Paid</div><div className="value paid">{formatCurrency(rbpaid)}</div></div>
-//                                     <div className="summary-item"><div className="label">Due</div><div className="value due">{formatCurrency(rbdue)}</div></div>
-//                                 </div>
-//                                 <div className="summary-box">
-//                                     <span>Tot Advance: ₹{total_wallet_balance}</span>
-//                                     <span>Grp Advance: ₹{group_specific_balance}</span>
-//                                 </div>
-//                                 <div className="form-group">
-//                                     <label>Payment Type:</label>
-//                                     <div className="radio-group">
-//                                         <label>
-//                                             <input type="radio" value="full" checked={paymentType === "full"} onChange={() => { setPaymentType("full"); setPartialAmount(""); }} /> Full Payment
-//                                         </label>
-//                                         <label>
-//                                             <input type="radio" value="partial" checked={paymentType === "partial"} onChange={() => setPaymentType("partial")} /> Partial Payment
-//                                         </label>
-//                                     </div>
-//                                 </div>
-
-//                                 {paymentType === "partial" && (
-//                                     <div className="form-group">
-//                                         <label>Partial Amount:</label>
-//                                         <input type="number" className="large-input" value={partialAmount} onChange={handlePartialAmountChange} placeholder="₹0.00" min="0" />
-//                                     </div>
-//                                 )}
-
-//                                 <div className="modal-actions">
-//                                     <button className="cancel-button" onClick={onClose}>Cancel</button>
-//                                     <button className="pay-button" onClick={handleSubmit} disabled={!paymentMethod || (paymentType === "partial" && !partialAmount)}>
-//                                         Pay
-//                                     </button>
-//                                 </div>
-//                             </div>
-//                         </>
-//                     )
-//                 ) : (
-//                     <div className="modal-body receipt-view">
-//                         <div className="receipt-container">
-//                             <h2 className="receipt-header">✅ Payment Successful</h2>
-//                             <hr className="receipt-divider" />
-//                             <div className="receipt-row"><span className="receipt-label">Subscriber Name:</span><span className="receipt-value">{name}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Receivable Date:</span><span className="receipt-value">{formatDate(receivableDate)}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Group Name:</span><span className="receipt-value">{group_name}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Auction Date:</span><span className="receipt-value">{formatDate(auct_date)}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Amount Paid:</span><span className="receipt-value">{formatCurrency(receiptData.paymentAmount)}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Payment Method:</span><span className="receipt-value">{receiptData.paymentMethod}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Payment Type:</span><span className="receipt-value">{receiptData.paymentType}</span></div>
-//                             <div className="receipt-row"><span className="receipt-label">Transaction Ref:</span><span className="receipt-value">{receiptData.paymentTransactionRef}</span></div>
-//                         </div>
-
-//                         <div className="receipt-actions">
-//                             <button className="action-button" onClick={handlePrint}>🖨️ Print</button>
-//                             <div style={{ marginTop: '20px', textAlign: 'center' }}>
-//                                 <PDFDownloadLink
-//                                     document={<ReceivableReceitPdf receivableData={receiptData} companyData={userCompany} />}
-//                                     fileName={`Receipt-${receiptData.subscriberName}-${Date.now()}.pdf`}
-//                                     className="action-button"
-//                                     onClick={() => {
-//                                         setIsDownloading(true);
-//                                         setTimeout(() => setIsDownloading(false), 3000);
-//                                     }}
-//                                 >
-//                                     {() => isDownloading ? "Downloading..." : <><FiDownload style={{ marginRight: 5 }} /> Download PDF</>}
-//                                 </PDFDownloadLink>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 )}
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default ReceivablePayementModal;
-
-
-// ReceivablePayementModal.js
 import React, { useState, useEffect } from "react";
 import { useLedgerAccountContext } from "../context/ledgerAccount_context";
 import { useLedgerEntryContext } from "../context/ledgerEntry_context";
@@ -329,10 +6,9 @@ import { toast, ToastContainer } from "react-toastify";
 import { API_BASE_URL } from "../utils/apiConfig";
 import ReceivableReceitPdf from "./PDF/ReceivableReceitPdf";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FiDownload } from "react-icons/fi";
+import { FiDownload, FiUser, FiPhone, FiCalendar, FiDollarSign, FiCreditCard, FiX, FiCheck, FiAlertCircle, FiPrinter } from 'react-icons/fi';
 import { FaRupeeSign, FaCheckCircle, FaMoneyBillWave, FaBalanceScale, FaExclamationCircle } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
-import "../style/ReceivablePayementModal.css";
 
 const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables }) => {
     const [groupAdvanceInput, setGroupAdvanceInput] = useState("");
@@ -350,7 +26,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     const userCompany = user?.results?.userCompany;
     const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
     const [receivableDate, setReceivableDate] = useState(
-  new Date().toISOString().split("T")[0]);
+        new Date().toISOString().split("T")[0]);
 
     const totalDue = receivable?.rbdue ?? 0;
     const group_specific_balance = receivable?.group_specific_balance ?? 0;
@@ -386,13 +62,11 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
         group_specific_balance
     ]);
 
-
-
-
     if (!isOpen || !receivable) return null;
 
     const {
         name,
+        phone,
         group_name,
         auct_date,
         user_image_from_s3,
@@ -461,6 +135,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                 setTimeout(() => fetchReceivables(), 2000);
                 fetchLedgerAccounts();
                 fetchLedgerEntries();
+                toast.success("Payment processed successfully!");
             } else {
                 const err = await response.json();
                 toast.error(err.message || "Payment failed.");
@@ -474,11 +149,11 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
 
     const handleSubmit = () => {
         if (!paymentMethod) {
-            toast.error("\u274c Please select a payment method.");
+            toast.error("❌ Please select a payment method.");
             return;
         }
         if (paymentType === "full" && useGroupAdvance && group_specific_balance < totalDue) {
-            toast.error("\u274c Not enough group advance. Please choose partial payment.");
+            toast.error("❌ Not enough group advance. Please choose partial payment.");
             return;
         }
         setIsConfirming(true);
@@ -497,275 +172,453 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <ToastContainer position="top-center" />
-                <button className="modal-close-button" onClick={onClose}>&times;</button>
-
-                <div className="modal-header">
-                    <img src={user_image_from_s3 || "/default.jpg"} alt="User" className="subscriber-img" />
-                    <div className="subscriber-info">
-                        <h2 className="subscriber-name">{name}</h2>
-                        <p className="pay-subscriber-detail">Group: {group_name}</p>
-                        <p className="pay-subscriber-detail">Auction: {formatDate(auct_date)}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+            <ToastContainer position="top-center" />
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+                {/* Modal Header */}
+                <div className="bg-gradient-to-r from-custom-red to-red-600 px-6 py-4 text-white">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="relative">
+                                {user_image_from_s3 ? (
+                                    <img
+                                        src={user_image_from_s3}
+                                        alt={name}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                ) : null}
+                                <div
+                                    className={`w-12 h-12 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center ${user_image_from_s3 ? 'hidden' : 'flex'}`}
+                                >
+                                    <FiUser className="w-6 h-6 text-white" />
+                                </div>
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold">{name}</h2>
+                                <p className="text-red-100 text-sm flex items-center gap-1">
+                                    <FiPhone className="w-3 h-3" />
+                                    {phone}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-colors duration-200"
+                        >
+                            <FiX className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 
-                {isConfirming && !receiptData ? (
-                    <div className="confirmation-screen">
-                        <div className="confirmation-header">🔒 Confirm Payment</div>
-                        <div className="confirmation-body">
-                            <div className="confirmation-row"><span className="receipt-label">Subscriber:</span><span className="receipt-value">{name}</span></div>
-                            <div className="confirmation-row"><span className="receipt-label">Group:</span><span className="receipt-value">{group_name}</span></div>
-                            <div className="confirmation-row"><span className="receipt-label">Auction:</span><span className="receipt-value">{formatDate(auct_date)}</span></div>
-                            <div className="confirmation-row"><span className="receipt-label">Receivable Date:</span><span className="receipt-value">{formatDate(receivableDate)}</span></div>
-                            <div className="confirmation-row"><span className="receipt-label">Payment Method:</span><span className="receipt-value">{paymentMethod}</span></div>
+                {/* Modal Content */}
+                <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+                    {isConfirming && !receiptData ? (
+                        /* Confirmation Screen */
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <FiAlertCircle className="w-8 h-8 text-yellow-600" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-800 mb-2">Confirm Payment</h3>
+                                <p className="text-gray-600">Please review the payment details before proceeding</p>
+                            </div>
 
+                            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Subscriber:</span>
+                                    <span className="font-semibold">{name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Group:</span>
+                                    <span className="font-semibold">{group_name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Auction Date:</span>
+                                    <span className="font-semibold">{formatDate(auct_date)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Receivable Date:</span>
+                                    <span className="font-semibold">{formatDate(receivableDate)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Payment Method:</span>
+                                    <span className="font-semibold">{paymentMethod}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Payment Type:</span>
+                                    <span className="font-semibold">{paymentType === "full" ? "Full Payment" : "Partial Payment"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Total Due:</span>
+                                    <span className="font-semibold text-red-600">{formatCurrency(totalDue)}</span>
+                                </div>
+                                {useGroupAdvance && (
+                                    <>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Advance Applied:</span>
+                                            <span className="font-semibold text-green-600">{formatCurrency(advanceApplied)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Balance Advance:</span>
+                                            <span className="font-semibold text-blue-600">{formatCurrency(balanceAdvance)}</span>
+                                        </div>
+                                    </>
+                                )}
+                                {paymentType === "partial" && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Partial Amount:</span>
+                                        <span className="font-semibold text-orange-600">{formatCurrency(parsedPartialAmount)}</span>
+                                    </div>
+                                )}
+                            </div>
 
-                            <div className="confirmation-row"><span className="receipt-label">Payment Type:</span><span className="receipt-value">{paymentType}</span></div>
-                            <div className="confirmation-row"><span className="receipt-label">Total Due:</span><span className="receipt-value">{formatCurrency(totalDue)}</span></div>
-                            {useGroupAdvance && (
-                                <>
-                                    <div className="confirmation-row"><span className="receipt-label">Advance Applied:</span><span className="receipt-value">{formatCurrency(advanceApplied)}</span></div>
-                                    <div className="confirmation-row"><span className="receipt-label">Balance Advance:</span><span className="receipt-value">{formatCurrency(balanceAdvance)}</span></div>
-                                </>
-                            )}
-                            {paymentType === "partial" && (
-                                <div className="confirmation-row"><span className="receipt-label">Partial Amount:</span><span className="receipt-value">{formatCurrency(parsedPartialAmount)}</span></div>
-                            )}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setIsConfirming(false)}
+                                    className="flex-1 py-3 px-4 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleConfirmPayment}
+                                    disabled={loading}
+                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FiCheck className="w-5 h-5" />
+                                            Confirm Payment
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
-                        <div className="confirmation-actions">
-                            <button className="cancel-button" onClick={() => setIsConfirming(false)}>Back</button>
-                            <button className="pay-button" onClick={handleConfirmPayment} disabled={loading}>
-                                {loading ? "Processing..." : "Confirm Payment"}
-                            </button>
-                        </div>
-                    </div>
-                ) : receiptData ? (
-                    <div className="modal-body receipt-view">
-                        <div className="receipt-container">
-                            <h2 className="receipt-header">✅ Payment Successful</h2>
-                            <hr className="receipt-divider" />
-                            <div className="receipt-row"><span className="receipt-label">Subscriber Name:</span><span className="receipt-value">{receiptData.subscriberName}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Receivable Date:</span><span className="receipt-value">{formatDate(receivableDate)}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Group Name:</span><span className="receipt-value">{group_name}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Auction Date:</span><span className="receipt-value">{formatDate(auct_date)}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Amount Paid:</span><span className="receipt-value">{formatCurrency(receiptData.paymentAmount)}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Payment Method:</span><span className="receipt-value">{receiptData.paymentMethod}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Payment Type:</span><span className="receipt-value">{receiptData.paymentType}</span></div>
-                            <div className="receipt-row"><span className="receipt-label">Transaction Ref:</span><span className="receipt-value">{receiptData.paymentTransactionRef}</span></div>
-                        </div>
+                    ) : receiptData ? (
+                        /* Receipt Screen */
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                                    <FiCheck className="w-8 h-8 text-green-600" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h3>
+                                <p className="text-gray-600">Your payment has been processed successfully</p>
+                            </div>
 
-                        <div className="receipt-actions">
-                            <button className="action-button" onClick={handlePrint}>🖨️ Print</button>
-                            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Subscriber Name:</span>
+                                    <span className="font-semibold">{receiptData.subscriberName}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Receivable Date:</span>
+                                    <span className="font-semibold">{formatDate(receivableDate)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Group Name:</span>
+                                    <span className="font-semibold">{group_name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Auction Date:</span>
+                                    <span className="font-semibold">{formatDate(auct_date)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Amount Paid:</span>
+                                    <span className="font-semibold text-green-600">{formatCurrency(receiptData.paymentAmount)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Payment Method:</span>
+                                    <span className="font-semibold">{receiptData.paymentMethod}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Payment Type:</span>
+                                    <span className="font-semibold">{receiptData.paymentType}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Transaction Ref:</span>
+                                    <span className="font-semibold">{receiptData.paymentTransactionRef}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handlePrint}
+                                    className="flex-1 py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                                >
+                                    <FiPrinter className="w-5 h-5" />
+                                    Print
+                                </button>
                                 <PDFDownloadLink
                                     document={<ReceivableReceitPdf receivableData={receiptData} companyData={userCompany} />}
                                     fileName={`Receipt-${receiptData.subscriberName}-${Date.now()}.pdf`}
-                                    className="action-button"
+                                    className="flex-1"
                                     onClick={() => {
                                         setIsDownloading(true);
                                         setTimeout(() => setIsDownloading(false), 3000);
                                     }}
                                 >
-                                    {() => isDownloading ? "Downloading..." : <><FiDownload style={{ marginRight: 5 }} /> Download PDF</>}
+                                    {({ loading: pdfLoading }) => (
+                                        <button className="w-full py-3 px-4 bg-custom-red text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center justify-center gap-2">
+                                            <FiDownload className="w-5 h-5" />
+                                            {pdfLoading || isDownloading ? "Downloading..." : "Download PDF"}
+                                        </button>
+                                    )}
                                 </PDFDownloadLink>
                             </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label>Receivable Date</label>
-                            <input
-  type="date"
-  className="large-input"
-  value={receivableDate}
-  onChange={(e) => setReceivableDate(e.target.value)}
-/>
-
-                        </div>
-
-                        <div className="form-group">
-                            <label>Payment Method</label>
-                            <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                                <option value="">-- Select --</option>
-                                {ledgerAccounts.map((acc) => (
-                                    <option key={acc.id} value={acc.account_name}>{acc.account_name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="payment-summary-bar">
-                            <div className="summary-item"><div className="label">Total</div><div className="value total">{formatCurrency(rbtotal)}</div></div>
-                            <div className="summary-item"><div className="label">Paid</div><div className="value paid">{formatCurrency(rbpaid)}</div></div>
-                            <div className="summary-item"><div className="label">Due</div><div className="value due">{formatCurrency(rbdue)}</div></div>
-                        </div>
-
-                        <div className="summary-box">
-                            <span>Tot Advance: {formatCurrency(total_wallet_balance)}</span>
-                            <span>Grp Advance: {formatCurrency(group_specific_balance)}</span>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Payment Type:</label>
-                            <div className="radio-group">
-                                <label>
-                                    <input
-                                        type="radio"
-                                        value="full"
-                                        checked={paymentType === "full"}
-                                        onChange={() => {
-                                            setPaymentType("full");
-                                            // ✅ Always reset useGroupAdvance when switching to full
-                                            setUseGroupAdvance(false);
-                                            setGroupAdvanceInput("0");
-                                            setPartialAmount("0");
-                                        }}
-                                    />
-                                    Full Payment
-                                </label>
-
-                                <label>
-                                    <input
-                                        type="radio"
-                                        value="partial"
-                                        checked={paymentType === "partial"}
-                                        onChange={() => {
-                                            setPaymentType("partial");
-
-                                            // ❗ Reset group advance usage and related inputs
-                                            setUseGroupAdvance(false);
-                                            setGroupAdvanceInput("0");
-                                            setPartialAmount(totalDue.toString());
-                                        }}
-                                    />
-                                    Partial Payment
-                                </label>
-                            </div>
-
-                        </div>
-
-                        <div className="form-group">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={useGroupAdvance}
-                                    onChange={(e) => {
-                                        const checked = e.target.checked;
-                                        setUseGroupAdvance(checked);
-
-                                        if (!checked) {
-                                            // Reset advance if unchecked
-                                            setGroupAdvanceInput("0");
-                                            if (paymentType === "partial") {
-                                                setPartialAmount(totalDue.toString());
-                                            }
-                                        } else {
-                                            // Use advance: apply minimum available
-                                            const adv = Math.min(group_specific_balance, totalDue);
-                                            setGroupAdvanceInput(adv.toString());
-                                            const userPayable = totalDue - adv;
-                                            setPartialAmount(userPayable.toString());
-                                        }
-                                    }}
-                                />
-                                Use Group Advance
-                            </label>
-                        </div>
-
-
-
-                        {paymentType === "partial" && (
-                            <>
-                                {useGroupAdvance && (
-                                    <div className="form-group">
-                                        <label>Group Advance Used:</label>
-                                        <input
-                                            type="number"
-                                            className="large-input"
-                                            value={groupAdvanceInput}
-                                            onChange={(e) => {
-                                                const val = Math.min(Number(e.target.value), group_specific_balance, totalDue);
-                                                setGroupAdvanceInput(val.toString());
-                                                setPartialAmount(Math.max(totalDue - val, 0).toString());
+                    ) : (
+                        /* Payment Form */
+                        <div className="space-y-6">
+                            {/* Subscriber Info */}
+                            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                                <div className="relative">
+                                    {user_image_from_s3 ? (
+                                        <img
+                                            src={user_image_from_s3}
+                                            alt={name}
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
                                             }}
-                                            min="0"
-                                            max={group_specific_balance}
                                         />
+                                    ) : null}
+                                    <div
+                                        className={`w-16 h-16 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center ${user_image_from_s3 ? 'hidden' : 'flex'}`}
+                                    >
+                                        <FiUser className="w-8 h-8 text-gray-500" />
                                     </div>
-                                )}
-
-                                <div className="form-group">
-                                    <label>Partial Amount:</label>
-                                    <input
-                                        type="number"
-                                        className="large-input"
-                                        value={partialAmount}
-                                        onChange={(e) => {
-                                            const val = Number(e.target.value);
-                                            setPartialAmount(val.toString());
-                                        }}
-                                        min="0"
-                                        max={totalDue}
-                                        placeholder="₹0.00"
-                                    />
-
                                 </div>
-                            </>
-                        )}
-
-
-                        {useGroupAdvance && (
-                            <div className="group-advance-summary">
-                                <div className="summary-row"><span className="summary-label"><FaMoneyBillWave /> Total Due:</span><span>{formatCurrency(totalDue)}</span></div>
-                                <div className="summary-row"><span className="summary-label"><FaCheckCircle /> Advance Applied:</span><span>{formatCurrency(advanceApplied)}</span></div>
-                                {paymentType === 'partial' && (
-                                    <div className="summary-row">
-                                        <span className="summary-label"><FaRupeeSign /> Partial Amount:</span>
-                                        <span>{formatCurrency(parsedPartialAmount)}</span>
-                                    </div>
-                                )}
-                                <div className="summary-row">
-                                    <span className="summary-label"><FaExclamationCircle /> Remaining Due:</span>
-                                    <span>{formatCurrency(remainingDue)}</span>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
+                                    <p className="text-gray-600 flex items-center gap-1">
+                                        <FiPhone className="w-4 h-4" />
+                                        {phone}
+                                    </p>
+                                    <p className="text-gray-600 flex items-center gap-1">
+                                        <FiCalendar className="w-4 h-4" />
+                                        {formatDate(auct_date)}
+                                    </p>
                                 </div>
-
-                                <div className="summary-row"><span className="summary-label"><FaBalanceScale /> Balance Advance:</span><span>{formatCurrency(balanceAdvance)}</span></div>
                             </div>
-                        )}
 
-                        <div className="modal-actions">
-                            <button className="cancel-button" onClick={onClose}>Cancel</button>
-                            <button className="pay-button" onClick={handleSubmit} disabled={!paymentMethod || (paymentType === "partial" && !partialAmount)}>Pay</button>
+                            {/* Financial Summary */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                    <div className="text-xs text-blue-600 font-medium mb-1">Total</div>
+                                    <div className="text-lg font-bold text-blue-700">{formatCurrency(rbtotal)}</div>
+                                </div>
+                                <div className="text-center p-3 bg-green-50 rounded-lg">
+                                    <div className="text-xs text-green-600 font-medium mb-1">Paid</div>
+                                    <div className="text-lg font-bold text-green-700">{formatCurrency(rbpaid)}</div>
+                                </div>
+                                <div className="text-center p-3 bg-red-50 rounded-lg">
+                                    <div className="text-xs text-red-600 font-medium mb-1">Due</div>
+                                    <div className="text-lg font-bold text-red-700">{formatCurrency(rbdue)}</div>
+                                </div>
+                            </div>
+
+                            {/* Advance Balances */}
+                            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-yellow-800 font-medium">Total Advance:</span>
+                                    <span className="text-yellow-900 font-bold">{formatCurrency(total_wallet_balance || 0)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mt-1">
+                                    <span className="text-yellow-800 font-medium">Group Advance:</span>
+                                    <span className="text-yellow-900 font-bold">{formatCurrency(group_specific_balance || 0)}</span>
+                                </div>
+                            </div>
+
+                            {/* Form Fields */}
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Receivable Date</label>
+                                    <input
+                                        type="date"
+                                        value={receivableDate}
+                                        onChange={(e) => setReceivableDate(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                                    <select
+                                        value={paymentMethod}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                    >
+                                        <option value="">-- Select Payment Method --</option>
+                                        {ledgerAccounts.map((acc) => (
+                                            <option key={acc.id} value={acc.account_name}>{acc.account_name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">Payment Type</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                            <input
+                                                type="radio"
+                                                value="full"
+                                                checked={paymentType === "full"}
+                                                onChange={() => {
+                                                    setPaymentType("full");
+                                                    setUseGroupAdvance(false);
+                                                    setGroupAdvanceInput("0");
+                                                    setPartialAmount("0");
+                                                }}
+                                                className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                            />
+                                            <span className="ml-3 text-sm font-medium text-gray-700">Full Payment</span>
+                                        </label>
+                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                            <input
+                                                type="radio"
+                                                value="partial"
+                                                checked={paymentType === "partial"}
+                                                onChange={() => {
+                                                    setPaymentType("partial");
+                                                    setUseGroupAdvance(false);
+                                                    setGroupAdvanceInput("0");
+                                                    setPartialAmount(totalDue.toString());
+                                                }}
+                                                className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                            />
+                                            <span className="ml-3 text-sm font-medium text-gray-700">Partial Payment</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center p-3 border border-gray-200 rounded-lg">
+                                    <input
+                                        type="checkbox"
+                                        checked={useGroupAdvance}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setUseGroupAdvance(checked);
+                                            if (!checked) {
+                                                setGroupAdvanceInput("0");
+                                                if (paymentType === "partial") {
+                                                    setPartialAmount(totalDue.toString());
+                                                }
+                                            } else {
+                                                const adv = Math.min(group_specific_balance, totalDue);
+                                                setGroupAdvanceInput(adv.toString());
+                                                const userPayable = totalDue - adv;
+                                                setPartialAmount(userPayable.toString());
+                                            }
+                                        }}
+                                        className="w-4 h-4 text-custom-red border-gray-300 rounded focus:ring-custom-red"
+                                    />
+                                    <span className="ml-3 text-sm font-medium text-gray-700">Use Group Advance</span>
+                                </div>
+
+                                {paymentType === "partial" && (
+                                    <>
+                                        {useGroupAdvance && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Group Advance Used</label>
+                                                <input
+                                                    type="number"
+                                                    value={groupAdvanceInput}
+                                                    onChange={(e) => {
+                                                        const val = Math.min(Number(e.target.value), group_specific_balance, totalDue);
+                                                        setGroupAdvanceInput(val.toString());
+                                                        setPartialAmount(Math.max(totalDue - val, 0).toString());
+                                                    }}
+                                                    min="0"
+                                                    max={group_specific_balance}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Partial Amount</label>
+                                            <input
+                                                type="number"
+                                                value={partialAmount}
+                                                onChange={(e) => {
+                                                    const val = Number(e.target.value);
+                                                    setPartialAmount(val.toString());
+                                                }}
+                                                min="0"
+                                                max={totalDue}
+                                                placeholder="₹0.00"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                {useGroupAdvance && (
+                                    <div className="p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200">
+                                        <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                            <FiDollarSign className="w-5 h-5 text-custom-red" />
+                                            Payment Summary
+                                        </h4>
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Total Due:</span>
+                                                <span className="font-semibold text-red-600">{formatCurrency(totalDue)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Advance Applied:</span>
+                                                <span className="font-semibold text-green-600">{formatCurrency(advanceApplied)}</span>
+                                            </div>
+                                            {paymentType === 'partial' && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Partial Amount:</span>
+                                                    <span className="font-semibold text-orange-600">{formatCurrency(parsedPartialAmount)}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Remaining Due:</span>
+                                                <span className="font-semibold text-red-600">{formatCurrency(remainingDue)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Balance Advance:</span>
+                                                <span className="font-semibold text-blue-600">{formatCurrency(balanceAdvance)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={onClose}
+                                    className="flex-1 py-3 px-4 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={!paymentMethod || (paymentType === "partial" && !partialAmount)}
+                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <FiDollarSign className="w-5 h-5" />
+                                    Process Payment
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
-
 };
 
 export default ReceivablePayementModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

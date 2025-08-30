@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL } from '../utils/apiConfig';
 import { MdOutlineAttachMoney, MdLocationOn, MdLink, MdDataObject, MdTimeline, MdTimeToLeave } from "react-icons/md";
+import { FiUser, FiPhone, FiCalendar, FiDollarSign, FiCreditCard, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import Modal from "./Modal";
 import { useUserContext } from "../context/user_context";
 import Alert from '../components/Alert';
@@ -32,7 +33,7 @@ const ReceivablesList = ({ receivables, region, onFilteredCount, refreshReceivab
     const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
 
-       const handleMouseEnter = (event, payments) => {
+    const handleMouseEnter = (event, payments) => {
         const rect = event.target.getBoundingClientRect();
         setPopupData(payments);
 
@@ -54,7 +55,6 @@ const ReceivablesList = ({ receivables, region, onFilteredCount, refreshReceivab
     // useEffect(() => {
     //     console.log("useEffect triggered! Receivables:", receivables);
 
-    
 
 
 
@@ -115,7 +115,7 @@ const ReceivablesList = ({ receivables, region, onFilteredCount, refreshReceivab
 
     const handlePayButtonClick = (subscriber, e) => {
 
-        e.preventDefault();   
+        e.preventDefault();
         setSelectedSubscriber(subscriber);
 
         setIsModalOpen(true);
@@ -289,197 +289,325 @@ const ReceivablesList = ({ receivables, region, onFilteredCount, refreshReceivab
     }
 
     return (
-        <>
-            <select
-                id="location"
-                onChange={handleLocationChange}
-                value={searchLocation}
-                style={{
-                    height: '40px', // Adjust the height value as needed
-                    padding: '0.25rem',
-                    paddingLeft: '1rem',
-                    background: 'var(--clr-grey-10)',
-                    borderTopLeftRadius: 'var(--radius)',
-                    borderBottomLeftRadius: 'var(--radius)',
-                    borderTopRightRadius: 'var(--radius)',
-                    borderBottomRightRadius: 'var(--radius)',
-                    borderColor: 'transparent',
-                    fontSize: '1rem',
-                    flex: '1 0 auto',
-                    color: 'var(--clr-grey-5)',
-                    marginBottom: '1rem',
-                    marginRight: "12px"
-                }}
-            >
-                <option value="">All Regions</option>
-                {region.map(region => (
-                    <option key={region.id} value={region.aob}>{region.aob}</option>
-                ))}
-            </select>
+        <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FiUser className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <select
+                            id="location"
+                            onChange={handleLocationChange}
+                            value={searchLocation}
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 appearance-none bg-white"
+                        >
+                            <option value="">All Regions</option>
+                            {region.map(region => (
+                                <option key={region.id} value={region.aob}>{region.aob}</option>
+                            ))}
+                        </select>
+                    </div>
 
-            <input
-                type="text"
-                id="search"
-                value={searchText}
-                onChange={handleSearchChange}
-                placeholder="Enter name to search"
-                style={{
-                    height: '40px', // Adjust the height value as needed
-                    padding: '0.25rem',
-                    paddingLeft: '1rem',
-                    background: 'var(--clr-grey-10)',
-                    borderTopLeftRadius: 'var(--radius)',
-                    borderBottomLeftRadius: 'var(--radius)',
-                    borderTopRightRadius: 'var(--radius)',
-                    borderBottomRightRadius: 'var(--radius)',
-                    borderColor: 'transparent',
-                    fontSize: '1rem',
-                    flex: '1 0 auto',
-                    color: 'var(--clr-grey-5)',
-                    marginBottom: '1rem'
-                }}
-            />
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FiUser className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            id="search"
+                            value={searchText}
+                            onChange={handleSearchChange}
+                            placeholder="Enter name to search"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200"
+                        />
+                    </div>
+                </div>
+            </div>
 
-            {filteredPeople.map((person, index) => {
+            {/* Receivables List */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredPeople.map((person, index) => {
+                    const { name, phone, user_image_from_s3, rbtotal,
+                        id,
+                        rbpaid,
+                        receipts,
+                        payments,
+                        group_id,
+                        subscriber_id,
+                        group_subscriber_id,
+                        group_account_id,
+                        auct_date, group_name, unique_id, rbdue,
+                        pbdue } = person;
 
-
-
-                const { name, phone, user_image_from_s3, rbtotal,
-                    id,
-                    rbpaid,
-                    receipts,
-                    payments,
-                    group_id,
-                    subscriber_id,
-                    group_subscriber_id,
-                    group_account_id,
-                    auct_date, group_name, unique_id, rbdue,
-                    pbdue } = person;
-                return (
-                    <React.Fragment key={unique_id}>
-                        <article className='receivable'>
-                            {/* <img 
-                            src= "https://i.imgur.com/ndu6pfe.png" 
-                            alt={name} 
-                            style={{ alignSelf: "self-start" }} 
-                        /> */}
-                           
-                                <img
-                                    src={user_image_from_s3 || "default-image.jpg"}
-                                    alt={name}
-                                    style={{ alignSelf: "self-start", width: "50px", height: "50px", borderRadius: "50%" }}
-                                    onError={(e) => { e.target.src = "default-image.jpg"; }}  // Fallback in case of error
-                                />
-
-                           
-                            <div>
-                                <h4>{name}</h4>
-                                <p>{phone}</p>
-                                <p>Group Name: {group_name}</p>
-                                <p>Auction Date: {auct_date}</p>
+                    return (
+                        <div key={unique_id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                            {/* Card Header */}
+                            <div className="bg-gradient-to-r from-custom-red to-red-600 p-6 text-white">
+                                <div className="flex items-center gap-4">
+                                    <div className="relative">
+                                        {user_image_from_s3 ? (
+                                            <img
+                                                src={user_image_from_s3}
+                                                alt={name}
+                                                className="w-16 h-16 rounded-full object-cover border-2 border-white/30"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'flex';
+                                                }}
+                                            />
+                                        ) : null}
+                                        <div
+                                            className={`w-16 h-16 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center ${user_image_from_s3 ? 'hidden' : 'flex'}`}
+                                        >
+                                            <FiUser className="w-8 h-8 text-white" />
+                                        </div>
+                                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold">{name}</h3>
+                                        <p className="text-red-100 flex items-center gap-2">
+                                            <FiPhone className="w-4 h-4" />
+                                            {phone}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <p>Receivable Due: {rbtotal}</p>
-                                <p
-                                    className="receivable-paid"
-                                    onMouseEnter={(event) => handleMouseEnter(event, payments)}
-                                    onMouseLeave={handleMouseLeave}
+
+                            {/* Card Body */}
+                            <div className="p-6">
+                                {/* Group Info */}
+                                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                                        <FiUser className="w-4 h-4" />
+                                        <span className="font-medium">Group:</span>
+                                        <span>{group_name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <FiCalendar className="w-4 h-4" />
+                                        <span className="font-medium">Auction Date:</span>
+                                        <span>{auct_date}</span>
+                                    </div>
+                                </div>
+
+                                {/* Financial Summary */}
+                                <div className="grid grid-cols-3 gap-3 mb-6">
+                                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                        <div className="text-xs text-blue-600 font-medium mb-1">Total Due</div>
+                                        <div className="text-lg font-bold text-blue-700">₹{rbtotal}</div>
+                                    </div>
+                                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                                        <div className="text-xs text-green-600 font-medium mb-1">Paid</div>
+                                        <div className="text-lg font-bold text-green-700">₹{rbpaid}</div>
+                                    </div>
+                                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                                        <div className="text-xs text-red-600 font-medium mb-1">Balance</div>
+                                        <div className="text-lg font-bold text-red-700">₹{rbdue}</div>
+                                    </div>
+                                </div>
+
+                                {/* Pay Button */}
+                                <button
+                                    onClick={(e) => handlePayButtonClick(person, e)}
+                                    className="w-full py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
                                 >
-                                    Receivable Paid: {rbpaid}
-                                </p>
-                                <h4>Receivable Balance: {rbdue}</h4>
-                                <p>Payable Advance: {pbdue}</p>
-                                <button onClick={(e) => handlePayButtonClick(person, e)}>Pay</button>
+                                    <FiDollarSign className="w-5 h-5" />
+                                    Process Payment
+                                </button>
                             </div>
-                        </article>
-                        {index !== receivables.length - 1 && <hr />}
-                    </React.Fragment>
+                        </div>
+                    );
+                })}
+            </div>
 
-                );
-            })}
+            {/* Payment Popup */}
             {popupData && (
-
-                <div className="popup" style={{ top: popupPosition.top, left: popupPosition.left }}>
-                    <ul>
+                <div className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-4 max-w-sm" style={{ top: popupPosition.top, left: popupPosition.left }}>
+                    <h4 className="font-semibold text-gray-800 mb-2">Payment History</h4>
+                    <ul className="space-y-2">
                         {popupData.map((receipt) => (
-                            <li key={receipt.id}>
-                                Date: {new Date(receipt.created_at).toLocaleDateString()} - Payment: {receipt.payment_amount} {receipt.payment_method}
+                            <li key={receipt.id} className="text-sm text-gray-600 border-b border-gray-100 pb-2 last:border-b-0">
+                                <div className="font-medium">{new Date(receipt.created_at).toLocaleDateString()}</div>
+                                <div>Amount: ₹{receipt.payment_amount} ({receipt.payment_method})</div>
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
+
+            {/* Payment Modal */}
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-                {/* Modal content */}
-                {selectedSubscriber && (
-                    <>
-                        <h2 style={{ marginTop: "16px" }}>Payment Confirmation</h2>
-                        <div>
-                            <img src={selectedSubscriber.user_image_from_s3
-|| "https://mytreasure-assets-ap-south-1.s3.ap-south-1.amazonaws.com/compressed-1738171114641.jpeg"}
-                                alt={selectedSubscriber.username} style={{ width: '50px', height: '50px', background: "#f0f0f0" }} />
-                            <h3 style={{ marginBottom: "12px" }}>{selectedSubscriber.name}</h3>
-                            <p>Group Name: {selectedSubscriber.group_name}</p>
-                            <p>Phone: {selectedSubscriber.phone}</p>
+                <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                    {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
 
+                    {selectedSubscriber && (
+                        <>
+                            {/* Modal Header */}
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold text-gray-800">Payment Confirmation</h2>
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                                >
+                                    <FiX className="w-5 h-5" />
+                                </button>
+                            </div>
 
-                        </div>
-
-                        <div className="links" style={{ paddingLeft: "8px" }}>
-                            <p>
-                                <MdOutlineAttachMoney  ></MdOutlineAttachMoney  > <span style={{ width: "110px" }}>Auction Due</span>: {selectedSubscriber.rbtotal}{" "}
-                            </p>
-                            <p>
-                                <MdTimeline></MdTimeline> <span style={{ width: "110px" }}>Paid</span>: {selectedSubscriber.rbpaid}{" "}
-                            </p>
-                            <p>
-                                <MdTimeToLeave></MdTimeToLeave> <span style={{ width: "110px" }}>Balance</span>: {selectedSubscriber.rbdue}{" "}
-                            </p>
-                            <p>
-                                <MdLocationOn></MdLocationOn> <span style={{ width: "110px" }}>Advance</span>: {selectedSubscriber.pbdue || "earth"}{" "}
-                            </p>
-
-                        </div>
-
-                        <div>
-                            {/* Select payment method */}
-                            <h4 style={{ marginTop: "16px", marginBottom: "4px" }}>Select Payment Method:</h4>
-                            <label style={{ marginRight: "20px" }}>
-                                <input type="radio" name="paymentMethod" value="Cash" checked={paymentMethod === "Cash"} style={{ marginRight: "8px" }} onChange={handlePaymentMethodChange} />
-                                Cash Payment
-                            </label>
-                            <label style={{ marginRight: "20px" }}>
-                                <input type="radio" name="paymentMethod" value="Online" checked={paymentMethod === "Online"} style={{ marginRight: "8px" }} onChange={handlePaymentMethodChange} />
-                                Online Payment
-                            </label>
-                        </div>
-
-                        <div>
-                            <h4 style={{ marginTop: "16px", marginBottom: "4px" }}>Select Payment Type:</h4>
-                            <label style={{ marginRight: "20px" }}>
-                                <input type="radio" name="paymentType" value="partial" checked={paymentType === "partial"} style={{ marginRight: "8px" }} onChange={handlePartialPayment} />
-                                Partial Payment
-                            </label>
-                            <label style={{ marginRight: "20px" }}>
-                                <input type="radio" name="paymentType" value="full" checked={paymentType === "full"} style={{ marginRight: "8px" }} onChange={handleFullPayment} />
-                                Full Payment
-                            </label>
-                            {paymentType === "partial" && (
-                                <div>
-                                    <label htmlFor="partialAmount">Enter Partial Amount:</label>
-                                    <input type="number" id="partialAmount" value={partialAmount} onChange={handlePartialAmountChange} />
+                            {/* Subscriber Info */}
+                            <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                                <div className="relative">
+                                    {selectedSubscriber.user_image_from_s3 ? (
+                                        <img
+                                            src={selectedSubscriber.user_image_from_s3}
+                                            alt={selectedSubscriber.username}
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                    ) : null}
+                                    <div
+                                        className={`w-16 h-16 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center ${selectedSubscriber.user_image_from_s3 ? 'hidden' : 'flex'}`}
+                                    >
+                                        <FiUser className="w-8 h-8 text-gray-500" />
+                                    </div>
                                 </div>
-                            )}
-                            <button className='payButton' onClick={handlePayment} style={{ marginTop: "24px" }}>Submit</button>
-                            <button className='payButton' onClick={handleCloseModal} style={{ marginTop: "20px" }}>Cancel</button>
-                        </div>
-                    </>
-                )}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">{selectedSubscriber.name}</h3>
+                                    <p className="text-gray-600">Group: {selectedSubscriber.group_name}</p>
+                                    <p className="text-gray-600">Phone: {selectedSubscriber.phone}</p>
+                                </div>
+                            </div>
+
+                            {/* Financial Details */}
+                            <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200">
+                                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                    <FiDollarSign className="w-5 h-5 text-custom-red" />
+                                    Financial Summary
+                                </h4>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Auction Due:</span>
+                                        <span className="font-semibold text-blue-600">₹{selectedSubscriber.rbtotal}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Paid:</span>
+                                        <span className="font-semibold text-green-600">₹{selectedSubscriber.rbpaid}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Balance:</span>
+                                        <span className="font-semibold text-red-600">₹{selectedSubscriber.rbdue}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Advance:</span>
+                                        <span className="font-semibold text-orange-600">₹{selectedSubscriber.pbdue || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Payment Method Selection */}
+                            <div className="mb-6">
+                                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                    <FiCreditCard className="w-5 h-5 text-custom-red" />
+                                    Payment Method
+                                </h4>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="Cash"
+                                            checked={paymentMethod === "Cash"}
+                                            onChange={handlePaymentMethodChange}
+                                            className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                        />
+                                        <span className="ml-3 text-sm font-medium text-gray-700">Cash Payment</span>
+                                    </label>
+                                    <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="Online"
+                                            checked={paymentMethod === "Online"}
+                                            onChange={handlePaymentMethodChange}
+                                            className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                        />
+                                        <span className="ml-3 text-sm font-medium text-gray-700">Online Payment</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Payment Type Selection */}
+                            <div className="mb-6">
+                                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                    <FiCheck className="w-5 h-5 text-custom-red" />
+                                    Payment Type
+                                </h4>
+                                <div className="grid grid-cols-2 gap-3 mb-4">
+                                    <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <input
+                                            type="radio"
+                                            name="paymentType"
+                                            value="partial"
+                                            checked={paymentType === "partial"}
+                                            onChange={handlePartialPayment}
+                                            className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                        />
+                                        <span className="ml-3 text-sm font-medium text-gray-700">Partial Payment</span>
+                                    </label>
+                                    <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <input
+                                            type="radio"
+                                            name="paymentType"
+                                            value="full"
+                                            checked={paymentType === "full"}
+                                            onChange={handleFullPayment}
+                                            className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                        />
+                                        <span className="ml-3 text-sm font-medium text-gray-700">Full Payment</span>
+                                    </label>
+                                </div>
+
+                                {paymentType === "partial" && (
+                                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <label htmlFor="partialAmount" className="block text-sm font-medium text-gray-700 mb-2">
+                                            Enter Partial Amount:
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="partialAmount"
+                                            value={partialAmount}
+                                            onChange={handlePartialAmountChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                            placeholder="Enter amount"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handlePayment}
+                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                                >
+                                    <FiCheck className="w-5 h-5" />
+                                    Submit Payment
+                                </button>
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </Modal>
-
-
-        </>
+        </div>
     );
 };
 
