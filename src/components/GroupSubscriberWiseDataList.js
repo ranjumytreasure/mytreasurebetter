@@ -187,8 +187,8 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                 isOpen={!!selectedSubscriber}
                 onRequestClose={closeModal}
                 contentLabel="Subscriber Details"
-                className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                overlayClassName="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
+                className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[9999]"
             >
                 <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
                     {modalLoading ? (

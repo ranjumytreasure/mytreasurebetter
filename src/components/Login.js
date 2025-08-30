@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import styled from 'styled-components'
 import { useHistory } from 'react-router-dom';
 import { useUserContext } from '../context/user_context';
 import { useLedgerAccountContext } from "../context/ledgerAccount_context";
@@ -7,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Alert from '../components/Alert';
 import { API_BASE_URL } from '../utils/apiConfig';
 import Modal from "../components/Modal";
+import { FiEye, FiEyeOff, FiUser, FiLock, FiArrowRight } from 'react-icons/fi';
 
 function Login() {
   const { login, updateUserRole } = useUserContext();
@@ -23,6 +23,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [userObjectFromAPI, setUserObjectFromAPI] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     const apiUrl = `${API_BASE_URL}/signin`;
@@ -112,195 +113,165 @@ function Login() {
   };
 
 
-  return (<Wrapper className='section-center'>
-    <div className="contain">
-      {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-      <h3>Login</h3>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Alert */}
+        {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
 
-      <form className="form" onSubmit={handleLogin}>
-        <input
-          className="formInput"
-          type="text"
-          placeholder="Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <input
-          className="formInput"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button
-          className={`formSubmit ${isButtonDisabled ? 'disabled' : ''}`}
-          type="submit"
-          disabled={isButtonDisabled}
-        >
-          {isLoading ? 'Logging In...' : 'Login'}
-        </button>
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-custom-red to-red-600 px-8 py-6 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
+              <FiUser className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
+            <p className="text-red-100 mt-2">Sign in to your Treasure account</p>
+          </div>
 
-      </form>
-      <p >
-        New to Treasure? <Link to="/signup">Signup</Link>
-      </p>
-      <p >
-        <Link to="/forgotpassword">Forgot Password</Link>
-      </p>
-    </div>
-    {showModal && (<Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-      <div className="modal-content">
-        <button className="close-btn" onClick={() => setShowModal(false)}>X</button>
-        <h2>Select Your Role</h2>
-        <ul>
-          {userRole && userRole.map((role) => (
-            <li key={role.accountName}>
-              <label className="role-label">
-                <input
-                  type="radio"
-                  name="role"
-                  value={role.accountName}
-                  onChange={() => handleRoleSelect(role.accountName)}
-                />
-                {role.accountName}
-              </label>
-            </li>
-          ))}
-        </ul>
+          {/* Form */}
+          <div className="px-8 py-8">
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Phone Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiUser className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Enter your phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  />
+                </div>
+              </div>
 
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiLock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    {showPassword ? (
+                      <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isButtonDisabled}
+                className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${isButtonDisabled
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-custom-red to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  }`}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Logging In...
+                  </>
+                ) : (
+                  <>
+                    Login
+                    <FiArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Links */}
+            <div className="mt-6 space-y-3 text-center">
+              <p className="text-sm text-gray-600">
+                New to Treasure?{' '}
+                <Link
+                  to="/signup"
+                  className="text-custom-red hover:text-red-600 font-medium transition-colors duration-200"
+                >
+                  Create Account
+                </Link>
+              </p>
+              <p className="text-sm">
+                <Link
+                  to="/forgotpassword"
+                  className="text-gray-500 hover:text-custom-red transition-colors duration-200"
+                >
+                  Forgot Password?
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-500">
+            © 2024 Treasure. All rights reserved.
+          </p>
+        </div>
       </div>
-    </Modal>
-    )}
-  </Wrapper>
+
+      {/* Role Selection Modal */}
+      {showModal && (
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-800">Select Your Role</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {userRole && userRole.map((role) => (
+                <label
+                  key={role.accountName}
+                  className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200"
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role.accountName}
+                    onChange={() => handleRoleSelect(role.accountName)}
+                    className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                  />
+                  <span className="ml-3 text-sm font-medium text-gray-700">
+                    {role.accountName}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
   );
 }
-const Wrapper = styled.section`
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-align-items: center;
 
-.modal-content {
-  position: relative;
-}
-.contain {
-  max-width: 25rem;
-  margin-top: 2rem;
-  margin-bottom: 4rem;
-padding-top: 10px;
-display: flex;
-flex-direction: column;
-align-items: center;
-background: var(--clr-white);
-border-radius: var(--radius);
-box-shadow: var(--light-shadow);
-transition: var(--transition);
-width: 90vw;
-height: 400px;
-position: relative;
-
-}
-
-
-.contain:hover {
-    box-shadow: var(--dark-shadow);
-  }
-
-.form {
-    display: flex;
-    padding: 10px;
-    flex-direction: column;
-    width: 350px;
-    height: 200px;
-    
-}
-
-.formInput {
-    border-radius: 5px;
-    border-color: #e5e5e5;
-    border-style: solid;
-    border-width: 0.5px;
-    margin-bottom: 10px;
-    padding: 10px;
-}
-
-.formSubmit {
-  border-radius: 5px;
-  background-color:#cd3240;
-  border: 2px solid transparent;
-  color: var(--clr-white); 
-  width: 330px;
-  padding-top: 8px;
-margin-top:20px;
-align-items: center;
-cursor:pointer;
-}
-.formSubmit.disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.formSelect {
-    width: 380px;
-    border-radius: 5px;
-    border-color: #e5e5e5;
-    border-style: solid;
-    border-width: 0.5px;
-    margin-bottom: 10px;
-    padding: 10px;
-    
-}
-  
-  @media (min-width: 992px) 
-  {
-    height: calc(100vh - 5rem);
-    
-  }
-  .role-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 8px; /* Adjust as needed */
-  }
-  
-  .role-label input[type="radio"] {
-    margin-right: 8px; /* Adjust as needed */
-  }
-  .alert {
-    margin-bottom: 1rem;
-    height: 1.25rem;
-    display: grid;
-    align-items: center;
-    text-align: center;
-    font-size: 0.7rem;
-    border-radius: 0.25rem;
-    letter-spacing: var(--spacing);
-    text-transform: capitalize;
-  }
-  
-  .alert-danger {
-    color: #721c24;
-    background: #f8d7da;
-  }
-  
-  .alert-success {
-    color: #155724;
-    background: #d4edda;
-  }
-  
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #000;
-  }
-  
-  .close-btn:hover {
-    color: red; /* Change color on hover if desired */
-  }
-  `
 export default Login;

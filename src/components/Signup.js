@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components';
 import ReactFlagsSelect from "react-flags-select";
 import "./flags.css";
 import { Link } from 'react-router-dom';
 import LoadingBar from './LoadingBar';
 import Alert from '../components/Alert';
 import { API_BASE_URL } from '../utils/apiConfig';
+import { FiEye, FiEyeOff, FiUser, FiLock, FiMail, FiPhone, FiArrowRight, FiCheck } from 'react-icons/fi';
 
 function SignUp() {
 
@@ -24,6 +24,7 @@ function SignUp() {
     const [selectedCountry, setSelectedCountry] = useState('auto');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // State for controlling loading bar
+    const [showPassword, setShowPassword] = useState(false);
 
     const showSelectedLabel = true; // Change this to true or false based on your requirement
     const searchable = true;
@@ -162,225 +163,194 @@ function SignUp() {
     };
     const isButtonDisabled = !agreedToTerms || !formData.phone || !formData.email || !formData.password;
     return (
-        <Wrapper className='section-center'>
-
-            <div className="contain">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-gray-100 flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                {/* Alert */}
                 {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
 
-                {!showSuccess && (
-                    <>
-                        <h3>Lets get started</h3>
-                        <ReactFlagsSelect
-                            selected={selectedCountry}
-                            onSelect={handleCountryChange}
-                            countries={countries.map((country) => country.value)}
-                            showSelectedLabel={showSelectedLabel}
-                            searchable={searchable}
-                        />
-                        <form className="form" onSubmit={handleSubmit}>
-
-                            <input className="formInput" type="text" placeholder="Phone" name="phone" onChange={handleChange} />
-                            <input className="formInput" type="email" placeholder="Email" name="email" onChange={handleChange} />
-                            <input className="formInput" type="password" placeholder="Password" name="password" onChange={handleChange} />
-                            <div className="terms-checkbox">
-                                <input type="checkbox" id="termsCheckbox" onChange={handleCheckboxChange} />
-                                <label htmlFor="termsCheckbox">
-                                    By continuing, you agree to our Terms of Use, Privacy Policy, E-sign & communication Authorization.
-                                </label>
-                            </div>
-                            <button
-                                className={`formSubmit ${isButtonDisabled || isLoading ? 'disabled' : ''}`}
-                                type="submit"
-                                disabled={isButtonDisabled || isLoading}
-                            >
-                                {isLoading ? 'Signing Up...' : 'Sign Up'}
-                            </button>
-
-                        </form>
-
-
-
-                        <p>
-                            Already a user? <Link to="/login">Sign in</Link>
-                        </p>
-
-                        {/* {signupMessage && <p>{signupMessage}</p>} */}
-                        {otp && <p>OTP sent to your mobile: {otp}</p>}
-                    </>
-                )}
-
-                {showSuccess && (
-                    <div className="success-container">
-                        <div className="success-icon">&#10004;</div> {/* Unicode checkmark */}
-                        <p className="success-message">Signup successful!</p>
-                        <p className="success-subtext">Try logging in below</p>
-                        <Link to="/login" className="login-button">Login</Link>
+                {/* Main Card */}
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-custom-red to-red-600 px-8 py-6 text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
+                            <FiUser className="w-8 h-8 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-white">Join Treasure</h1>
+                        <p className="text-red-100 mt-2">Create your account to get started</p>
                     </div>
-                )}
+
+                    {/* Form */}
+                    <div className="px-8 py-8">
+                        {!showSuccess ? (
+                            <>
+                                {/* Country Selection */}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                    <div className="relative">
+                                        <ReactFlagsSelect
+                                            selected={selectedCountry}
+                                            onSelect={handleCountryChange}
+                                            countries={countries.map((country) => country.value)}
+                                            showSelectedLabel={showSelectedLabel}
+                                            searchable={searchable}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    {/* Phone Input */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <FiPhone className="h-5 w-5 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter your phone number"
+                                                name="phone"
+                                                onChange={handleChange}
+                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Email Input */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Email Address</label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <FiMail className="h-5 w-5 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="email"
+                                                placeholder="Enter your email"
+                                                name="email"
+                                                onChange={handleChange}
+                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Password Input */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Password</label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <FiLock className="h-5 w-5 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="Create a password"
+                                                name="password"
+                                                onChange={handleChange}
+                                                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                            >
+                                                {showPassword ? (
+                                                    <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                                ) : (
+                                                    <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Terms Checkbox */}
+                                    <div className="flex items-start space-x-3">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                type="checkbox"
+                                                id="termsCheckbox"
+                                                onChange={handleCheckboxChange}
+                                                className="w-4 h-4 text-custom-red border-gray-300 rounded focus:ring-custom-red"
+                                            />
+                                        </div>
+                                        <label htmlFor="termsCheckbox" className="text-sm text-gray-600 leading-5">
+                                            By continuing, you agree to our{' '}
+                                            <span className="text-custom-red hover:text-red-600 cursor-pointer">Terms of Use</span>,{' '}
+                                            <span className="text-custom-red hover:text-red-600 cursor-pointer">Privacy Policy</span>,{' '}
+                                            <span className="text-custom-red hover:text-red-600 cursor-pointer">E-sign & communication Authorization</span>.
+                                        </label>
+                                    </div>
+
+                                    {/* Sign Up Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={isButtonDisabled || isLoading}
+                                        className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${isButtonDisabled || isLoading
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-gradient-to-r from-custom-red to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                                            }`}
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                Signing Up...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Create Account
+                                                <FiArrowRight className="w-4 h-4" />
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+
+                                {/* Links */}
+                                <div className="mt-6 text-center">
+                                    <p className="text-sm text-gray-600">
+                                        Already have an account?{' '}
+                                        <Link
+                                            to="/login"
+                                            className="text-custom-red hover:text-red-600 font-medium transition-colors duration-200"
+                                        >
+                                            Sign In
+                                        </Link>
+                                    </p>
+                                </div>
+
+                                {/* OTP Message */}
+                                {otp && (
+                                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <p className="text-sm text-blue-700">OTP sent to your mobile: {otp}</p>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            /* Success State */
+                            <div className="text-center py-8">
+                                <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
+                                    <FiCheck className="w-10 h-10 text-green-600" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to Treasure!</h2>
+                                <p className="text-gray-600 mb-6">Your account has been created successfully.</p>
+                                <Link
+                                    to="/login"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                >
+                                    <FiArrowRight className="w-4 h-4" />
+                                    Sign In Now
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center mt-8">
+                    <p className="text-sm text-gray-500">
+                        © 2024 Treasure. All rights reserved.
+                    </p>
+                </div>
             </div>
-        </Wrapper>
+        </div>
     );
 }
-const Wrapper = styled.section`
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-align-items: center;
 
-.contain {  
-    max-width: 30rem;
-      margin-top: 2rem;
-      margin-bottom: 4rem;
-  padding-top: 35px;
-  display: flex;
-  flex-direction: column;
-  background: var(--clr-white);
-  border-radius: var(--radius);
-  box-shadow: var(--light-shadow);
-  transition: var(--transition);
-  padding: 2rem;
-  width: 90vw;
-  height: 500px;
-  margin: 10 auto;
-  align-items: center;
-  }
-  
-  
-  .contain:hover {
-      box-shadow: var(--dark-shadow);
-    }
-  
-
-.form {
-    display: flex;
-    padding: 10px;
-    flex-direction: column;
-    width: 350px;
-    height: 300px;
-}
-
-.formInput {
-    border-radius: 5px;
-    border-color: #e5e5e5;
-    border-style: solid;
-    border-width: 0.5px;
-    margin-bottom: 10px;
-    padding: 10px;
-}
-.custom-button {
-    background-color: #FF5733; /* Change to your desired background color */
-    /* You can also add other styles like text color, padding, etc. */
-  }
-.formSubmit {
-    cursor:pointer;
-    border-radius: 5px;
-    background-color:#cd3240;
-    border: 2px solid transparent;
-    color: white; 
-    width: 330px;
-    padding-top: 8px;
-margin-top:20px;
-align-items: center;
-}
-/* Disabled button style */
-.formSubmit.disabled {
-    background-color: #ccc; /* Change the background color when disabled */
-    cursor: not-allowed; /* Change cursor to not-allowed when disabled */
-}
-
-.terms-checkbox {
-    display: flex;
-    align-items: center;
-    margin-top: 10px; /* Adjust the margin as needed */
-  }
-  
-  .terms-checkbox input[type="checkbox"] {
-    margin-right: 10px; /* Adjust the margin between the checkbox and label */
-  }
-  
-  .terms-checkbox label {
-    font-size: 14px; /* Adjust the font size as needed */
-    color: #333; /* Adjust the text color */
-  }   
-  
-  .p {
-    margin-top:1rem;
-  }
-  @media (min-width: 992px) 
-  {
-    height: calc(100vh - 5rem);
-    
-  }
-  .alert {
-    margin-bottom: 1rem;
-    height: 1.25rem;
-    display: grid;
-    align-items: center;
-    text-align: center;
-    font-size: 0.7rem;
-    border-radius: 0.25rem;
-    letter-spacing: var(--spacing);
-    text-transform: capitalize;
-  }
-  
-  .alert-danger {
-    color: #721c24;
-    background: #f8d7da;
-  }
-  
-  .alert-success {
-    color: #155724;
-    background: #d4edda;
-  }
-    .success-container {
-  text-align: center;
-  margin-top: 2rem;
-  animation: fadeIn 0.6s ease-in-out;
-}
-
-.success-icon {
-  font-size: 4rem;
-  color: green;
-  animation: pop 0.6s ease;
-  margin-bottom: 0.5rem;
-}
-
-.success-message {
-  font-size: 1.5rem;
-  color: green;
-  margin-bottom: 0.25rem;
-}
-
-.success-subtext {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-
-.login-button {
-  display: inline-block;
-  background-color: #28a745;
-  color: white;
-  padding: 0.5rem 1.2rem;
-  text-decoration: none;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.login-button:hover {
-  background-color: #218838;
-}
-
-/* Tick animation */
-@keyframes pop {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(1); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-`
 export default SignUp;
