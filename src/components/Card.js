@@ -12,7 +12,7 @@
 
 
 //   // Default preview image
-//   const DEFAULT_IMAGE = 'https://i.imgur.com/ndu6pfe.png';
+//   const DEFAULT_IMAGE = defaultLogo;
 
 //   console.log("He llo i am from card");
 //   console.log(user.results);
@@ -240,23 +240,27 @@
 
 // export default Card;
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useUserContext } from '../context/user_context';
 import styled from 'styled-components';
 import { MdBusiness, MdLocationOn, MdVoicemail } from 'react-icons/md';
 import { useHistory } from 'react-router-dom';
 import { hasPermission } from '../rbacPermissionUtils';
+import defaultLogo from '../assets/logo.png';
 
 const Card = () => {
   const history = useHistory();
   const { user, userRole } = useUserContext();
+  const [imageError, setImageError] = useState(false);
 
-  const DEFAULT_IMAGE = 'https://i.imgur.com/ndu6pfe.png';
+  const DEFAULT_IMAGE = defaultLogo;
   const userCompany = user.results?.userCompany || null;
   const isUserCompanyEmpty = !userCompany;
 
   const userd = {
-    avatar_url: userCompany?.logo_s3_image || DEFAULT_IMAGE,
+    avatar_url: (userCompany?.logo_s3_image && userCompany.logo_s3_image.trim() !== '' && !imageError)
+      ? userCompany.logo_s3_image
+      : DEFAULT_IMAGE,
     name: userCompany?.name || '',
     company: userCompany?.phone || '',
     location: userCompany?.street_address || '',
@@ -270,6 +274,11 @@ const Card = () => {
   const { avatar_url, name, company, location, city, state, email, bio } = userd;
 
   const handleStartCompany = () => history.push('/company');
+
+  const handleImageError = () => {
+    console.log('Company logo failed to load, using default logo');
+    setImageError(true);
+  };
 
   return (
     <Wrapper>
@@ -285,7 +294,11 @@ const Card = () => {
       ) : (
         <div className="company-info">
           <header>
-            <img src={avatar_url} alt={name} />
+            <img
+              src={imageError ? DEFAULT_IMAGE : avatar_url}
+              alt={name}
+              onError={handleImageError}
+            />
             <div className="header-text">
               <h4>{name}</h4>
               <p>@{name || 'organiser'}</p>

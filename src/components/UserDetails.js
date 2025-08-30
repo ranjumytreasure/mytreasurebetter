@@ -79,7 +79,7 @@ const InnerContent = styled.div`
   gap: 2rem; /* space between card & followers */
   
   @media (min-width: 992px) {
-    grid-template-columns: 1.5fr 0.5fr;
+    grid-template-columns: 0.3fr 0.7fr;
   }
 `;
 

@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom utility classes */
+@layer utilities {
+  .bg-custom-red {
+    background-color: var(--clr-red-dark);
+  }
+  .text-custom-red {
+    color: var(--clr-red-dark);
+  }
+  .border-custom-red {
+    border-color: var(--clr-red-dark);
+  }
+}
+
 /*
 =============== 
 Fonts

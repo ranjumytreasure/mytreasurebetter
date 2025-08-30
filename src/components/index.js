@@ -50,6 +50,7 @@ import AvatarGenerator from './AvatarGenerator'
 import GroupWiseOverallDue from './GroupWiseOverallDue'
 import GroupAccountWiseOverallDue from './GroupAccountWiseOverallDue'
 import GroupWiseOverallUserDue from './GroupWiseOverallUserDue'
+import ScrollToTop from './ScrollToTop'
 import GroupAccountWiseOverallUserDue from './GroupAccountWiseOverallUserDue'
 import PersonalSettings from './PersonalSettings'
 
@@ -85,7 +86,6 @@ import AddAccountModal from './AddAccountModal'
 import ReceivablePayementModal from './ReceivablePayementModal'
 import PayablePaymentModal from './PayablePaymentModal'
 import YourDue from './YourDue'
-import ScrollToTop from "./ScrollToTop";
 
 export {
   FeaturedProducts,
@@ -116,5 +116,5 @@ export {
   ProfileCard,
   AdminSettings, AddEmployee, ImageUploader, EmployeeList, ListView, AddAob, EmployeeProfilecard, EmployeeRegionWiseDue, AreaSubscribersPage, DashboardMasterInfo, DashboardGroups, ReceivablesList, PayablesList, DashboardAreaWiseGroups, EPC, ForgetPassword, AssignGroupAmountPopup, AvatarUploader,
   SendReminderModal, EditableField, AddEntryModal, FilterBar, LedgerTable, LedgerHeader,
-  AddAccountModal, ReceivablePayementModal, PayablePaymentModal, YourDue,ScrollToTop
+  AddAccountModal, ReceivablePayementModal, PayablePaymentModal, YourDue, ScrollToTop
 }

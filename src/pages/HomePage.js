@@ -369,7 +369,7 @@
 // export default HomePage;
 
 import  { useState, useEffect } from 'react';
-import {  ReadyGroups, NewGroups, ClosedGroups, UserDetails } from '../components';
+import {  ReadyGroups, NewGroups, ClosedGroups, UserDetails, ScrollToTop } from '../components';
 import { useHistory } from 'react-router-dom';
 import GroupDataInNavbar from '../components/GroupDataInNavbar';
 import loadingImage from '../images/preloader.gif';
@@ -470,6 +470,7 @@ const HomePage = () => {
           )}
         </div>
       </div>
+      <ScrollToTop />
     </div>
   );
 };
