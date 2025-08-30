@@ -6,15 +6,15 @@ import { useUserContext } from '../context/user_context';
 import Alert from '../components/Alert';
 import { useLocation } from 'react-router-dom';
 import AssignGroupAmountPopup from "../components/AssignGroupAmountPopup";
-import defaultUserImage from '../images/default.png'; // adjust the path as needed
-
-import '../style/Subscriber.css'; // ✅ New CSS file
+import defaultUserImage from '../images/default.png';
+import { Phone, Eye, User } from 'lucide-react';
 
 const Subscriber = ({ name, id, phone, user_image_from_s3 }) => {
     const [showAddButton, setShowAddButton] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
+    const [imageError, setImageError] = useState(false);
     const location = useLocation();
     const { user } = useUserContext();
     const { groupId } = useParams();
@@ -65,33 +65,45 @@ const Subscriber = ({ name, id, phone, user_image_from_s3 }) => {
 
     return (
         <>
-            <div className="subscriber-card">
-                <div className="subscriber-image">
-                    <img
-                        src={user_image_from_s3 || defaultUserImage}
-                        alt={name || 'Subscriber profile'}
-                    />
+            <div className="flex flex-col items-center bg-white border border-gray-200 rounded-xl shadow-lg p-6 transition-all duration-300 mb-6 max-w-sm mx-auto hover:-translate-y-1 hover:shadow-xl hover:border-gray-300 md:flex-row md:items-start md:gap-6 md:max-w-2xl">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-gray-100 md:w-24 md:h-24 bg-gray-100 flex items-center justify-center">
+                    {user_image_from_s3 && !imageError ? (
+                        <img
+                            src={user_image_from_s3}
+                            alt={name || 'Subscriber profile'}
+                            className="w-full h-full object-cover"
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <User size={32} className="text-gray-400" />
+                    )}
                 </div>
-                <div className="subscriber-info">
-                    <h3>{name}</h3>
-                    <p>{phone}</p>
+                <div className="text-center md:text-left md:flex-1">
+                    <h3 className="text-xl my-2 text-gray-800">{name}</h3>
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-600 mb-4">
+                        <Phone size={16} />
+                        <span>{phone}</span>
+                    </div>
 
-                    <Link to={`/subscriber/${id}`} className="subscriber-btn">
-                        View Details
+                    <Link
+                        to={`/subscriber/${id}`}
+                        className="flex items-center justify-center gap-2 w-full py-2 px-4 mt-2 text-sm bg-custom-red text-white border-none rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-600 text-center no-underline"
+                    >
+                        <Eye size={16} />
+                        <span>View Details</span>
                     </Link>
 
                     {showAddButton && (
                         <button
                             onClick={() => setShowConfirmation(true)}
                             disabled={isLoading}
-                            className="subscriber-btn"
+                            className="block w-full py-2 px-4 mt-2 text-sm bg-custom-red text-white border-none rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-600"
                         >
                             {isLoading ? 'Adding...' : 'Add Subscriber'}
                         </button>
                     )}
 
                     {alert.show && <Alert {...alert} removeAlert={showAlert} list={[]} />}
-
                 </div>
             </div>
             {showConfirmation && (
@@ -107,179 +119,6 @@ const Subscriber = ({ name, id, phone, user_image_from_s3 }) => {
 
 
 
-// const Subscriber = ({ name, id, phone, user_image_from_s3 }) => {
 
-//     const [showAddButton, setShowAddButton] = useState(false);
-//     const [showConfirmation, setShowConfirmation] = useState(false);
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
-//     const location = useLocation();
-//     const { user } = useUserContext();
-//     const { groupId } = useParams();
-
-//     // Detect if the user is on the group creation path
-//     useEffect(() => {
-//         const pattern = /\/addgroupsubscriber\//;
-//         if (pattern.test(location.pathname)) {
-//             setShowAddButton(true);
-//         }
-//     }, [location]);
-
-//     const showAlert = (show = false, type = '', msg = '') => {
-//         setAlert({ show, type, msg });
-//     };
-
-//     // Submit subscriber data to the server
-//     const postSubscriberData = async (contributionAmount, contributionPercentage) => {
-//         const apiUrl = `${API_BASE_URL}/groups/${groupId}/subscribers/${id}`;
-
-//         try {
-//             setIsLoading(true);
-//             const subData = {
-//                 groupId: groupId,
-//                 subscriberUserId: id,
-//                 sourceSystem: 'WEB',
-//                 referredBy: user.results.userId,
-//                 shareAmount: contributionAmount,  // Include contribution amount
-//                 sharePercentage: contributionPercentage,  // Include contribution percentage
-//             };
-
-//             const response = await fetch(apiUrl, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Authorization': `Bearer ${user?.results?.token}`,
-//                     'Content-Type': 'application/json',
-//                 },
-//                 body: JSON.stringify(subData),
-//             });
-
-//             if (response.ok) {
-//                 const subJsonObject = await response.json();
-//                 showAlert(true, 'success', subJsonObject.message);
-//             } else {
-//                 const errorResponse = await response.json();
-//                 showAlert(true, 'danger', errorResponse.message);
-//             }
-//         } catch (error) {
-//             console.error('An error occurred while submitting group details:', error);
-//         } finally {
-//             setIsLoading(false);
-//             setShowConfirmation(false);
-//         }
-//     };
-
-//     // Confirm the addition of a subscriber
-//     const confirmAddSubscriber = (contributionAmount, contributionPercentage) => {
-
-//         postSubscriberData(contributionAmount, contributionPercentage);
-//     };
-
-
-//     // Cancel the addition of a subscriber
-//     const cancelAddSubscriber = () => {
-//         setShowConfirmation(false);
-//     };
-
-
-
-
-
-
-//     return (
-//         <Wrapper>
-//             <div className="img-container">
-//                 {isLoading ? (
-//                     <p>Loading image...</p> // Display loading message while image is being fetched
-//                 ) : (
-//                     <img src={user_image_from_s3 || 'https://i.imgur.com/ndu6pfe.png'} alt={name || "Default profile image"} />
-
-//                 )}
-//             </div>
-//             <div className="cocktail-footer">
-//                 <h3>{name}</h3>
-//                 <h4>{phone}</h4>
-//                 <Link to={`/subscriber/${id}`} className="btn btn-primary btn-details" style={{ marginTop: "12px", width: "100%", textAlign: "center", fontSize: "14px", height: "36px" }}>
-//                     Details
-//                 </Link>
-//                 {showAddButton && (
-//                     <button
-//                         onClick={() => setShowConfirmation(true)}
-//                         disabled={isLoading}
-//                         className="btn btn-primary btn-details"
-//                         style={{ marginTop: "12px", width: "100%", textAlign: "center", fontSize: "14px", height: "36px" }}
-//                     >
-//                         {isLoading ? 'Adding...' : 'Add Subscriber'}
-//                     </button>
-//                 )}
-//                 {alert.show && <Alert {...alert} removeAlert={showAlert} list={[]} />}
-
-//                 {/* Assign group amount popup */}
-//                 {showConfirmation && (
-//                     <AssignGroupAmountPopup
-//                         confirmAddSubscriber={confirmAddSubscriber}
-//                         cancelAddSubscriber={cancelAddSubscriber}
-//                     />
-//                 )}
-//             </div>
-//         </Wrapper>
-//     );
-// };
-
-// Styled components for Subscriber component layout
-// const Wrapper = styled.section`
-//     margin-bottom: 2rem;
-//     box-shadow: 2px 5px 3px 0px rgba(0, 0, 0, 0.5);
-//     transition: all 0.3s linear;
-//     display: grid;
-//     grid-template-rows: auto 1fr;
-//     border-radius: 0.25rem;
-
-//     &:hover {
-//         box-shadow: 4px 10px 5px 0px rgba(0, 0, 0, 0.5);
-//     }
-
-//     img {
-//         width: 100%;
-//         height: auto;
-//         object-fit: cover;
-//         border-top-left-radius: 0.25rem;
-//         border-top-right-radius: 0.25rem;
-//     }
-
-//     .cocktail-footer {
-//         padding: 1.5rem;
-//     }
-
-//     .cocktail-footer h3,
-//     .cocktail-footer h4 {
-//         margin-bottom: 0.3rem;
-//     }
-
-//     .cocktail-footer h3 {
-//         font-size: 2rem;
-//     }
-
-//     .cocktail-footer h4 {
-//         color: var(--darkGrey);
-//         margin-bottom: 0.5rem;
-//     }
-
-//     .img-container {
-//     width: 70px;
-//     height: 70px;
-//     border-radius: 50%; /* Makes the container circular */
-//     overflow: hidden; /* Ensures the image doesn't overflow the circular boundary */
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     background: #f0f0f0; /* Optional: adds a background color for images that don't load */
-// }
-
-// .img-container img {
-//     width: 100%;
-//     height: 100%;
-//     object-fit: cover; /* Ensures the image covers the container while maintaining proportions */
-// }
-// `;
 
 export default Subscriber;

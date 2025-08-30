@@ -156,12 +156,11 @@
 
 import { useState } from 'react';
 import Subcriber from './Subcriber';
-import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { useCompanySubscriberContext } from '../context/companysubscriber_context';
 import loadingImage from '../images/preloader.gif';
 import { useUserContext } from '../context/user_context';
-import { Grid, List } from 'lucide-react'; // For toggle icons
+import { Grid, List } from 'lucide-react';
 
 const Subscribers = () => {
   const history = useHistory();
@@ -196,153 +195,71 @@ const Subscribers = () => {
   }
 
   return (
-    <Wrapper>
-      <div className="section-center">
-        <div className="header">
-          <h2 className="section-title">
+    <section className="py-8 px-4 bg-white min-h-screen">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
+          <h2 className="text-3xl font-bold text-gray-800">
             Company Subscribers ({filteredSubscribers.length})
           </h2>
-          <div className="toggle-view">
-            <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg border transition-all duration-300 ${viewMode === 'grid'
+                ? 'bg-custom-red border-custom-red text-white shadow-lg'
+                : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
+                }`}
+            >
               <Grid size={18} />
             </button>
-            <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-lg border transition-all duration-300 ${viewMode === 'list'
+                ? 'bg-custom-red border-custom-red text-white shadow-lg'
+                : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
+                }`}
+            >
               <List size={18} />
             </button>
           </div>
         </div>
 
-        <div className="actions">
+        <div className="flex flex-col gap-4 my-6 md:flex-row md:items-center md:justify-between">
           <input
             type="text"
             placeholder="Search by name"
             value={nameFilter}
             onChange={(e) => setNameFilter(e.target.value)}
+            className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-base w-full md:flex-1 placeholder-gray-500 focus:border-custom-red focus:ring-1 focus:ring-custom-red transition-all duration-300"
           />
-          <div className="button-group">
-            <button onClick={handleMultiStepSubscriber}>+ Add Subscriber</button>
-            <button onClick={handleBackButtonClick}>← Back</button>
+          <div className="flex gap-4 flex-wrap">
+            <button
+              onClick={handleMultiStepSubscriber}
+              className="px-4 py-3 bg-custom-red border border-custom-red rounded-lg text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-red-700 hover:shadow-lg hover:scale-105"
+            >
+              + Add Subscriber
+            </button>
+            <button
+              onClick={handleBackButtonClick}
+              className="px-4 py-3 bg-custom-red border border-custom-red rounded-lg text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-red-700 hover:shadow-lg hover:scale-105"
+            >
+              ← Back
+            </button>
           </div>
         </div>
 
-        <div className={`subscribers-view ${viewMode}`}>
+        <div className={`${viewMode === 'grid'
+          ? 'grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+          : 'flex flex-col gap-4'
+          }`}>
           {filteredSubscribers.map((item) => (
             <Subcriber key={item.id} {...item} view={viewMode} />
           ))}
         </div>
       </div>
-    </Wrapper>
+    </section>
   );
 };
 
 export default Subscribers;
-
-const Wrapper = styled.section`
-  padding: 2rem 1rem;
-  background: #f9f9fb;
-
-  .section-center {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .section-title {
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #343a40;
-  }
-
-  .toggle-view {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .toggle-view button {
-    background: #e4e6eb;
-    border: none;
-    border-radius: 5px;
-    padding: 0.4rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .toggle-view button.active,
-  .toggle-view button:hover {
-    background: #cd3240;
-    color: white;
-  }
-
-  .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 1.5rem 0;
-  }
-
-  .actions input[type='text'] {
-    padding: 0.75rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 1rem;
-    width: 100%;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .button-group button {
-    padding: 0.6rem 1rem;
-    border: none;
-    border-radius: 8px;
-    background-color: #cd3240;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  .button-group button:hover {
-    background-color: #cd3240;
-  }
-
-  .subscribers-view.grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
-
-  .subscribers-view.list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .actions {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .actions input[type='text'] {
-      flex: 1;
-    }
-
-    .button-group {
-      flex-shrink: 0;
-    }
-  }
-`;
 
 

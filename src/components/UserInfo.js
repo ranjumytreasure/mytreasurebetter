@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import { SubContext } from '../context/subscribecontext';
-import styled from 'styled-components';
 import { GoRepo, GoGist, GoArrowBoth } from 'react-icons/go';
 import { FiUsers, FiUserPlus } from 'react-icons/fi';
 
@@ -48,77 +46,48 @@ const UserInfo = ({ data }) => {
   ]
 
 
-  return <section className='section'>
-    <Wrapper className='section-center'>
-      {items.map((item) => {
-        return <Item key={item.id} {...item}></Item>
-      })}
-    </Wrapper>
-  </section>;
+  return (
+    <section className="py-8 px-4 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+          {items.map((item) => {
+            return <Item key={item.id} {...item}></Item>
+          })}
+        </div>
+      </div>
+    </section>
+  );
 };
 
 const Item = ({ icon, label, value, color }) => {
-  return <article className="item">
-    <span className={color}>{icon}</span>
-    <div>
-      <h3>{value}</h3>
-      <p>{label}</p>
-    </div>
+  const getColorClasses = (color) => {
+    switch (color) {
+      case 'pink':
+        return 'bg-pink-100 text-pink-600';
+      case 'green':
+        return 'bg-green-100 text-green-600';
+      case 'purple':
+        return 'bg-purple-100 text-purple-600';
+      case 'yellow':
+        return 'bg-yellow-100 text-yellow-600';
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  };
 
-  </article>
+  return (
+    <article className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center gap-4">
+        <span className={`w-12 h-12 rounded-full flex items-center justify-center ${getColorClasses(color)}`}>
+          <span className="text-xl">{icon}</span>
+        </span>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">{value}</h3>
+          <p className="text-sm text-gray-600 capitalize">{label}</p>
+        </div>
+      </div>
+    </article>
+  );
 }
-
-const Wrapper = styled.section`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem 2rem;
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
-  .item {
-    border-radius: var(--radius);
-    padding: .5rem 1rem;
-    background: var(--clr-white);   
-
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 3rem;
-    align-items: center;
-    span {
-      width: 3rem;
-      height: 3rem;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-    }
-    .icon {
-      font-size: 1.5rem;
-    }
-    h3 {
-      margin-bottom: 0;
-      letter-spacing: 0;
-    }
-    p {
-      margin-bottom: 0;
-      text-transform: capitalize;
-    }
-    .pink {
-      background: #ffe0f0;
-      color: #da4a91;
-    }
-    .green {
-      background: var(--clr-primary-10);
-      color: var(--clr-primary-5);
-    }
-    .purple {
-      background: #e6e6ff;
-      color: #5d55fa;
-    }
-    .yellow {
-      background: #fffbea;
-      color: #f0b429;
-    }
-  }
-`;
 
 export default UserInfo;

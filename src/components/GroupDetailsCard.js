@@ -8,7 +8,8 @@ import List from "../components/List";
 import Alert from "../components/Alert";
 import { API_BASE_URL } from "../utils/apiConfig";
 import { useUserContext } from "../context/user_context";
-import SendReminderModal from "../components/SendReminderModal"
+import SendReminderModal from "../components/SendReminderModal";
+import { Gavel } from "lucide-react";
 
 const GroupDetailsCard = ({ groups, yourdue, customerdue, nextAuctionDate, startTime, endTime, commisionType, is_commision_taken, commision, emi, isGroupProgress, groupType, groupSubcriberResult }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -185,6 +186,7 @@ const GroupDetailsCard = ({ groups, yourdue, customerdue, nextAuctionDate, start
 
             {isGroupProgress !== "CLOSED" && (
                 <button className="buttonStyle" onClick={handleGoToAuctions}>
+                    <Gavel size={16} style={{ marginRight: '8px' }} />
                     Go To Auction
                 </button>
             )}

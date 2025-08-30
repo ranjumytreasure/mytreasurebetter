@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
+import { Calendar, DollarSign, TrendingUp, Award, Users, Hash, Clock, Wallet, Target, Gift } from 'lucide-react';
 
 const formatDate = (dateString) => {
     console.log('formatDate');
@@ -10,127 +11,210 @@ const formatDate = (dateString) => {
     return formattedDate;
 };
 
+const formatCurrency = (value) => {
+    if (!value || isNaN(value)) return '₹0';
+    return `₹${parseFloat(value).toLocaleString('en-IN')}`;
+};
+
 const GroupAccountList = ({ items, removeItem, editItem, type }) => {
 
 
     const renderFixedView = () => (
-        <div className='subcriber-list'>
-            <article className='subcriber-header' style={{ padding: "4px 16px" }}>
-               <p>S.No</p>
-                <p>Date</p>
-                <p>Due</p>
-                <p>Profit</p>
-                <p>Comm</p>
-                <p>PrizeMoney</p>               
-                          
-            </article>
-            {items?.map((item, index) => {
-                const { grpAccountId, group_id, auctionDate, auctionAmount, commision, profit, customerDue, auctionStatus,prizeMoney,sno } = item;
-                const formattedAuctionDate = formatDate(auctionDate);
+        <div className="overflow-x-auto">
+            <div className="bg-custom-red text-white rounded-lg overflow-hidden">
+                <div className="grid grid-cols-7 gap-4 p-4 text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                        <Hash size={16} />
+                        <span>S.No</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Calendar size={16} />
+                        <span>Date</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Wallet size={16} />
+                        <span>Due</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <TrendingUp size={16} />
+                        <span>Profit</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Award size={16} />
+                        <span>Comm</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Gift size={16} />
+                        <span>Prize</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <DollarSign size={16} />
+                        <span>Bid</span>
+                    </div>
+                </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-b-lg">
+                {items?.map((item, index) => {
+                    const { grpAccountId, group_id, auctionDate, auctionAmount, commision, profit, customerDue, auctionStatus, prizeMoney, sno } = item;
+                    const formattedAuctionDate = formatDate(auctionDate);
 
-                return (
-                    // <Link to={`/groups/${group_id}/accounts/${grpAccountId}`} key={index}>
-                        <article className='subcriber-item'>
-                        <p className='title'>{sno ?? 0}</p>
-                            <p className={`title ${auctionStatus === 'completed' ? 'completed-date' : ''}`}>{formattedAuctionDate}</p>
-                            <p className='title'>{customerDue ?? 0}</p>
-                            <p className='title'>{profit ?? 0}</p>
-                            <p className='title'>{commision ?? 0}</p>
-                            <p className='title'>{prizeMoney ?? 0}</p>
-                            <p className='title'>{auctionAmount ?? 0}</p>
-                           
-                           
-                        
-                        </article>
-                    //</Link>
-                );
-            })}
+                    return (
+                        <div key={index} className="grid grid-cols-7 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                            <div className="font-medium text-gray-800">
+                                {sno ?? 0}
+                            </div>
+                            <div className={`${auctionStatus === 'completed' ? 'bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center' : 'text-gray-700'}`}>
+                                <span>{formattedAuctionDate}</span>
+                            </div>
+                            <div className="font-medium text-gray-800">
+                                {formatCurrency(customerDue)}
+                            </div>
+                            <div className="font-medium text-green-600">
+                                {formatCurrency(profit)}
+                            </div>
+                            <div className="font-medium text-blue-600">
+                                {formatCurrency(commision)}
+                            </div>
+                            <div className="font-medium text-purple-600">
+                                {formatCurrency(prizeMoney)}
+                            </div>
+                            <div className="font-bold text-custom-red">
+                                {formatCurrency(auctionAmount)}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 
     const renderAccumulativeView = () => {
         return (
-            <div className='subcriber-list'>
-                <article className='subcriber-header' style={{ padding: "4px 16px" }}>
-                <p>S.No</p>
-                    <p>Date</p>
-                    <p>AucAmt</p>
-                    <p>Commision</p>
-                    <p>Reserve</p>
-                    <p>Due</p>
-                </article>
-                {items?.map((item, index) => {
-                    const {
-                        grpAccountId,
-                        group_id,
-                        auctionDate,
-                        auctionAmount,
-                        commision,
-                        reserve,
-                        customerDue,
-                        auctionStatus,sno
-                    } = item;
-    
-                    return (
-                        // <Link to={`/groups/${group_id}/accounts/${grpAccountId}`} key={index}>
-                            <article className='subcriber-item'>
-                            <p className='title'>{sno ?? 0}</p>
-                                <p className={`title ${auctionStatus === 'completed' ? 'completed-date' : ''}`}>{formatDate(auctionDate)}</p>
-                                <p className='title'>{auctionAmount ?? 0}</p>
-                                <p className='title'>{commision ?? 0}</p>
-                                <p className='title'>{reserve ?? 0}</p>
-                                <p className='title'>{customerDue ?? 0}</p>
-                            </article>
-                       // </Link>
-                    );
-                })}
+            <div className="overflow-x-auto">
+                <div className="bg-custom-red text-white rounded-lg overflow-hidden">
+                    <div className="grid grid-cols-6 gap-2 p-4 text-sm font-semibold">
+                        <div className="flex items-center gap-1">
+                            <Hash size={16} />
+                            <span>S.No</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Calendar size={16} />
+                            <span>Date</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <DollarSign size={16} />
+                            <span>Auc Amt</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Award size={16} />
+                            <span>Comm</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <TrendingUp size={16} />
+                            <span>Reserve</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Wallet size={16} />
+                            <span>Due</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-b-lg">
+                    {items?.map((item, index) => {
+                        const {
+                            grpAccountId,
+                            group_id,
+                            auctionDate,
+                            auctionAmount,
+                            commision,
+                            reserve,
+                            customerDue,
+                            auctionStatus,
+                            sno
+                        } = item;
+
+                        return (
+                            <div key={index} className="grid grid-cols-6 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                <div className="font-medium text-gray-800">{sno ?? 0}</div>
+                                <div className={`${auctionStatus === 'completed' ? 'bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center' : 'text-gray-700'}`}>
+                                    {formatDate(auctionDate)}
+                                </div>
+                                <div className="font-bold text-custom-red">{formatCurrency(auctionAmount)}</div>
+                                <div className="font-medium text-blue-600">{formatCurrency(commision)}</div>
+                                <div className="font-medium text-purple-600">{formatCurrency(reserve)}</div>
+                                <div className="font-medium text-gray-800">{formatCurrency(customerDue)}</div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         );
     };
-    
+
     const renderDeductiveView = () => {
         return (
-            <div className='subcriber-list'>
-                <article className='subcriber-header' style={{ padding: "4px 16px" }}>
-                <p>S.No</p>
-                    <p>Date</p>
-                    <p>AucAmt</p>
-                    <p>Commision</p>
-                    <p>Profit</p>
-                    <p>Due</p>
-                </article>
-                {items?.map((item, index) => {
-                    const {
-                        grpAccountId,
-                        group_id,
-                        auctionDate,
-                        auctionAmount,
-                        commision,
-                        profit,
-                        customerDue,
-                        auctionStatus,
-                        sno
-                    } = item;
-    
-                    return (
-                        // <Link to={`/groups/${group_id}/accounts/${grpAccountId}`} key={index}>
-                            <article className='subcriber-item'>
+            <div className="overflow-x-auto">
+                <div className="bg-custom-red text-white rounded-lg overflow-hidden">
+                    <div className="grid grid-cols-6 gap-2 p-4 text-sm font-semibold">
+                        <div className="flex items-center gap-1">
+                            <Hash size={16} />
+                            <span>S.No</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Calendar size={16} />
+                            <span>Date</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <DollarSign size={16} />
+                            <span>Auc Amt</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Award size={16} />
+                            <span>Comm</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <TrendingUp size={16} />
+                            <span>Profit</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Wallet size={16} />
+                            <span>Due</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-b-lg">
+                    {items?.map((item, index) => {
+                        const {
+                            grpAccountId,
+                            group_id,
+                            auctionDate,
+                            auctionAmount,
+                            commision,
+                            profit,
+                            customerDue,
+                            auctionStatus,
+                            sno
+                        } = item;
 
-                            <p className='title'>{sno ?? 0}</p>
-                                <p className={`title ${auctionStatus === 'completed' ? 'completed-date' : ''}`}>{formatDate(auctionDate)}</p>
-                                <p className='title'>{auctionAmount ?? 0}</p>
-                                <p className='title'>{commision ?? 0}</p>
-                                <p className='title'>{profit ?? 0}</p>
-                                <p className='title'>{customerDue ?? 0}</p>
-                            </article>
-                        // </Link>
-                    );
-                })}
+                        return (
+                            <div key={index} className="grid grid-cols-6 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                <div className="font-medium text-gray-800">{sno ?? 0}</div>
+                                <div className={`${auctionStatus === 'completed' ? 'bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center' : 'text-gray-700'}`}>
+                                    {formatDate(auctionDate)}
+                                </div>
+                                <div className="font-bold text-custom-red">{formatCurrency(auctionAmount)}</div>
+                                <div className="font-medium text-blue-600">{formatCurrency(commision)}</div>
+                                <div className="font-medium text-green-600">{formatCurrency(profit)}</div>
+                                <div className="font-medium text-gray-800">{formatCurrency(customerDue)}</div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         );
     };
 
-    
+
     // Conditional return based on type
     if (type.trim() === 'FIXED') {
         return renderFixedView();
