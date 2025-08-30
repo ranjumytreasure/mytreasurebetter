@@ -187,293 +187,220 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                 isOpen={!!selectedSubscriber}
                 onRequestClose={closeModal}
                 contentLabel="Subscriber Details"
-                style={{
-                    overlay: { backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1000 },
-                    content: {
-                        maxWidth: "850px",
-                        margin: "auto",
-                        borderRadius: "12px",
-                        padding: "25px 35px",
-                        border: "none",
-                        boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
-                    },
-
-                }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
             >
-                {modalLoading ? (
-                    <div style={{ textAlign: "center", padding: "60px" }}>
-                        <img src={loadingImage} alt="loading" style={{ width: "80px" }} />
-                        <p style={{ color: "#6b7280", marginTop: "16px", fontSize: "14px" }}>
-                            Loading subscriber details...
-                        </p>
-                    </div>
-                ) : (
-                    selectedSubscriber && (
-                        <div
-                            className="modal-container"
-                            style={{ fontFamily: "'Segoe UI', sans-serif", color: "#1f2937" }}
-                        >
-                            {/* Header + Action Buttons */}
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    flexWrap: "wrap",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                }}
-                            >
-                                <h2 style={{ fontSize: "22px", fontWeight: "600", margin: 0 }}>
-                                    {selectedSubscriber.name}'s Details
-                                </h2>
-                                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                                    {pdfData ? (
-                                        <PDFDownloadLink
-                                            document={
-                                                <Mypdf
-                                                    tableData={pdfData}
-                                                    tableHeaders={[
-                                                        { title: "Auction Date", value: "auct_date" },
-                                                        { title: "Total", value: "total_supposed_to_pay" },
-                                                        { title: "Paid", value: "total_paid_amount" },
-                                                        { title: "Due", value: "total_outstanding_balance" },
-                                                    ]}
-                                                    heading="Subscriber Auction Wise Receivable"
-                                                    companyData={userCompany}
-                                                />
-                                            }
-                                            fileName={generateFileName()}
-                                        >
-                                            {({ loading }) => (
-                                                <button
-                                                    onClick={() => setTimeout(() => setPdfData(null), 500)}
-                                                    style={{
-                                                        background: "#2563eb",
-                                                        color: "white",
-                                                        padding: "8px 14px",
-                                                        borderRadius: "6px",
-                                                        border: "none",
-                                                        cursor: "pointer",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: "6px",
-                                                    }}
-                                                >
-                                                    <FiDownload /> {loading ? "Preparing..." : "Download PDF"}
-                                                </button>
-                                            )}
-                                        </PDFDownloadLink>
-                                    ) : (
-                                        <button
-                                            onClick={handleGeneratePDFforindividualsubscriber}
-                                            style={{
-                                                background: "#2563eb",
-                                                color: "white",
-                                                padding: "8px 14px",
-                                                borderRadius: "6px",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "6px",
-                                            }}
-                                        >
-                                            <FiDownload /> Generate PDF
-                                        </button>
-                                    )}
-
-
-
-                                    <button
-                                        onClick={closeModal}
-                                        style={{
-                                            background: "transparent",
-                                            border: "none",
-                                            fontSize: "22px",
-                                            cursor: "pointer",
-                                            color: "#6b7280",
-                                        }}
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Profile */}
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    flexWrap: "wrap",
-                                    gap: "20px",
-                                    marginTop: "20px",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <img
-                                    src={selectedSubscriber.user_image_from_s3}
-                                    alt={selectedSubscriber.name}
-                                    style={{
-                                        width: "100px",
-                                        height: "100px",
-                                        borderRadius: "12px",
-                                        objectFit: "cover",
-                                        boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                                        border: "1px solid #e5e7eb",
-                                    }}
-                                />
-                                <div style={{ fontSize: "14px", lineHeight: "1.6", minWidth: "150px" }}>
-                                    <p>
-                                        <strong>Total Amount:</strong> {selectedSubscriber.total_supposed_to_pay}
-                                    </p>
-                                    <p>
-                                        <strong>Paid:</strong> {selectedSubscriber.total_paid_amount}
-                                    </p>
-                                    <p>
-                                        <strong>Outstanding:</strong> {selectedSubscriber.total_outstanding_balance}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Auction Table */}
-                            {subscriberData ? (
-                                <div
-                                    style={{
-                                        marginTop: "20px",
-                                        borderRadius: "12px",
-                                        overflowX: "auto",
-                                        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-                                    }}
-                                >
-                                    <table
-                                        style={{
-                                            width: "100%",
-                                            borderCollapse: "collapse",
-                                            fontSize: "14px",
-                                            minWidth: "600px",
-                                        }}
-                                    >
-                                        <thead>
-                                            <tr style={{ background: "#f3f4f6", textAlign: "left", fontWeight: "600" }}>
-                                                <th style={{ padding: "12px" }}>Auction</th>
-                                                <th style={{ padding: "12px" }}>Pay</th>
-                                                <th style={{ padding: "12px" }}>Paid</th>
-                                                <th style={{ padding: "12px" }}>Outstanding</th>
-                                                <th style={{ padding: "12px" }}>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {subscriberData.map((item, index) => (
-                                                <React.Fragment key={index}>
-                                                    <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-                                                        <td style={{ padding: "10px", display: "flex", alignItems: "center" }}>
-                                                            {item.payments?.length > 0 && (
-                                                                <button
-                                                                    onClick={() => toggleExpandRow(index)}
-                                                                    style={{
-                                                                        marginRight: "10px",
-                                                                        background: "transparent",
-                                                                        border: "none",
-                                                                        cursor: "pointer",
-                                                                        color: "#2563eb",
-                                                                    }}
-                                                                >
-                                                                    {expandedRowIndex === index ? <FaMinus /> : <FaPlus />}
-                                                                </button>
-                                                            )}
-                                                            {item.auct_date}
-                                                        </td>
-                                                        <td style={{ padding: "10px" }}>{item.total_supposed_to_pay}</td>
-                                                        <td style={{ padding: "10px" }}>{item.total_paid_amount}</td>
-                                                        <td style={{ padding: "10px" }}>{item.total_outstanding_balance}</td>
-                                                        <td style={{ padding: "10px", fontSize: "12px", color: "#6b7280" }}>
-                                                            {item.payments?.length > 0 ? "Expand to download bills" : "-"}
-                                                        </td>
-                                                    </tr>
-
-                                                    {/* Expanded Payments */}
-                                                    {expandedRowIndex === index && item.payments?.length > 0 && (
-                                                        <tr>
-                                                            <td colSpan="5" style={{ background: "#f9fafb", padding: "12px 0" }}>
-                                                                <table
-                                                                    style={{
-                                                                        width: "100%",
-                                                                        borderCollapse: "collapse",
-                                                                        fontSize: "14px",
-                                                                    }}
-                                                                >
-                                                                    <thead>
-                                                                        <tr style={{ background: "#e5e7eb" }}>
-                                                                            <th style={{ padding: "8px" }}>Date</th>
-                                                                            <th style={{ padding: "8px" }}>Amount</th>
-                                                                            <th style={{ padding: "8px" }}>Method</th>
-                                                                            <th style={{ padding: "8px" }}>Download</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {item.payments.map((p) => (
-                                                                            <tr key={p.id} style={{ borderBottom: "1px solid #ddd" }}>
-                                                                                <td style={{ padding: "8px" }}>
-                                                                                    {new Date(p.created_at).toLocaleDateString()}
-                                                                                </td>
-                                                                                <td style={{ padding: "8px" }}>{p.payment_amount}</td>
-                                                                                <td style={{ padding: "8px" }}>{p.payment_method}</td>
-                                                                                <td style={{ padding: "8px" }}>
-                                                                                    <PDFDownloadLink
-                                                                                        document={
-                                                                                            <ReceivableReceitPdf
-                                                                                                receivableData={{
-                                                                                                    subscriberName: selectedSubscriber.name,
-                                                                                                    paymentType: p.payment_type,
-                                                                                                    paymentMethod: p.payment_method,
-                                                                                                    groupName: groupName,
-                                                                                                    auctionDate: new Date(p.created_at).toLocaleDateString(),
-                                                                                                    paymentAmount: p.payment_amount,
-                                                                                                }}
-                                                                                                companyData={userCompany}
-                                                                                            />
-                                                                                        }
-                                                                                        fileName={`Bill_${selectedSubscriber.name}_${new Date(
-                                                                                            p.created_at
-                                                                                        ).toISOString().slice(0, 10)}.pdf`}
-                                                                                    >
-                                                                                        {({ loading }) => (
-                                                                                            <button
-                                                                                                style={{
-                                                                                                    background: "#2563eb",
-                                                                                                    color: "white",
-                                                                                                    padding: "6px 12px",
-                                                                                                    borderRadius: "6px",
-                                                                                                    border: "none",
-                                                                                                    cursor: "pointer",
-                                                                                                    display: "flex",
-                                                                                                    alignItems: "center",
-                                                                                                    gap: "4px",
-                                                                                                }}
-                                                                                            >
-                                                                                                <FiDownload size={14} /> {loading ? "Preparing..." : "Download"}
-                                                                                            </button>
-                                                                                        )}
-                                                                                    </PDFDownloadLink>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </td>
-                                                        </tr>
-                                                    )}
-                                                </React.Fragment>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <p style={{ marginTop: "20px", color: "#6b7280" }}>No items available</p>
-                            )}
+                <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                    {modalLoading ? (
+                        <div className="flex flex-col items-center justify-center py-16 px-8">
+                            <img src={loadingImage} alt="loading" className="w-20 h-20 mb-4" />
+                            <p className="text-gray-500 text-sm font-medium">
+                                Loading subscriber details...
+                            </p>
                         </div>
-                    )
-                )}
+                    ) : (
+                        selectedSubscriber && (
+                            <div className="font-sans text-gray-800">
+                                {/* Header + Action Buttons */}
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-red-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative">
+                                            <img
+                                                src={selectedSubscriber.user_image_from_s3}
+                                                alt={selectedSubscriber.name}
+                                                className="w-12 h-12 rounded-full object-cover shadow-md border-2 border-white"
+                                            />
+                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-custom-red rounded-full border-2 border-white"></div>
+                                        </div>
+                                        <h2 className="text-2xl font-semibold text-gray-800">
+                                            {selectedSubscriber.name}'s Details
+                                        </h2>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-wrap">
+                                        {pdfData ? (
+                                            <PDFDownloadLink
+                                                document={
+                                                    <Mypdf
+                                                        tableData={pdfData}
+                                                        tableHeaders={[
+                                                            { title: "Auction Date", value: "auct_date" },
+                                                            { title: "Total", value: "total_supposed_to_pay" },
+                                                            { title: "Paid", value: "total_paid_amount" },
+                                                            { title: "Due", value: "total_outstanding_balance" },
+                                                        ]}
+                                                        heading="Subscriber Auction Wise Receivable"
+                                                        companyData={userCompany}
+                                                    />
+                                                }
+                                                fileName={generateFileName()}
+                                            >
+                                                {({ loading }) => (
+                                                    <button
+                                                        onClick={() => setTimeout(() => setPdfData(null), 500)}
+                                                        className="px-4 py-2 bg-custom-red text-white rounded-lg border-none cursor-pointer flex items-center gap-2 hover:bg-red-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                                                    >
+                                                        <FiDownload size={16} />
+                                                        {loading ? "Preparing..." : "Download PDF"}
+                                                    </button>
+                                                )}
+                                            </PDFDownloadLink>
+                                        ) : (
+                                            <button
+                                                onClick={handleGeneratePDFforindividualsubscriber}
+                                                className="px-4 py-2 bg-custom-red text-white rounded-lg border-none cursor-pointer flex items-center gap-2 hover:bg-red-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                                            >
+                                                <FiDownload size={16} /> Generate PDF
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={closeModal}
+                                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Financial Summary Section */}
+                                <div className="p-6 bg-white">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div className="bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-lg border border-red-200">
+                                            <p className="text-xs font-medium text-red-600 uppercase tracking-wide">Total Amount</p>
+                                            <p className="text-xl font-bold text-gray-800">₹{selectedSubscriber.total_supposed_to_pay || 0}</p>
+                                        </div>
+                                        <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                                            <p className="text-xs font-medium text-green-600 uppercase tracking-wide">Paid</p>
+                                            <p className="text-xl font-bold text-gray-800">₹{selectedSubscriber.total_paid_amount || 0}</p>
+                                        </div>
+                                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                                            <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">Outstanding</p>
+                                            <p className="text-xl font-bold text-gray-800">₹{selectedSubscriber.total_outstanding_balance || 0}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Auction Table */}
+                                <div className="p-6 pt-0">
+                                    {subscriberData ? (
+                                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full min-w-[600px]">
+                                                    <thead>
+                                                        <tr className="bg-custom-red text-white">
+                                                            <th className="px-4 py-3 text-left text-sm font-semibold">Auction</th>
+                                                            <th className="px-4 py-3 text-left text-sm font-semibold">Total</th>
+                                                            <th className="px-4 py-3 text-left text-sm font-semibold">Paid</th>
+                                                            <th className="px-4 py-3 text-left text-sm font-semibold">Outstanding</th>
+                                                            <th className="px-4 py-3 text-left text-sm font-semibold">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {subscriberData.map((item, index) => (
+                                                            <React.Fragment key={index}>
+                                                                <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                                                    <td className="px-4 py-3 flex items-center">
+                                                                        {item.payments?.length > 0 && (
+                                                                            <button
+                                                                                onClick={() => toggleExpandRow(index)}
+                                                                                className="mr-3 p-1 text-custom-red hover:bg-red-100 rounded-full transition-colors duration-200"
+                                                                            >
+                                                                                {expandedRowIndex === index ? <FaMinus size={14} /> : <FaPlus size={14} />}
+                                                                            </button>
+                                                                        )}
+                                                                        <span className="text-sm font-medium text-gray-800">{item.auct_date}</span>
+                                                                    </td>
+                                                                    <td className="px-4 py-3 text-sm font-bold text-custom-red">₹{item.total_supposed_to_pay || 0}</td>
+                                                                    <td className="px-4 py-3 text-sm font-medium text-green-600">₹{item.total_paid_amount || 0}</td>
+                                                                    <td className="px-4 py-3 text-sm font-medium text-orange-600">₹{item.total_outstanding_balance || 0}</td>
+                                                                    <td className="px-4 py-3 text-xs text-gray-500">
+                                                                        {item.payments?.length > 0 ? "Expand to download bills" : "-"}
+                                                                    </td>
+                                                                </tr>
+
+                                                                {/* Expanded Payments */}
+                                                                {expandedRowIndex === index && item.payments?.length > 0 && (
+                                                                    <tr>
+                                                                        <td colSpan="5" className="bg-gray-50 p-0">
+                                                                            <div className="p-4">
+                                                                                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                                                                    <div className="overflow-x-auto">
+                                                                                        <table className="w-full">
+                                                                                            <thead>
+                                                                                                <tr className="bg-gray-100">
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</th>
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Amount</th>
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Method</th>
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Download</th>
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody>
+                                                                                                {item.payments.map((p) => (
+                                                                                                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                                                                                        <td className="px-3 py-2 text-sm text-gray-700">
+                                                                                                            {new Date(p.created_at).toLocaleDateString()}
+                                                                                                        </td>
+                                                                                                        <td className="px-3 py-2 text-sm font-medium text-gray-800">₹{p.payment_amount}</td>
+                                                                                                        <td className="px-3 py-2 text-sm text-gray-600">{p.payment_method}</td>
+                                                                                                        <td className="px-3 py-2">
+                                                                                                            <PDFDownloadLink
+                                                                                                                document={
+                                                                                                                    <ReceivableReceitPdf
+                                                                                                                        receivableData={{
+                                                                                                                            subscriberName: selectedSubscriber.name,
+                                                                                                                            paymentType: p.payment_type,
+                                                                                                                            paymentMethod: p.payment_method,
+                                                                                                                            groupName: groupName,
+                                                                                                                            auctionDate: new Date(p.created_at).toLocaleDateString(),
+                                                                                                                            paymentAmount: p.payment_amount,
+                                                                                                                        }}
+                                                                                                                        companyData={userCompany}
+                                                                                                                    />
+                                                                                                                }
+                                                                                                                fileName={`Bill_${selectedSubscriber.name}_${new Date(
+                                                                                                                    p.created_at
+                                                                                                                ).toISOString().slice(0, 10)}.pdf`}
+                                                                                                            >
+                                                                                                                {({ loading }) => (
+                                                                                                                    <button className="px-3 py-1 bg-custom-red text-white text-xs rounded-md border-none cursor-pointer flex items-center gap-1 hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md">
+                                                                                                                        <FiDownload size={12} />
+                                                                                                                        {loading ? "Preparing..." : "Download"}
+                                                                                                                    </button>
+                                                                                                                )}
+                                                                                                            </PDFDownloadLink>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                ))}
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-12">
+                                            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                                                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-gray-500 font-medium">No items available</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )
+                    )}
+                </div>
             </Modal>
         </div>
     );
