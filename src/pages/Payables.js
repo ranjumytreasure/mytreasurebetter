@@ -1,15 +1,11 @@
-
 import React, { useEffect, useState } from 'react';
 import { usePayablesContext } from '../context/payables_context';
-import "../style/Payable.css";
-import loadingImage from '../images/preloader.gif';
-import Tooltip from 'react-tooltip-lite';
-import PayablePaymentModal from '../components/PayablePaymentModal';
 import { useAobContext } from '../context/aob_context';
+import PayablePaymentModal from '../components/PayablePaymentModal';
+import { FiSearch, FiFilter, FiX, FiUser, FiPhone, FiCalendar, FiDollarSign, FiCreditCard, FiTrendingUp } from 'react-icons/fi';
 
 const Payables = () => {
   const { fetchPayables, payables, isLoading } = usePayablesContext();
-  const [hoveredPayments, setHoveredPayments] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPayable, setSelectedPayable] = useState(null);
   const { aobs, fetchAobs } = useAobContext();
@@ -22,14 +18,6 @@ const Payables = () => {
   const [groupFilter, setGroupFilter] = useState("");
   const [subscriberFilter, setSubscriberFilter] = useState("");
   const [areaFilter, setAreaFilter] = useState("");
-
-  const handleMouseEnter = (payments) => {
-    setHoveredPayments(payments);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredPayments(null);
-  };
 
   const formatCurrency = (amount) => {
     return `₹${Number(amount).toLocaleString("en-IN")}`;
@@ -60,48 +48,92 @@ const Payables = () => {
   };
 
   return (
-    <div className="payable-page">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {isLoading ? (
-        <div className="loader-container">
-          <img src={loadingImage} alt="Loading..." className="loader-img" />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-custom-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Loading payables...</p>
+          </div>
         </div>
       ) : (
-        <div className="payable-wrapper">
-          <h2 className="payable-header">
-            Payable List <span>({payables.length})</span>
-          </h2>
-          <div className="payables-header">
-            <input
-              type="text"
-              placeholder="Group Name"
-              value={groupFilter}
-              onChange={(e) => setGroupFilter(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Subscriber Name"
-              value={subscriberFilter}
-              onChange={(e) => setSubscriberFilter(e.target.value)}
-            />
-            <select
-              value={areaFilter}
-              onChange={(e) => setAreaFilter(e.target.value)}
-              className="area-dropdown"
-            >
-              <option value="">All Areas</option>
-              {[...new Set(aobs.map((item) => item.aob).filter(Boolean))].map((areaName, index) => (
-                <option key={index} value={areaName}>
-                  {areaName}
-                </option>
-              ))}
-            </select>
+        <div className="container mx-auto px-4 py-8">
+          {/* Header Card */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-8">
+            <div className="bg-gradient-to-r from-custom-red to-red-600 px-6 py-4 text-white rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <FiCreditCard className="w-8 h-8" />
+                  <div>
+                    <h1 className="text-2xl font-bold">Payables Management</h1>
+                    <p className="text-red-100">Manage and process payable disbursements</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold">{payables.length}</div>
+                  <div className="text-red-100 text-sm">Total Records</div>
+                </div>
+              </div>
+            </div>
 
-            <button className="clear-btn" onClick={clearFilters}>
-              Clear
-            </button>
+            {/* Filter Section */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div className="relative">
+                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search by group name"
+                    value={groupFilter}
+                    onChange={(e) => setGroupFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                  />
+                </div>
+                <div className="relative">
+                  <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search by subscriber name"
+                    value={subscriberFilter}
+                    onChange={(e) => setSubscriberFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                  />
+                </div>
+                <div className="relative">
+                  <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <select
+                    value={areaFilter}
+                    onChange={(e) => setAreaFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent appearance-none bg-white"
+                  >
+                    <option value="">All Areas</option>
+                    {[...new Set(aobs.map((item) => item.aob).filter(Boolean))].map((areaName, index) => (
+                      <option key={index} value={areaName}>
+                        {areaName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  <FiX className="w-5 h-5" />
+                  Clear Filters
+                </button>
+              </div>
+
+              {filteredPayables.length !== payables.length && (
+                <p className="text-gray-600 text-sm">
+                  Showing {filteredPayables.length} of {payables.length} payables
+                </p>
+              )}
+            </div>
           </div>
+
+          {/* Payables List */}
           {filteredPayables.length > 0 ? (
-            <div className="payables-list">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredPayables.map((person) => {
                 const {
                   name,
@@ -121,60 +153,107 @@ const Payables = () => {
                 } = person;
 
                 return (
-                  <div className="payable-card" key={unique_id}>
-                    <div className="payable-left">
-                      <img
-                        src={user_image_from_s3 || "default-image.jpg"}
-                        alt={name}
-                        className="payable-img"
-                        onError={(e) => {
-                          e.target.src = "default-image.jpg";
-                        }}
-                      />
-                      <div className="payable-info">
-                        <h4>{name}</h4>
-                        <p>{phone}</p>
-                        <p>Group: {group_name}</p>
-                        <p>Auction Date: {formatDate(auct_date)}</p>
+                  <div key={unique_id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    {/* Card Header */}
+                    <div className="bg-gradient-to-r from-custom-red to-red-600 p-6 text-white">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          {user_image_from_s3 ? (
+                            <img
+                              src={user_image_from_s3}
+                              alt={name}
+                              className="w-16 h-16 rounded-full object-cover border-2 border-white/30"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className={`w-16 h-16 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center ${user_image_from_s3 ? 'hidden' : 'flex'}`}
+                          >
+                            <FiUser className="w-8 h-8 text-white" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold">{name}</h3>
+                          <p className="text-red-100 flex items-center gap-1">
+                            <FiPhone className="w-4 h-4" />
+                            {phone}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="payable-right">
-                      <div className="payment-summary-bar">
-                        <div className="summary-item">
-                          <div className="label">Total Payable</div>
-                          <div className="value total">{formatCurrency(pytotal)}</div>
+
+                    {/* Card Body */}
+                    <div className="p-6">
+                      {/* Group Info */}
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2 text-gray-600 mb-1">
+                          <FiCalendar className="w-4 h-4" />
+                          <span className="text-sm font-medium">Group Information</span>
                         </div>
-                        <div className="summary-item">
-                          <div className="label">Paid</div>
-                          <div className="value paid">{formatCurrency(pbpaid)}</div>
+                        <p className="text-gray-800 font-semibold">{group_name}</p>
+                        <p className="text-gray-600 text-sm">Auction: {formatDate(auct_date)}</p>
+                      </div>
+
+                      {/* Financial Summary */}
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-xs text-blue-600 font-medium mb-1">Total</div>
+                          <div className="text-lg font-bold text-blue-700">{formatCurrency(pytotal || 0)}</div>
                         </div>
-                        <div className="summary-item">
-                          <div className="label">Balance</div>
-                          <div className="value due">{formatCurrency(pbdue)}</div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-xs text-green-600 font-medium mb-1">Paid</div>
+                          <div className="text-lg font-bold text-green-700">{formatCurrency(pbpaid || 0)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-red-50 rounded-lg">
+                          <div className="text-xs text-red-600 font-medium mb-1">Due</div>
+                          <div className="text-lg font-bold text-red-700">{formatCurrency(pbdue || 0)}</div>
                         </div>
                       </div>
 
-                      <div className="payment-button-container">
-                        <button
-                          className="pay-button"
-                          onClick={() => {
-                            setSelectedPayable(person);
-                            setModalOpen(true);
-                          }}
-                        >
-                          Pay
-                        </button>
-                      </div>
+                      {/* Action Button */}
+                      <button
+                        onClick={() => {
+                          setSelectedPayable(person);
+                          setModalOpen(true);
+                        }}
+                        className="w-full py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      >
+                        <FiDollarSign className="w-5 h-5" />
+                        Process Payment
+                      </button>
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="empty-message">No payables to disburse.</div>
+            <div className="text-center py-16">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                <FiCreditCard className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">No Payables Found</h3>
+              <p className="text-gray-500">
+                {payables.length === 0
+                  ? "There are no payables to process at the moment."
+                  : "No payables match your current filter criteria."}
+              </p>
+              {payables.length > 0 && (
+                <button
+                  onClick={clearFilters}
+                  className="mt-4 px-6 py-2 bg-custom-red text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}
+
+      {/* Payment Modal */}
       {modalOpen && (
         <PayablePaymentModal
           isOpen={modalOpen}
@@ -188,124 +267,3 @@ const Payables = () => {
 };
 
 export default Payables;
-
-
-// import React, { useEffect, useState } from 'react';
-// import { API_BASE_URL } from '../utils/apiConfig';
-// import { useUserContext } from '../context/user_context';
-// import PayablesList from '../components/PayablesList';
-// //import './Receivable.css';
-
-// const Payables = () => {
-//     const { user } = useUserContext();
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [payables, setPayables] = useState(null);
-//     const [filteredCount, setFilteredCount] = useState(0);
-//     const [region, setRegion] = useState(null);
-
-//     const fetchPayables = async () => {
-//         try {
-//             setIsLoading(true);
-//             const apiUrl = `${API_BASE_URL}/payables`;
-//             const response = await fetch(apiUrl, {
-//                 method: 'GET',
-//                 headers: {
-//                     Authorization: `Bearer ${user?.results?.token}`,
-//                     'Content-Type': 'application/json',
-//                 },
-//             });
-
-//             if (!response.ok) {
-//                 throw new Error('Failed to fetch payables');
-//             }
-
-//             const fetchedPayables = await response.json();
-//             // Log the data from the API
-//             setPayables(fetchedPayables.results.payablesResult); // Update the state
-//         } catch (error) {
-//             console.error('Error fetching payables:', error);
-//         } finally {
-//             setIsLoading(false);
-//         }
-//     };
-
-//     const loadAreasOfBusiness = async () => {
-//         try {
-//             setIsLoading(true);
-//             const apiUrl = `${API_BASE_URL}/aob/all`;
-
-//             const response = await fetch(apiUrl, {
-//                 method: 'GET',
-//                 headers: {
-//                     Authorization: `Bearer ${user?.results?.token}`,
-//                     'Content-Type': 'application/json',
-//                 },
-//             });
-
-//             if (!response.ok) {
-//                 throw new Error('Failed to fetch areas of business');
-//             }
-
-//             const data = await response.json();
-//             setRegion(data?.results);
-           
-//         } catch (error) {
-//             console.error('Error fetching areas of business:', error);
-//         } finally {
-//             setIsLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         if (user) {
-//             fetchPayables(); // Fetch payables when the user is available
-//             loadAreasOfBusiness(); // Load areas of business
-//         }
-//     }, [user]); // Dependency on user to ensure the fetch happens after user is set
-
-//     // Log whenever `payables` changes
-//     useEffect(() => {
-//         console.log('Updated Payables State:', payables);
-//     }, [payables]);
-
-//     const refreshPayables = () => {
-//         fetchPayables(); // Refresh the payables list
-//     };
-
-//     const handleFilteredCount = (count) => {
-//         setFilteredCount(count); // Update the count of filtered items
-//     };
-
-//     const mainContainerStyle = {
-//         minHeight: '100vh',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//     };
-
-//     return (
-//         <div style={mainContainerStyle}>
-//             {payables && payables.length > 0 ? (
-//                 <section className="receivablecontainer">
-//                     <h3>Payables List ({filteredCount})</h3>
-//                     {isLoading ? (
-//                         <p>Loading...</p>
-//                     ) : (
-//                         <PayablesList
-//                             payables={payables}
-//                             region={region}
-//                             onFilteredCount={handleFilteredCount}
-//                             refreshPayables={refreshPayables}
-//                         />
-//                     )}
-//                 </section>
-//             ) : (
-//                 <section className="receivablecontainer">
-//                     <h3>No Payables Data to Show</h3>
-//                 </section>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default Payables;
