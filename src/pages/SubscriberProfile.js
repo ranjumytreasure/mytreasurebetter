@@ -1229,3 +1229,4 @@ export default SubscriberProfile;
 //   text-align: center;
 //   margin-top: 100px;
 // `;
+

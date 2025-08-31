@@ -6,7 +6,6 @@ import { useCompanySubscriberContext } from '../../context/companysubscriber_con
 import { API_BASE_URL } from "../../utils/apiConfig";
 import { uploadImage } from "../../utils/uploadImage";
 import Alert from '../../components/Alert';
-import "./Multistepdesignstyles.css";
 
 const PreviewAndSubmit = () => {
     const { fetchCompanySubscribers } = useCompanySubscriberContext();
@@ -217,31 +216,48 @@ const PreviewAndSubmit = () => {
     };
 
     return (
-        <div className="preview-submit">
+        <div className="max-w-4xl mx-auto my-4 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
             {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-            <h4>Preview and Submit</h4>
-            <div className="buttons">
-                <button
-                    className="button"
-                    type="button"
-                    onClick={() => stepDetails.setStep(stepDetails.step - 1)}
-                    disabled={isLoading}
-                >
-                    Previous
-                </button>
-                <button
-                    className="button"
-                    type="button"
-                    onClick={handleCustomerSubmit}
-                    disabled={isLoading}
-                >
-                    {isLoading ? "Submitting..." : "Submit"}
-                </button>
-
+            <div className="bg-red-600 text-white p-6 text-center">
+                <h2 className="text-2xl font-bold font-['Poppins']">Preview and Submit</h2>
             </div>
-            {renderPreviewList()}
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-            {successMessage && <div className="success-message">{successMessage}</div>}
+            <div className="p-8">
+
+                <div className="flex gap-4 mb-8">
+                    <button
+                        className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 hover:from-gray-600 hover:to-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gray-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                        type="button"
+                        onClick={() => stepDetails.setStep(stepDetails.step - 1)}
+                        disabled={isLoading}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 hover:from-green-700 hover:to-green-800 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                        type="button"
+                        onClick={handleCustomerSubmit}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Submitting..." : "Submit"}
+                    </button>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Review Your Information</h3>
+                    {renderPreviewList()}
+                </div>
+
+                {errorMessage && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                        {errorMessage}
+                    </div>
+                )}
+                {successMessage && (
+                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+                        {successMessage}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

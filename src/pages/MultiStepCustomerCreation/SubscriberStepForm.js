@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import './Multistepdesignstyles.css';
+import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import AppContext from './Context';
 import PhotoDetails from './PhotoDetails';
 import PersonalDetails from './PersonalDetails';
@@ -15,6 +15,8 @@ import ProgressBar from './ProgressBar';
 
 const SubscriberStepForm = () => {
     const [step, setStep] = useState(0);
+    const [focusTrigger, setFocusTrigger] = useState(0);
+    const history = useHistory();
 
     // Personal Details
     const [subscriberName, setSubscriberName] = useState("");
@@ -54,8 +56,30 @@ const SubscriberStepForm = () => {
     const [annualTurnover, setAnnualTurnover] = useState("");
     const [password, setPassword] = useState("");
 
+    // Scroll to top whenever step changes
+    useEffect(() => {
+        // Small delay to ensure DOM has updated
+        const timer = setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [step]);
+
+    // Handle back to home navigation
+    const handleBackToHome = () => {
+        history.push('/home');
+    };
+
     const contextValues = {
-        stepDetails: { step, setStep },
+        stepDetails: {
+            step,
+            setStep: (newStep) => {
+                setStep(newStep);
+                setFocusTrigger(prev => prev + 1); // Trigger focus on step change
+            },
+            focusTrigger
+        },
         personalDetails: {
             subscriberName,
             setSubscriberName,
@@ -71,13 +95,13 @@ const SubscriberStepForm = () => {
             setNationality,
             education,
             setEducation,
-            spouseName, 
+            spouseName,
             setSpouseName,
-            spouseDob, 
+            spouseDob,
             setSpouseDob,
             spouseAge,
             setSpouseAge
-        
+
         },
         photoDetails: {
             image,
@@ -134,9 +158,20 @@ const SubscriberStepForm = () => {
 
     return (
         <AppContext.Provider value={contextValues}>
-            <div className="multistepmain">
-                <div className="multistepbody">
-                    <div className="multistepwrapper">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4">
+                <div className="flex flex-col items-center p-4 max-w-6xl mx-auto">
+                    {/* Back to Home Button */}
+                    <div className="w-full max-w-4xl mb-4">
+                        <button
+                            onClick={handleBackToHome}
+                            className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-lg"
+                        >
+                            <span className="text-lg">←</span>
+                            Back to Home
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col justify-between items-center w-full max-w-4xl">
                         <ProgressBar />
                         {step === 0 && <PhotoDetails />}
                         {step === 1 && <PersonalDetails />}
