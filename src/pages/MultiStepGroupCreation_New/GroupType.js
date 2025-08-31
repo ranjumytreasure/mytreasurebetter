@@ -1,106 +1,14 @@
-import React, { useContext } from "react";
-import styled from "styled-components";
+import React, { useContext, useRef, useEffect } from "react";
 import { FaVideo } from "react-icons/fa";
 import AppContext from "./Context";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Container = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: auto;
-  overflow: hidden;
-`;
-
-const HeadingBar = styled.div`
-  background: #b30000;
-  color: #fff;
-  font-size: 1.3rem;
-  font-weight: bold;
-  padding: 15px;
-  text-align: center;
-`;
-
-const Content = styled.div`
-  padding: 20px;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-`;
-
-const RadioGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 15px;
-  margin-bottom: 20px;
-  max-width: 350px;
-  margin-left: auto;
-  margin-right: auto;
-`;
-
-const RadioRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px; /* smaller gap between radio label and icon */
-  width: 100%;
-`;
-
-const RadioLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  flex-grow: 1; /* so label takes remaining space */
-
-  input {
-    accent-color: #b30000;
-    transform: scale(1.2);
-  }
-`;
-
-const VideoIcon = styled.a`
-  color: #b30000;
-  font-size: 1.3rem;
-  cursor: pointer;
-  flex-shrink: 0; /* prevent shrinking */
-
-  &:hover {
-    color: #990000;
-  }
-`;
-
-const NextButton = styled.button`
-  background: #b30000;
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: background 0.2s ease-in-out;
-
-  &:hover {
-    background: #990000;
-  }
-`;
-// Extra style to center toast message text
-const ToastStyle = styled.div`
-  .Toastify__toast-body {
-    text-align: center;
-  }
-`;
-
 
 export default function GroupType() {
   const { groupDetails: updateContext } = useContext(AppContext);
+  const firstInputRef = useRef(null);
 
   const next = () => {
     if (!updateContext.groupType) {
@@ -116,56 +24,111 @@ export default function GroupType() {
     Fixed: "https://example.com/fixed-video",
   };
 
+  // Auto-focus first input when component mounts
+  useEffect(() => {
+    if (firstInputRef.current && updateContext.focusTrigger) {
+      const timer = setTimeout(() => {
+        firstInputRef.current.focus();
+      }, 200); // Delay to ensure smooth scroll completes first
+
+      return () => clearTimeout(timer);
+    }
+  }, [updateContext.focusTrigger]);
+
   return (
-    <Container>
-      <HeadingBar>Choose your group type :</HeadingBar>
-      <Content>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <RadioGroup>
-            {["Accumulative", "Deductive", "Fixed"].map((type) => (
-              <RadioRow key={type}>
-                <RadioLabel>
-                  <input
-                    type="radio"
-                    name="groupType"
-                    value={type}
-                    checked={updateContext.groupType === type}
-                    onChange={() => updateContext.setGroupType(type)}
-                  />
-                  {type}
-                </RadioLabel>
-                <VideoIcon
-                  href={videoLinks[type]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`Watch video about ${type}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <FaVideo />
-                </VideoIcon>
-              </RadioRow>
+    <div className="max-w-4xl mx-auto my-6 bg-white rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden border border-gray-100">
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white p-8 text-center relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
+        <div className="relative z-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
+            <span className="text-2xl">🏢</span>
+          </div>
+          <h2 className="text-3xl font-bold font-['Poppins'] mb-2">Choose Your Group Type</h2>
+          <p className="text-red-100 text-sm">Select the type of group you want to create</p>
+        </div>
+      </div>
+      <div className="p-8">
+        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <div className="space-y-4">
+            {["Accumulative", "Deductive", "Fixed"].map((type, index) => (
+              <label key={type} className="relative cursor-pointer block">
+                <input
+                  ref={index === 0 ? firstInputRef : null}
+                  type="radio"
+                  name="groupType"
+                  value={type}
+                  checked={updateContext.groupType === type}
+                  onChange={() => updateContext.setGroupType(type)}
+                  className="sr-only"
+                />
+                <div className={`p-6 rounded-2xl border-2 transition-all duration-300 ${updateContext.groupType === type
+                    ? 'border-red-500 bg-red-50 shadow-md'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${updateContext.groupType === type
+                          ? 'border-red-500 bg-red-500'
+                          : 'border-gray-300'
+                        }`}>
+                        {updateContext.groupType === type && (
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 font-['Poppins']">
+                          {type}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {type === 'Accumulative' && 'Members contribute increasing amounts over time'}
+                          {type === 'Deductive' && 'Members contribute decreasing amounts over time'}
+                          {type === 'Fixed' && 'Members contribute fixed amounts throughout the period'}
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={videoLinks[type]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={`Watch video about ${type}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-red-500 hover:text-red-700 transition-colors duration-200 p-2 rounded-full hover:bg-red-50"
+                    >
+                      <FaVideo className="text-xl" />
+                    </a>
+                  </div>
+                </div>
+              </label>
             ))}
-          </RadioGroup>
+          </div>
 
-          <NextButton type="button" onClick={next}>
-            Next
-          </NextButton>
+          <div className="flex gap-4 pt-6">
+            <button
+              type="button"
+              className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:from-red-700 hover:to-red-800 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-600/30 flex items-center justify-center gap-2"
+              onClick={next}
+            >
+              Next
+              <span>→</span>
+            </button>
+          </div>
         </form>
-      </Content>
+      </div>
 
-      <ToastStyle>
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-      </ToastStyle>
-    </Container>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastStyle={{
+          textAlign: 'center'
+        }}
+      />
+    </div>
   );
 }

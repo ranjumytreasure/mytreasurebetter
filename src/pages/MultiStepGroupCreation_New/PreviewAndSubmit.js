@@ -1,110 +1,10 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import styled from "styled-components";
 import AppContext from "./Context";
 import { API_BASE_URL } from "../../utils/apiConfig";
 import productJson from "../../assets/product.json";
 import { useHistory } from "react-router-dom";
 import { useUserContext } from "../../context/user_context";
 import { v4 as uuidv4 } from "uuid";
-
-const Container = styled.div`
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 20px auto;
-  max-width: 1200px;
-`;
-
-const Heading = styled.h2`
-  color: #e53935;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e53935;
-  padding-bottom: 8px;
-`;
-
-const Card = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const CardItem = styled.li`
-  flex: 1 1 50%;
-  display: flex;
-  padding: 10px 15px;
-  border-bottom: 1px solid #eee;
-  background: ${(props) => (props.index % 2 === 0 ? "#fafafa" : "white")};
-
-  span {
-    font-weight: bold;
-    margin-right: 6px;
-    color: #333;
-  }
-
-  @media (max-width: 768px) {
-    flex: 1 1 100%;
-  }
-`;
-
-const TableContainer = styled.div`
-  margin-top: 20px;
-  overflow-x: auto;
-`;
-
-const StyledTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-
-  th {
-    background: #e53935;
-    color: #fff;
-    padding: 8px;
-    text-align: left;
-  }
-
-  td {
-    padding: 8px;
-    border: 1px solid #ddd;
-    text-align: center;
-  }
-
-  tr:nth-child(even) {
-    background: #f9f9f9;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const Button = styled.button`
-  background-color: #e53935;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-
-  &:hover {
-    background-color: #c62828;
-  }
-`;
-
-const SecondaryButton = styled(Button)`
-  background-color: #ccc;
-  color: #333;
-
-  &:hover {
-    background-color: #aaa;
-  }
-`;
 
 export default function PreviewAndSubmit() {
   const { groupDetails } = useContext(AppContext);
@@ -260,63 +160,132 @@ export default function PreviewAndSubmit() {
   };
 
   return (
-    <Container>
-      <Heading>Preview & Submit</Heading>
+    <div className="max-w-4xl mx-auto my-6 bg-white rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden border border-gray-100">
+      <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white p-8 text-center relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
+        <div className="relative z-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
+            <span className="text-2xl">📋</span>
+          </div>
+          <h2 className="text-3xl font-bold font-['Poppins'] mb-2">Preview & Submit</h2>
+          <p className="text-red-100 text-sm">Review your group details before submission</p>
+        </div>
+      </div>
+      <div className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Group Name:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.groupName}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Group Amount:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.groupAmt}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">
+              {groupDetails.groupType === "Fixed" ? "No of Months:" : "No of Subscribers:"}
+            </span>
+            <span className="ml-2 text-gray-900">
+              {groupDetails.groupType === "Fixed" ? groupDetails.groupNoOfMonths : groupDetails.groupNoOfSub}
+            </span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Group Type:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.groupType}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Commission Type:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.commType}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Commission Percent:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.commPercentage}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Commission Amount:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.commAmt}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Auction Mode:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.auctFreq}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Auction Date:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.firstAuctDate}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Auction Start Time:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.auctStartTime}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Auction End Time:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.auctEndTime}</span>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <span className="font-semibold text-gray-700">Auction Place:</span>
+            <span className="ml-2 text-gray-900">{groupDetails.auctPlace}</span>
+          </div>
+        </div>
 
-      <Card>
-        <CardItem><span>Group Name:</span>{groupDetails.groupName}</CardItem>
-        <CardItem><span>Group Amount:</span>{groupDetails.groupAmt}</CardItem>
-        <CardItem>
-          <span>{groupDetails.groupType === "Fixed" ? "No of Months:" : "No of Subscribers:"}</span>
-          {groupDetails.groupType === "Fixed" ? groupDetails.groupNoOfMonths : groupDetails.groupNoOfSub}
-        </CardItem>
-        <CardItem><span>Group Type:</span>{groupDetails.groupType}</CardItem>
-        <CardItem><span>Commission Type:</span>{groupDetails.commType}</CardItem>
-        <CardItem><span>Commission Percent:</span>{groupDetails.commPercentage}</CardItem>
-        <CardItem><span>Commission Amount:</span>{groupDetails.commAmt}</CardItem>
-        <CardItem><span>Auction Mode:</span>{groupDetails.auctFreq}</CardItem>
-        <CardItem><span>Auction Date:</span>{groupDetails.firstAuctDate}</CardItem>
-        <CardItem><span>Auction Start Time:</span>{groupDetails.auctStartTime}</CardItem>
-        <CardItem><span>Auction End Time:</span>{groupDetails.auctEndTime}</CardItem>
-        <CardItem><span>Auction Place:</span>{groupDetails.auctPlace}</CardItem>
-      </Card>
+        {groupDetails.groupType === "Fixed" && fixedGroupAccounts.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 font-['Poppins']">Fixed Group Accounts</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse bg-white rounded-xl shadow-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-gradient-to-r from-red-600 to-red-700 text-white">
+                    <th className="p-4 text-left font-semibold">Auction Date</th>
+                    <th className="p-4 text-center font-semibold">Bid</th>
+                    <th className="p-4 text-center font-semibold">Prize</th>
+                    <th className="p-4 text-center font-semibold">Commission</th>
+                    <th className="p-4 text-center font-semibold">Balance</th>
+                    <th className="p-4 text-center font-semibold">Due</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fixedGroupAccounts.map((acc, idx) => (
+                    <tr key={idx} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                      <td className="p-4 border-b border-gray-200">{formatDate(acc.auctDate)}</td>
+                      <td className="p-4 border-b border-gray-200 text-center">{acc.bid ?? 0}</td>
+                      <td className="p-4 border-b border-gray-200 text-center">{acc.prize ?? 0}</td>
+                      <td className="p-4 border-b border-gray-200 text-center">{acc.comm ?? 0}</td>
+                      <td className="p-4 border-b border-gray-200 text-center">{acc.bal ?? 0}</td>
+                      <td className="p-4 border-b border-gray-200 text-center">{acc.due ?? 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
-      {groupDetails.groupType === "Fixed" && fixedGroupAccounts.length > 0 && (
-        <TableContainer>
-          <h3>Fixed Group Accounts</h3>
-          <StyledTable>
-            <thead>
-              <tr>
-                <th>Auction Date</th>
-                <th>Bid</th>
-                <th>Prize</th>
-                <th>Commission</th>
-                <th>Balance</th>
-                <th>Due</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fixedGroupAccounts.map((acc, idx) => (
-                <tr key={idx}>
-                  <td>{formatDate(acc.auctDate)}</td>
-                  <td>{acc.bid ?? 0}</td>
-                  <td>{acc.prize ?? 0}</td>
-                  <td>{acc.comm ?? 0}</td>
-                  <td>{acc.bal ?? 0}</td>
-                  <td>{acc.due ?? 0}</td>
-                </tr>
-              ))}
-            </tbody>
-          </StyledTable>
-        </TableContainer>
-      )}
-
-      <ButtonGroup>
-        <SecondaryButton onClick={handlePrevious}>Previous</SecondaryButton>
-        <Button onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Submit"}
-        </Button>
-      </ButtonGroup>
-    </Container>
+        <div className="flex gap-4 pt-6">
+          <button
+            onClick={handlePrevious}
+            className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:from-gray-600 hover:to-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gray-500/30 flex items-center justify-center gap-2"
+          >
+            <span>←</span>
+            Previous
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:from-red-700 hover:to-red-800 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-600/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                Submitting...
+              </>
+            ) : (
+              <>
+                Submit
+                <span>→</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
