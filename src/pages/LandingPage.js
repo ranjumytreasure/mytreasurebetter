@@ -1,13 +1,11 @@
 
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FeaturedProducts, Hero, Services, Contact, Navbar, Footer } from '../components'
+import { FeaturedProducts, Hero, Services, Contact } from '../components'
 import ReactGA from 'react-ga4';
 import { TRACKING_ID } from '../utils/constants'
 
 // Initialize ReactGA with your tracking ID
 ReactGA.initialize(TRACKING_ID);
-
 
 const LandingPage = () => {
   // Use useEffect to track page view on component mount
@@ -16,17 +14,21 @@ const LandingPage = () => {
     ReactGA.send({ hitType: 'pageview', page: window.location.pathname });
   }, []);
 
-  return <div>
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <Hero />
 
-    <Hero />
-    <FeaturedProducts />
+      {/* How It Works Section */}
+      <FeaturedProducts />
 
-    <Services />
-    <Contact />
+      {/* Services Section */}
+      <Services />
 
-  </div>
-
-
+      {/* Newsletter Section */}
+      <Contact />
+    </div>
+  );
 }
 
-export default LandingPage
+export default LandingPage;

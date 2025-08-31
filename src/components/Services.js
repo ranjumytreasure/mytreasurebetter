@@ -1,94 +1,88 @@
 import React from 'react'
-import styled from 'styled-components'
 import { services } from '../utils/constants'
+import { FaBrain, FaRocket, FaShieldAlt } from 'react-icons/fa'
 
 const Services = () => {
   return (
-    <Wrapper>
-      <div className='section-center'>
-        <article className='header'>
-          <h3>
+    <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-red-50 relative overflow-hidden">
+      {/* Background Decorations */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-red-100 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-100 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-green-100 rounded-full opacity-20 animate-pulse delay-500"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-100 to-blue-100 text-gray-800 text-sm font-medium mb-6">
+            <FaBrain className="w-4 h-4 mr-2 text-red-600" />
+            AI-Powered Solutions
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Treasure - Powered by AI
-          </h3>
-        </article>
-        <div className='services-center'>
-          {services.map((service) => {
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Experience the future of chit fund management with our cutting-edge AI technology
+          </p>
+        </div>
+
+        {/* Services Grid */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {services.map((service, index) => {
             const { id, icon, title, text } = service
+            const bgColors = ['bg-red-50', 'bg-blue-50', 'bg-green-50']
+            const borderColors = ['border-red-200', 'border-blue-200', 'border-green-200']
+            const iconColors = ['text-red-600', 'text-blue-600', 'text-green-600']
+
             return (
-              <article className='service' key={id}>
-                <span className='icon'>{icon}</span>
-                <h4>{title}</h4>
-                <p>{text}</p>
-              </article>
+              <div
+                key={id}
+                className={`${bgColors[index]} ${borderColors[index]} border-2 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group`}
+              >
+                {/* Icon */}
+                <div className="mb-6">
+                  <div className={`w-16 h-16 ${bgColors[index].replace('50', '100')} rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`${iconColors[index]} text-2xl`}>
+                      {icon}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <h3 className="text-xl font-bold text-gray-900 mb-4 capitalize">
+                  {title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {text}
+                </p>
+              </div>
             )
           })}
         </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <div className="inline-flex items-center space-x-4">
+            <div className="flex items-center space-x-2 text-gray-600">
+              <FaShieldAlt className="w-5 h-5 text-green-600" />
+              <span className="text-sm font-medium">Secure & Reliable</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <FaRocket className="w-5 h-5 text-blue-600" />
+              <span className="text-sm font-medium">Fast & Efficient</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <FaBrain className="w-5 h-5 text-red-600" />
+              <span className="text-sm font-medium">AI-Powered</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </Wrapper>
+    </section>
   )
 }
 
-const Wrapper = styled.section`
-  h3,
-  h4 {
-    color: var(--clr-primary-1);
-  }
-  padding: 5rem 0;
-
-  background: var(--clr-primary-10);
-
-  .header h3 {
-    margin-bottom: 2rem;
-  }
-  p {
-    margin-bottom: 0;
-    line-height: 1.8;
-    color: var(--clr-primary-3);
-  }
-  .services-center {
-    margin-top: 4rem;
-    display: grid;
-    gap: 2.5rem;
-  }
-  .service {
-    background: var(--clr-primary-7);
-    text-align: center;
-    padding: 2.5rem 2rem;
-    border-radius: var(--radius);
-    p {
-      color: var(--clr-primary-2);
-    }
-  }
-  span {
-    width: 4rem;
-    height: 4rem;
-    display: grid;
-    margin: 0 auto;
-    place-items: center;
-    margin-bottom: 1rem;
-    border-radius: 50%;
-    background: var(--clr-primary-10);
-    color: var(--clr-primary-1);
-    svg {
-      font-size: 2rem;
-    }
-  }
-  @media (min-width: 992px) {
-    .header {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  @media (min-width: 576px) {
-    .services-center {
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    }
-  }
-  @media (min-width: 1280px) {
-    padding: 0;
-    .section-center {
-      transform: translateY(5rem);
-    }
-  }
-`
 export default Services
