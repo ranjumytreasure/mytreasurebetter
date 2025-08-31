@@ -7,9 +7,11 @@
   .bg-custom-red {
     background-color: var(--clr-red-dark);
   }
+
   .text-custom-red {
     color: var(--clr-red-dark);
   }
+
   .border-custom-red {
     border-color: var(--clr-red-dark);
   }
@@ -97,6 +99,8 @@ body {
   color: var(--clr-grey-1);
   line-height: 1.5;
   font-size: 0.875rem;
+  padding-top: 5rem;
+  /* 80px - matches navbar height (h-20) */
 }
 
 ul {
@@ -297,3 +301,16 @@ main {
 }
 
 /* Layout Fix for App */
+
+/* Alternative: Use a main content wrapper class for specific pages */
+.main-content {
+  padding-top: 5rem;
+  /* 80px - matches navbar height */
+  min-height: calc(100vh - 5rem);
+}
+
+/* For pages that need full viewport height */
+.full-height-content {
+  min-height: 100vh;
+  padding-top: 5rem;
+}

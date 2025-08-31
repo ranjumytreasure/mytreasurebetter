@@ -1,116 +1,105 @@
 import React from 'react'
 import logo from '../assets/logo.png'
 import { Link } from 'react-router-dom'
-
-import { FaTimes } from 'react-icons/fa'
+import {
+  FaTimes,
+  FaHome,
+  FaPlay,
+  FaQuestionCircle,
+  FaInfoCircle
+} from 'react-icons/fa'
 import { links } from '../utils/constants'
-import styled from 'styled-components'
 import CartButtons from './CartButtons'
 import { useUserContext } from '../context/user_context'
 
 const Sidebar = () => {
   const { isLoggedIn, isSidebarOpen, closeSidebar } = useUserContext();
 
-  return <SidebarContainer>
-    <aside className={`${isSidebarOpen ? 'sidebar show-sidebar' : 'sidebar'}`}>
+  // Icon mapping for navigation links
+  const getIconForLink = (text) => {
+    switch (text.toLowerCase()) {
+      case 'start group':
+        return <FaPlay className="w-5 h-5" />;
+      case 'help':
+        return <FaQuestionCircle className="w-5 h-5" />;
+      case 'faq':
+        return <FaInfoCircle className="w-5 h-5" />;
+      default:
+        return null;
+    }
+  };
 
-      <div className="sidebar-header">
-        <Link to='/'>
-          <img className='logo' src={logo} alt="treasure" />
-        </Link>
-        <button type='button' className='close-btn' onClick={closeSidebar}>
-          <FaTimes />
-        </button>
+  return (
+    <div className={`fixed inset-0 z-50 lg:hidden ${isSidebarOpen ? 'block' : 'hidden'}`}>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+        onClick={closeSidebar}
+      />
+
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <Link to="/" onClick={closeSidebar}>
+              <img
+                src={logo}
+                alt="Treasure"
+                className="h-10 w-auto"
+              />
+            </Link>
+            <button
+              type="button"
+              onClick={closeSidebar}
+              className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
+            >
+              <FaTimes className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex-1 px-6 py-6">
+            <ul className="space-y-2">
+              {isLoggedIn && (
+                <li>
+                  <Link
+                    to="/home"
+                    onClick={closeSidebar}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                  >
+                    <FaHome className="w-5 h-5" />
+                    Home
+                  </Link>
+                </li>
+              )}
+              {links.map((link) => {
+                const { id, text, url } = link;
+                return (
+                  <li key={id}>
+                    <Link
+                      to={url}
+                      onClick={closeSidebar}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                    >
+                      {getIconForLink(text)}
+                      {text}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* User Actions */}
+          <div className="p-6 border-t border-gray-200">
+            <CartButtons />
+          </div>
+        </div>
       </div>
-
-      <ul className="links">
-        {isLoggedIn && (
-          <li>
-            <Link to="/home" onClick={closeSidebar}>Home</Link>
-          </li>
-        )}
-        {links.map((link) => {
-          const { id, text, url } = link;
-          return <li key={id}>
-            <Link to={url} onClick={closeSidebar} >{text}</Link>
-          </li>
-        })}
-      </ul>
-
-      <CartButtons />
-    </aside>
-  </SidebarContainer>
+    </div>
+  );
 }
 
-const SidebarContainer = styled.div`
-  text-align: center;
-  .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-  }
-  .close-btn {
-    font-size: 2rem;
-    background: transparent;
-    border-color: transparent;
-    color: var(--clr-primary-5);
-    transition: var(--transition);
-    cursor: pointer;
-    color: var(--clr-red-dark);
-    margin-top: 0.2rem;
-  }
-  .close-btn:hover {
-    color: var(--clr-red-light);
-  }
-  .logo {
-    justify-self: center;
-    height: 45px;
-  }
-  .links {
-    margin-bottom: 2rem;
-  }
-  .links a {
-    display: block;
-    text-align: left;
-    font-size: 1rem;
-    text-transform: capitalize;
-    padding: 1rem 1.5rem;
-    color: var(--clr-grey-3);
-    transition: var(--transition);
-    letter-spacing: var(--spacing);
-  }
-
-  .links a:hover {
-    padding: 1rem 1.5rem;
-    padding-left: 2rem;
-    background: var(--clr-grey-10);
-    color: var(--clr-grey-2);
-  }
-
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--clr-white);
-    transition: var(--transition);
-    transform: translate(-100%);
-    z-index: -1;
-  }
-  .show-sidebar {
-    transform: translate(0);
-    z-index: 999;
-  }
-  .cart-btn-wrapper {
-    margin: 2rem auto;
-  }
-  @media screen and (min-width: 992px) {
-    .sidebar {
-      display: none;
-    }
-  }
-`
-
-export default Sidebar
+export default Sidebar;

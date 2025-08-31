@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FaUserMinus, FaUserPlus } from "react-icons/fa";
+import {
+    FaUserMinus,
+    FaUserPlus,
+    FaUser,
+    FaCog,
+    FaUsers,
+    FaTachometerAlt,
+    FaMoneyBillWave,
+    FaCreditCard,
+    FaShieldAlt,
+    FaBook,
+    FaSignInAlt
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
 import { useUserContext } from "../context/user_context";
 import { useHistory } from "react-router-dom";
 import { API_BASE_URL } from '../utils/apiConfig';
@@ -79,169 +90,180 @@ const CartButtons = ({ scrolled }) => {
     const showTooltip = () => setIsTooltipVisible(true);
     const hideTooltip = () => setIsTooltipVisible(false);
 
+    // Icon mapping for menu items
+    const getIconForMenuItem = (text) => {
+        switch (text.toLowerCase()) {
+            case 'personal settings':
+                return <FaCog className="w-4 h-4" />;
+            case 'subscribers':
+                return <FaUsers className="w-4 h-4" />;
+            case 'dashboard':
+                return <FaTachometerAlt className="w-4 h-4" />;
+            case 'receivables':
+                return <FaMoneyBillWave className="w-4 h-4" />;
+            case 'payables':
+                return <FaCreditCard className="w-4 h-4" />;
+            case 'admin settings':
+                return <FaShieldAlt className="w-4 h-4" />;
+            case 'ledger':
+                return <FaBook className="w-4 h-4" />;
+            default:
+                return <FaUser className="w-4 h-4" />;
+        }
+    };
+
     return (
-        <Wrapper className="cart-btn-wrapper">
+        <div className="flex items-center space-x-4">
             {user ? (
                 <>
-                    <div className={`user-provider ${scrolled ? 'scrolled' : ''}`}>
-                        <div className="user-info">
-                            <p>Hi {user.results.firstname || user.results.name || "Guest"}</p>
+                    <div className="flex items-center space-x-3">
+                        <div className={`text-sm font-medium ${scrolled ? 'text-white' : 'text-gray-700'}`}>
+                            Hi {user.results.firstname || user.results.name || "Guest"}
                         </div>
-                        <div className="avatar" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
-                            <img src={image || previewUrl} alt={user.results.firstname || "User Avatar"} />
+                        <div className="relative" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 hover:border-red-500 transition-all duration-300 cursor-pointer">
+                                <img
+                                    src={image || previewUrl}
+                                    alt={user.results.firstname || "User Avatar"}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
                             {isTooltipVisible && (
-                                <Tooltip>
-                                    <ul>
+                                <div className="absolute right-0 top-12 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                    <div className="px-4 py-2 border-b border-gray-100">
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {user.results.firstname || user.results.name || "User"}
+                                        </p>
+                                        <p className="text-xs text-gray-500">{user.results.email}</p>
+                                    </div>
+                                    <ul className="py-1">
                                         {hasPermission(userRole, 'viewPersonalSettings') && (
                                             <li>
-                                                <Link to="/personal-settings" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/personal-settings"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Personal Settings')}
                                                     Personal Settings
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewSubscribers') && (
                                             <li>
-                                                <Link to="/subscribers" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/subscribers"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Subscribers')}
                                                     Subscribers
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewDashboard') && (
                                             <li>
-                                                <Link to="/dashboard" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/dashboard"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Dashboard')}
                                                     Dashboard
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewReceivables') && (
                                             <li>
-                                                <Link to="/receivables" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/receivables"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Receivables')}
                                                     Receivables
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewPayables') && (
                                             <li>
-                                                <Link to="/payables" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/payables"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Payables')}
                                                     Payables
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewAdminSettings') && (
                                             <li>
-                                                <Link to="/admin-settings" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/admin-settings"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Admin Settings')}
                                                     Admin Settings
                                                 </Link>
                                             </li>
                                         )}
                                         {hasPermission(userRole, 'viewAdminSettings') && (
                                             <li>
-                                                <Link to="/ledger" onClick={closeSidebar}>
+                                                <Link
+                                                    to="/ledger"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Ledger')}
                                                     Ledger
                                                 </Link>
                                             </li>
                                         )}
-
                                     </ul>
-                                </Tooltip>
+                                    <div className="border-t border-gray-100 pt-1">
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                                        >
+                                            <FaUserMinus className="w-4 h-4" />
+                                            Logout
+                                        </button>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </div>
-                    <button className="logout-btn" onClick={handleLogout}>
-                        Logout <FaUserMinus />
-                    </button>
                 </>
             ) : (
-                <>
-                    <Link to="/login" className="login-btn" onClick={closeSidebar}>
-                        Login <FaUserPlus />
+                <div className="flex items-center space-x-3">
+                    <Link
+                        to="/login"
+                        onClick={closeSidebar}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${scrolled
+                            ? 'text-white hover:text-red-100 hover:bg-white/10'
+                            : 'text-red-600 hover:text-red-700 hover:bg-red-50'
+                            }`}
+                    >
+                        <FaSignInAlt className="w-4 h-4" />
+                        Login
                     </Link>
-                    <Link to="/signup" className="signup-btn" onClick={closeSidebar}>
+                    <Link
+                        to="/signup"
+                        onClick={closeSidebar}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${scrolled
+                            ? 'bg-white text-red-600 hover:bg-red-50'
+                            : 'bg-red-600 text-white hover:bg-red-700'
+                            }`}
+                    >
+                        <FaUserPlus className="w-4 h-4" />
                         Signup
                     </Link>
-                </>
+                </div>
             )}
-        </Wrapper>
+        </div>
     );
 };
-
-const Wrapper = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    justify-content: center;
-
-    .user-provider {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        align-items: center;
-    }
-
-    .user-info {
-        margin-right: 10px;
-        color: ${(props) => (props.scrolled ? 'green' : 'yellow')};
-    }
-
-    .avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        overflow: hidden;
-        background-color: #2c303a;
-        border: 2px solid #2c303a;
-
-        img {
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
-        }
-
-        &:hover {
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-    }
-
-    .logout-btn,
-    .login-btn,
-    .signup-btn {
-        padding: 0.5rem 1rem;
-        background: var(--clr-red-dark);
-        border: none;
-        color: var(--clr-white);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.2s;
-        margin-left: 16px;
-
-        &:hover {
-            background: var(--clr-red-light);
-        }
-    }
-`;
-
-const Tooltip = styled.div`
-    position: absolute;
-    background: white;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    border-radius: 10px;
-    z-index: 1;
-
-    ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    li {
-        padding: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    li:hover {
-        background-color: var(--clr-red-light);
-        color: white;
-    }
-`;
 
 export default CartButtons;

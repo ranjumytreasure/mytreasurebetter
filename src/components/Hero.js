@@ -75,7 +75,7 @@ const Wrapper = styled.section`
 
     }
     @media (min-width: 992px) {
-        height: calc(100vh - 5rem);
+        height: 100vh;
         grid-template-columns: 1fr 1fr;
         gap: 8rem;
         h1 {

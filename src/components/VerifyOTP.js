@@ -22,7 +22,7 @@ function VerifyOTP() {
         setIsLoading(true);
 
         const apiUrl = `${API_BASE_URL}/users/verify`;
-      
+
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -34,7 +34,7 @@ function VerifyOTP() {
 
             const responseData = await response.json();
 
-           
+
             if (response.ok) {
                 setVerificationMessage('OTP verification successful');
                 setIsVerified(true);
@@ -205,7 +205,7 @@ align-items: center;
   }
   @media (min-width: 992px) 
   {
-    height: calc(100vh - 5rem);
+    height: 100vh;
     
   }
   .success-animation {

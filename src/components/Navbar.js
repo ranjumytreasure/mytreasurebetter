@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components'
 import logo from '../assets/logo.png'
-import { FaBars } from 'react-icons/fa';
+import {
+  FaBars,
+  FaHome,
+  FaPlay,
+  FaQuestionCircle,
+  FaInfoCircle,
+  FaUser,
+  FaSignOutAlt,
+  FaSignInAlt,
+  FaUserPlus
+} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { links } from '../utils/constants';
 import CartButtons from './CartButtons';
@@ -28,137 +37,134 @@ const Nav = () => {
     };
   }, []);
 
+  // Icon mapping for navigation links
+  const getIconForLink = (text) => {
+    switch (text.toLowerCase()) {
+      case 'start group':
+        return <FaPlay className="w-4 h-4" />;
+      case 'help':
+        return <FaQuestionCircle className="w-4 h-4" />;
+      case 'faq':
+        return <FaInfoCircle className="w-4 h-4" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <NavContainer scrolled={scrolled}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+        ? 'bg-gradient-to-r from-red-600 via-red-700 to-red-800 shadow-lg backdrop-blur-sm'
+        : 'bg-white shadow-sm'
+      }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center">
+              <img
+                src={logo}
+                alt="Treasure"
+                className="h-12 w-auto transition-transform duration-300 hover:scale-105"
+              />
+            </Link>
+          </div>
 
-      <div className="nav-center">
-        <div className="nav-header">
-          <Link to='/'>
-            <img src={logo} alt="treasure" />
-          </Link>
-          <button type='button' className='nav-toggle' onClick={openSidebar}>
-            <FaBars />
-          </button>
+          {/* Desktop Navigation */}
+          <div className="hidden lg:block">
+            <div className="ml-10 flex items-baseline space-x-8">
+              {isLoggedIn && hasPermission(userRole, 'viewHome') && (
+                <Link
+                  to="/home"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${scrolled
+                      ? 'text-white hover:text-red-100 hover:bg-white/10'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                    }`}
+                >
+                  <FaHome className="w-4 h-4" />
+                  Home
+                </Link>
+              )}
+              {links.map((link) => {
+                const { id, text, url } = link;
+                return (
+                  <Link
+                    key={id}
+                    to={url}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${scrolled
+                        ? 'text-white hover:text-red-100 hover:bg-white/10'
+                        : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                      }`}
+                  >
+                    {getIconForLink(text)}
+                    {text}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
 
+          {/* User Actions */}
+          <div className="hidden lg:block">
+            <CartButtons scrolled={scrolled} />
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden">
+            <button
+              type="button"
+              onClick={openSidebar}
+              className={`inline-flex items-center justify-center p-2 rounded-md transition-all duration-300 ${scrolled
+                  ? 'text-white hover:text-red-100 hover:bg-white/10'
+                  : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                }`}
+              aria-controls="mobile-menu"
+              aria-expanded="false"
+            >
+              <span className="sr-only">Open main menu</span>
+              <FaBars className="block h-6 w-6" />
+            </button>
+          </div>
         </div>
+      </div>
 
-
-        <ul className="nav-links">
+      {/* Mobile Navigation Indicator */}
+      <div className="lg:hidden">
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {isLoggedIn && hasPermission(userRole, 'viewHome') && (
-            <li>
-              <Link to="/home">Home</Link>
-            </li>
+            <Link
+              to="/home"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${scrolled
+                  ? 'text-white hover:text-red-100 hover:bg-white/10'
+                  : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                }`}
+            >
+              <FaHome className="w-4 h-4" />
+              Home
+            </Link>
           )}
           {links.map((link) => {
             const { id, text, url } = link;
-            return <li key={id}>
-              <Link to={url}>{text}</Link>
-            </li>
+            return (
+              <Link
+                key={id}
+                to={url}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${scrolled
+                    ? 'text-white hover:text-red-100 hover:bg-white/10'
+                    : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                  }`}
+              >
+                {getIconForLink(text)}
+                {text}
+              </Link>
+            );
           })}
-        </ul>
-
-        <CartButtons scrolled={scrolled} />
+        </div>
       </div>
-    </NavContainer>
+    </nav>
   );
 };
 
-
-const NavContainer = styled.nav`
-  height: 5rem;
-  background-color:var(--clr-white);
-  //background-color:blue;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .nav-center {
-    //background-color:red;
-    width: 90vw;
-    margin: 10 auto;
-    max-width: var(--max-width);
-   
-  }
-  .nav-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    img {
-      width: 175px;
-     // margin-left: -15px;//
-    }
-  }
-  .nav-toggle {
-    background: transparent;
-    border: transparent;
-    color: var(--clr-red-dark);
-    cursor: pointer;
-    svg {
-      font-size: 2rem;
-    }
-  }
-  .nav-links {
-    display: none;
-  }
-  .cart-btn-wrapper {
-    display: none;
-  }
-  @media (min-width: 992px) {
-    .nav-toggle {
-      display: none;
-    }
-    .nav-center {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-    }
-   
-    .nav-links {
-      display: flex;
-      justify-content: center;
-      li {
-        margin: 0 0.5rem;
-      }
-      a {
-        color: var(--clr-grey-7);
-        font-size: 1rem;
-        text-transform: capitalize;
-        letter-spacing: var(--spacing);
-        padding: 0.5rem;
-        &:hover {
-          border-bottom: 2px solid var(--clr-primary-7);
-        }
-      }
-    }
-    .cart-btn-wrapper {
-      display: grid;
-    }
-  }
-  /* fixed navbar */
-
-  /* fixed navbar styles based on scrolled state */
-  ${({ scrolled }) =>
-    scrolled &&
-    `
-    position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: var(--clr-red-dark);
-  z-index: 2;
-  box-shadow: var(--light-shadow);
-  .nav-links {  
-    a {
-    color: var(--clr-white);
-  }
-  
-}
-    `
-  }
-  
-`
-
-export default Nav
+export default Nav;
 
 
 
