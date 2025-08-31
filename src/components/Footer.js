@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import {
   FaWhatsapp,
@@ -16,6 +16,9 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   const stats = [
     { number: "10,000+", label: "Happy Clients", icon: FaUsers },
     { number: "50,000+", label: "Groups Created", icon: FaHandshake },
@@ -45,22 +48,24 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white">
-      {/* Stats Section */}
-      <div className="bg-red-600 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            {stats.map((stat, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <stat.icon className="w-8 h-8 text-white" />
+      {/* Stats Section - Only show on home page */}
+      {isHomePage && (
+        <div className="bg-red-600 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              {stats.map((stat, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                    <stat.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
+                  <div className="text-red-100 font-medium">{stat.label}</div>
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-red-100 font-medium">{stat.label}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Footer Content */}
       <div className="py-16">
