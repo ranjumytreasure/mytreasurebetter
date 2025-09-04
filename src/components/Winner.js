@@ -1,35 +1,56 @@
 import React, { useState, useEffect, useRef } from 'react'
-import styled from 'styled-components'
 import Confetti from "react-confetti";
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/apiConfig';
+import { FaTrophy, FaHome, FaArrowLeft, FaCheckCircle, FaStar, FaMedal, FaGift, FaCoins, FaCalendar, FaUser } from 'react-icons/fa';
 
 const Winner = ({ location }) => {
     const history = useHistory();
+    const { groupId, reserve } = useParams();
     const [previewImage, setPreviewImage] = useState('https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true');
     const [error, setError] = useState(null);
     const [altText, setAltText] = useState('');
+    const [confettiActive, setConfettiActive] = useState(true);
 
-    const winningSub = location.state.winningSub;
-    // Extract image URL and amount from winningSub
-    const imageUrl = winningSub.winnerObject.userImage;
-    useEffect(() => {
-        fetchCompanyLogoUrl(imageUrl);
-    }, [imageUrl]);
+    // Get winningSub from location state or use fallback
+    const winningSub = location?.state?.winningSub || {};
+    const imageUrl = winningSub?.winnerObject?.userImage;
+    const amount = winningSub?.winnerObject?.winnerAmount || reserve || '5000';
+    const winnerName = winningSub?.winnerObject?.winnerName || 'Winner';
+    const groupName = winningSub?.winnerObject?.groupName || 'Auction Group';
 
-    const amount = winningSub.winnerObject.winnerAmount;
-    console.log(imageUrl);
-    console.log(amount);
     const [height, setHeight] = useState(null);
     const [width, setWidth] = useState(null);
-    const confetiRef = useRef(null);
+    const confettiRef = useRef(null);
+
     useEffect(() => {
-        setHeight(confetiRef.current.clientHeight);
-        setWidth(confetiRef.current.clientWidth);
-    }, []);
+        if (imageUrl) {
+            fetchCompanyLogoUrl(imageUrl);
+        }
+
+        if (confettiRef.current) {
+            setHeight(confettiRef.current.clientHeight);
+            setWidth(confettiRef.current.clientWidth);
+        }
+
+        // Stop confetti after 5 seconds
+        const timer = setTimeout(() => {
+            setConfettiActive(false);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [imageUrl]);
+
     const handleContinueClick = () => {
-        // Redirect to the home page
         history.push('/home');
+    };
+
+    const handleBackToGroup = () => {
+        if (groupId && groupId !== 'undefined') {
+            history.push(`/groups/${groupId}`);
+        } else {
+            history.push('/home');
+        }
     };
 
     const fetchCompanyLogoUrl = async (logoKey) => {
@@ -38,16 +59,12 @@ const Winner = ({ location }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/get-signed-url?key=${encodeURIComponent(logoKey)}`, {
                 method: 'GET',
-                headers: {
-                    // Include any headers if needed
-                    // 'Authorization': 'Bearer YourAccessToken',
-                },
+                headers: {},
             });
 
             if (response.ok) {
                 const responseBody = await response.json();
                 const signedUrl = responseBody.results;
-
                 setPreviewImage(signedUrl);
             } else {
                 console.error(`Failed to fetch signed URL for company logo: ${logoKey}`);
@@ -58,243 +75,179 @@ const Winner = ({ location }) => {
         }
     };
 
+    const formatCurrency = (amount) => {
+        return `₹${Number(amount).toLocaleString("en-IN")}`;
+    };
+
     return (
-        <Wrapper className='section-center' >
-            <div className='contain'>
-                <div className="confettie-wrap" ref={confetiRef}>
-                    <Confetti numberOfPieces={100} width={600} height={200} />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" ref={confettiRef}>
+            {/* Confetti Animation */}
+            {confettiActive && (
+                <Confetti
+                    numberOfPieces={200}
+                    width={width || window.innerWidth}
+                    height={height || window.innerHeight}
+                    recycle={false}
+                    colors={['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']}
+                />
+            )}
 
-                    <img src={previewImage} alt={altText} style={{ height: '100px', width: '100px' }} />
-
-                    <p>Amount: {amount}</p>
-                    <h2>Congratulations!</h2>
-                    <p>You are all set. Well done!</p>
-
-                    {/* <div className="checkmark-circle">
-                        <div className="background"></div>
-                        <div className="checkmark draw">
-                        </div>
-                    </div> */}
-
-                    <button className="submit-btn" type="submit" onClick={handleContinueClick}>Continue</button>
+            {/* Header Section */}
+            <div className="bg-white shadow-sm border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <button
+                            onClick={handleBackToGroup}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        >
+                            <FaArrowLeft className="w-4 h-4" />
+                            <span className="hidden sm:inline">Back to Group</span>
+                        </button>
+                        <h1 className="text-2xl font-bold text-gray-900 text-center flex-1">Auction Winner</h1>
+                        <div className="w-20"></div>
+                    </div>
                 </div>
             </div>
-        </Wrapper>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Main Winner Card */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+                    <div className="bg-gradient-to-r from-custom-red to-red-600 p-6 text-white">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <FaTrophy className="w-8 h-8" />
+                                <div>
+                                    <h2 className="text-xl font-semibold">🎉 Congratulations! 🎉</h2>
+                                    <p className="text-red-100">Auction Winner</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm text-red-100">Winning Amount</p>
+                                <p className="text-2xl font-bold text-white">{formatCurrency(amount)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Winner Profile */}
+                            <div className="text-center lg:text-left">
+                                <div className="relative inline-block mb-6">
+                                    <img
+                                        src={previewImage}
+                                        alt={winnerName}
+                                        className="w-32 h-32 rounded-full object-cover border-4 border-custom-red shadow-lg"
+                                        onError={(e) => {
+                                            e.target.src = "https://via.placeholder.com/128x128?text=W";
+                                        }}
+                                    />
+                                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white rounded-full p-2">
+                                        <FaCheckCircle className="w-5 h-5" />
+                                    </div>
+                                </div>
+
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">{winnerName}</h2>
+                                <p className="text-gray-600 mb-4">Auction Winner</p>
+
+                                <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full">
+                                    <FaStar className="w-4 h-4" />
+                                    <span className="font-semibold">Winner</span>
+                                </div>
+                            </div>
+
+                            {/* Auction Details */}
+                            <div className="space-y-6">
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <FaMedal className="w-5 h-5 text-blue-600" />
+                                        Auction Details
+                                    </h3>
+
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaUser className="w-4 h-4" />
+                                                Group:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">{groupName}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaCoins className="w-4 h-4" />
+                                                Winning Amount:
+                                            </span>
+                                            <span className="font-bold text-2xl text-green-600">
+                                                {formatCurrency(amount)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaCalendar className="w-4 h-4" />
+                                                Status:
+                                            </span>
+                                            <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                                                <FaCheckCircle className="w-3 h-3" />
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Prize Celebration */}
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <FaGift className="w-5 h-5 text-green-600" />
+                                        Your Prize
+                                    </h3>
+                                    <p className="text-gray-700 mb-3">
+                                        You've successfully secured the auction with your winning bid of{' '}
+                                        <span className="font-bold text-green-600 text-lg">
+                                            {formatCurrency(amount)}
+                                        </span>
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        The funds will be processed according to your group's payment schedule.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-gray-200">
+                            <button
+                                onClick={handleContinueClick}
+                                className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                            >
+                                <FaHome className="w-5 h-5" />
+                                Go to Home
+                            </button>
+
+                            {groupId && groupId !== 'undefined' && (
+                                <button
+                                    onClick={handleBackToGroup}
+                                    className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                >
+                                    <FaArrowLeft className="w-5 h-5" />
+                                    Back to Group
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Success Message Card */}
+                <div className="bg-white rounded-xl shadow-lg border border-green-200 p-6 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                        <FaCheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">You're All Set!</h3>
+                    <p className="text-gray-600">
+                        Your auction has been successfully completed. Thank you for participating!
+                    </p>
+                </div>
+            </div>
+        </div>
     );
-}
+};
 
-const Wrapper = styled.section`
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-align-items: center;
-
-.contain {  
-  max-width: 40rem;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
-padding: 35px;
-display: flex;
-flex-direction: column;
-background: var(--clr-white);
-border-radius: var(--radius);
-box-shadow: var(--light-shadow);
-transition: var(--transition);
-
-width: 90vw;
-height: 500px;
-margin: 10 auto;
-align-items: center;
-position: relative;
-}
-
-
-
-.contain:hover {
-    box-shadow: var(--dark-shadow);
-  }
-  .confettie-wrap {
-    display:flex;
-    flex-direction: column; /* Set flex-direction to column */
-    align-items: center;
-    justify-content: center;
-    padding: 35px;
-}
-
-
-  @media (min-width: 992px) 
-  {
-    height: 100vh;
-    
-  }
- 
-  
-
-  /* Checkmark */
-.checkmark-circle {
-    width: 150px;
-    height: 150px;
-    position: relative;
-    display: inline-block;
-    vertical-align: top;
-    margin-left: auto;
-    margin-right: auto;
-    align-items: center;
-    justify-content: center;
-}
-
-.checkmark-circle .background {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: #00C09D;
-    position: absolute;
-}
-
-.checkmark-circle .checkmark {
-    border-radius: 5px;
-}
-
-.checkmark-circle .checkmark.draw:after {
-    -webkit-animation-delay: 100ms;
-    -moz-animation-delay: 100ms;
-    animation-delay: 100ms;
-    -webkit-animation-duration: 3s;
-    -moz-animation-duration: 3s;
-    animation-duration: 3s;
-    -webkit-animation-timing-function: ease;
-    -moz-animation-timing-function: ease;
-    animation-timing-function: ease;
-    -webkit-animation-name: checkmark;
-    -moz-animation-name: checkmark;
-    animation-name: checkmark;
-    -webkit-transform: scaleX(-1) rotate(135deg);
-    -moz-transform: scaleX(-1) rotate(135deg);
-    -ms-transform: scaleX(-1) rotate(135deg);
-    -o-transform: scaleX(-1) rotate(135deg);
-    transform: scaleX(-1) rotate(135deg);
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-}
-
-.checkmark-circle .checkmark:after {
-    opacity: 1;
-    height: 75px;
-    width: 37.5px;
-    -webkit-transform-origin: left top;
-    -moz-transform-origin: left top;
-    -ms-transform-origin: left top;
-    -o-transform-origin: left top;
-    transform-origin: left top;
-    border-right: 15px solid white;
-    border-top: 15px solid white;
-    border-radius: 2.5px !important;
-    content: '';
-    left: 25px;
-    top: 75px;
-    position: absolute;
-}
-
-@-webkit-keyframes checkmark {
-    0% {
-        height: 0;
-        width: 0;
-        opacity: 1;
-    }
-
-    20% {
-        height: 0;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    40% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    100% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-}
-
-@-moz-keyframes checkmark {
-    0% {
-        height: 0;
-        width: 0;
-        opacity: 1;
-    }
-
-    20% {
-        height: 0;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    40% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    100% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-}
-
-@keyframes checkmark {
-    0% {
-        height: 0;
-        width: 0;
-        opacity: 1;
-    }
-
-    20% {
-        height: 0;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    40% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-
-    100% {
-        height: 75px;
-        width: 37.5px;
-        opacity: 1;
-    }
-}
-
-
-
-.submit-btn {
-    height: 45px;
-    width: 200px;
-    font-size: 15px;
-    background-color: #00c09d;
-    border: 1px solid #00ab8c;
-    color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px 0 rgba(87, 71, 81, .2);
-    cursor: pointer;
-    transition: all 2s ease-out;
-    transition: all .2s ease-out;
-}
-
-.submit-btn:hover {
-    background-color: #2ca893;
-    transition: all .2s ease-out;
-}
-
-  
-`
-export default Winner
+export default Winner;
