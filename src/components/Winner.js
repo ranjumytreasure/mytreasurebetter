@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Confetti from "react-confetti";
 import { useHistory, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/apiConfig';
-import { FaTrophy, FaHome, FaArrowLeft, FaCheckCircle, FaStar, FaMedal, FaGift, FaCoins, FaCalendar, FaUser } from 'react-icons/fa';
+import { FaTrophy, FaHome, FaArrowLeft, FaCheckCircle, FaStar, FaMedal, FaGift, FaCoins, FaCalendar, FaUser, FaCreditCard } from 'react-icons/fa';
 
 const Winner = ({ location }) => {
     const history = useHistory();
@@ -11,6 +11,7 @@ const Winner = ({ location }) => {
     const [error, setError] = useState(null);
     const [altText, setAltText] = useState('');
     const [confettiActive, setConfettiActive] = useState(true);
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     // Get winningSub from location state or use fallback
     const winningSub = location?.state?.winningSub || {};
@@ -50,6 +51,37 @@ const Winner = ({ location }) => {
             history.push(`/groups/${groupId}`);
         } else {
             history.push('/home');
+        }
+    };
+
+    const handlePayNow = async () => {
+        setIsProcessingPayment(true);
+
+        try {
+            // Here you would integrate with your payment gateway
+            // For now, we'll simulate a payment process
+            console.log('Processing payment for amount:', amount);
+            console.log('Winner details:', winningSub);
+
+            // Simulate payment processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // In a real implementation, you would:
+            // 1. Call your payment API
+            // 2. Handle the payment response
+            // 3. Update the payment status
+            // 4. Redirect to payment success/failure page
+
+            alert(`Payment of ${formatCurrency(amount)} has been processed successfully!`);
+
+            // You could redirect to a payment success page or update the UI
+            // history.push('/payment-success');
+
+        } catch (error) {
+            console.error('Payment processing error:', error);
+            alert('Payment processing failed. Please try again.');
+        } finally {
+            setIsProcessingPayment(false);
         }
     };
 
@@ -212,8 +244,40 @@ const Winner = ({ location }) => {
                             </div>
                         </div>
 
+                        {/* Payment Information */}
+                        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 border border-purple-200 mt-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <FaCreditCard className="w-5 h-5 text-purple-600" />
+                                Payment Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-600">Amount to Pay:</span>
+                                    <span className="font-bold text-2xl text-purple-600">
+                                        {formatCurrency(amount)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-600">Payment Method:</span>
+                                    <span className="font-semibold text-gray-900">Credit/Debit Card</span>
+                                </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-3">
+                                Click "Pay Now" to proceed with the payment for your winning bid.
+                            </p>
+                        </div>
+
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-gray-200">
+                            <button
+                                onClick={handlePayNow}
+                                disabled={isProcessingPayment}
+                                className="flex-1 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            >
+                                <FaCreditCard className="w-5 h-5" />
+                                {isProcessingPayment ? 'Processing...' : 'Pay Now'}
+                            </button>
+
                             <button
                                 onClick={handleContinueClick}
                                 className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
