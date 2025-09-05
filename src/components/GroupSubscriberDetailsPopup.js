@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGroupDetailsContext } from '../context/group_context';
 import BidSubscriberList from './BidSubscriberList'
+import Modal from './Modal';
 import "../style/GroupSubscriberDetailsPopup.css";
 
 //data 
@@ -58,14 +59,10 @@ import "../style/GroupSubscriberDetailsPopup.css";
 //     );
 // };
 const GroupSubscriberDetailsPopup = ({ onClose, onCloseRightSide }) => {
-    // const { state: groupDetailsState } = useGroupDetailsContext();
-    // const { data: groups } = groupDetailsState;
-    // const [people, setPeople] = useState(groups.results.groupSubcriberResult || []);
-
     const { data } = useGroupDetailsContext();
 
     const groups = data?.results?.groups;
-    const people = data?.results?.groupSubcriberResult;
+    const people = data?.results?.groupSubcriberResult || [];
 
     const [filteredCount, setFilteredCount] = useState(0);
 
@@ -76,16 +73,46 @@ const GroupSubscriberDetailsPopup = ({ onClose, onCloseRightSide }) => {
     const handleFilteredCount = (count) => setFilteredCount(count);
 
     return (
-        <div className="subscriber-popup-container">
-            <h3>{filteredCount} Group Subscribers</h3>
-            <BidSubscriberList
-                people={people}
-                onBidClick={handleBidClick}
-                onFilteredCount={handleFilteredCount}
-            />
+        <Modal isOpen={true} onClose={onCloseRightSide}>
+            <div className="subscriber-popup-container">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900">
+                        Select Subscriber ({filteredCount} available)
+                    </h3>
+                    <button
+                        className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                        onClick={onCloseRightSide}
+                    >
+                        ×
+                    </button>
+                </div>
 
-            <button className="close-button" onClick={onCloseRightSide}>×</button>
-        </div>
+                <div className="max-h-96 overflow-y-auto">
+                    {people && people.length > 0 ? (
+                        <BidSubscriberList
+                            people={people}
+                            onBidClick={handleBidClick}
+                            onFilteredCount={handleFilteredCount}
+                        />
+                    ) : (
+                        <div className="text-center py-8">
+                            <div className="text-gray-400 text-6xl mb-4">👥</div>
+                            <h4 className="text-lg font-medium text-gray-900 mb-2">No Subscribers Available</h4>
+                            <p className="text-gray-600">There are no subscribers in this group to select from.</p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                    <button
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200"
+                        onClick={onCloseRightSide}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </Modal>
     );
 };
 

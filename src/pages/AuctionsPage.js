@@ -19,7 +19,14 @@ const AuctionsPage = () => {
     const { user } = useUserContext();
     const { data } = useGroupDetailsContext();
 
-    const groupsAccountsDetail = data?.results?.groupsAccountsDetail;
+    // Debug the data structure
+    console.log('Full data object from context:', data);
+    console.log('data?.results:', data?.results);
+    console.log('data?.results?.groupAccountResult:', data?.results?.groupAccountResult);
+    console.log('data?.results?.type:', data?.results?.type);
+
+    // Fix: Use the correct data structure based on Groups component
+    const groupsAccountsDetail = data?.results;
     const [isPlacingBid, setIsPlacingBid] = useState(false);
 
     const { groupId, nextAuctionDate } = useParams();
@@ -43,15 +50,32 @@ const AuctionsPage = () => {
 
     // if its fixed take auction amount and put in text box
     useEffect(() => {
-        if (groupsAccountsDetail?.results?.type === 'FIXED') {
-            const pendingAuctions = groupsAccountsDetail.results.groupAccountResult
+        console.log('groupsAccountsDetail:', groupsAccountsDetail);
+        console.log('groupsAccountsDetail?.type:', groupsAccountsDetail?.type);
+        console.log('groupsAccountsDetail?.groupAccountResult:', groupsAccountsDetail?.groupAccountResult);
+
+        // Check if data is available and has the expected structure
+        if (groupsAccountsDetail?.type === 'FIXED') {
+            console.log('Fixed auction detected');
+            console.log('groupAccountResult:', groupsAccountsDetail.groupAccountResult);
+
+            const pendingAuctions = groupsAccountsDetail.groupAccountResult
                 ?.filter(item => item.auctionStatus === 'pending')
                 .sort((a, b) => a.sno - b.sno);
 
+            console.log('pendingAuctions:', pendingAuctions);
+
             if (pendingAuctions && pendingAuctions.length > 0) {
                 const firstAuctionAmount = pendingAuctions[0]?.auctionAmount;
+                console.log('firstAuctionAmount:', firstAuctionAmount);
                 setBidAmount(firstAuctionAmount?.toString() || '');
+                console.log('Bid amount set to:', firstAuctionAmount?.toString() || '');
+            } else {
+                console.log('No pending auctions found');
             }
+        } else {
+            console.log('Not a fixed auction or data not available');
+            console.log('Type found:', groupsAccountsDetail?.type);
         }
     }, [groupsAccountsDetail]);
 
@@ -388,6 +412,11 @@ const AuctionsPage = () => {
                                                 className="w-full px-4 py-3 text-xl border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 disabled={isPlacingBid}
                                             />
+                                            {bidAmount && (
+                                                <p className="text-sm text-gray-600 mt-1">
+                                                    Current bid amount: {bidAmount}
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <button

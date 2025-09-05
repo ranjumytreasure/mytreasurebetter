@@ -1,11 +1,10 @@
 /* Container for the popup */
 .subscriber-popup-container {
   max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
+  width: 100%;
+  padding: 24px;
   background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -16,17 +15,7 @@
   text-align: center;
 }
 
-/* Close button top right */
-.close-button {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 1.5rem;
-  background-color: transparent;
-  border: none;
-  color: #cd3240;
-  cursor: pointer;
-}
+/* Close button styling is now handled by Tailwind classes */
 
 /* Search bar styling */
 .search-bar {
