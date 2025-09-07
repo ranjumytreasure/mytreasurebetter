@@ -45,6 +45,8 @@ const ProductsPage = () => {
   const [formErrors, setFormErrors] = useState({});
   const [tenureSortOrder, setTenureSortOrder] = useState('asc'); // 'asc' or 'desc'
   const [modalTenureSortOrder, setModalTenureSortOrder] = useState('asc'); // 'asc' or 'desc' for modal
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   // Generate empty monthly details when tenure changes (only for create mode)
   useEffect(() => {
@@ -295,19 +297,33 @@ const ProductsPage = () => {
     }
   };
 
-  // Delete Product
-  const handleDeleteProduct = (productToDelete) => {
-    if (window.confirm('Are you sure you want to delete this product? This will remove both the product and all its details.')) {
+  // Show delete confirmation dialog
+  const handleDeleteProduct = (product) => {
+    setProductToDelete(product);
+    setShowDeleteConfirm(true);
+  };
+
+  // Confirm delete product
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
       deleteProduct(productToDelete.id).then(() => {
         if (selectedProduct && selectedProduct.id === productToDelete.id) {
           setSelectedProduct(null);
         }
         toast.success('Product deleted successfully');
+        setShowDeleteConfirm(false);
+        setProductToDelete(null);
       }).catch(error => {
         console.error('Error deleting product:', error);
         toast.error(error.message || 'Error deleting product');
       });
     }
+  };
+
+  // Cancel delete
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setProductToDelete(null);
   };
 
   // Edit Specific Row
@@ -721,18 +737,19 @@ const ProductsPage = () => {
                 </div>
 
                 {/* Product Details Section */}
-                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-6">
-                  <div className="mb-3">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                  {/* Header with gradient background */}
+                  <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-base font-semibold text-gray-900">Tenure Details</h3>
-                        <p className="text-xs text-gray-600">
+                        <h3 className="text-lg font-bold text-white">Tenure Details</h3>
+                        <p className="text-sm text-red-100 mt-1">
                           {(selectedProduct.monthlyDetails || []).length} tenure periods configured
                         </p>
                       </div>
                       <button
                         onClick={handleTenureSort}
-                        className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                        className="flex items-center gap-2 px-4 py-2 text-sm bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md border border-white border-opacity-30"
                         title={`Sort ${tenureSortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
                       >
                         <span className="font-medium">Sort</span>
@@ -745,101 +762,107 @@ const ProductsPage = () => {
                     </div>
                   </div>
 
-                  {(selectedProduct.monthlyDetails || []).length > 0 ? (
-                    <div className="space-y-3 overflow-x-auto">
-                      {/* Header Row */}
-                      <div className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl font-bold text-sm text-gray-800 shadow-sm">
-                        <div className="text-center flex items-center justify-center gap-1 cursor-pointer bg-red-600 text-white hover:bg-red-700 rounded px-2 py-1" onClick={handleTenureSort}>
-                          Tenure
-                          {tenureSortOrder === 'asc' ? (
-                            <FaChevronUp className="w-3 h-3" />
-                          ) : (
-                            <FaChevronDown className="w-3 h-3" />
-                          )}
-                        </div>
-                        <div className="text-center">Bid</div>
-                        <div className="text-center">Prize</div>
-                        <div className="text-center">Comm</div>
-                        <div className="text-center">Bal</div>
-                        <div className="text-center">Profit</div>
-                        <div className="text-center">Due</div>
-                        <div className="text-center">Action</div>
-                      </div>
-
-                      {/* Data Rows */}
-                      {getSortedMonthlyDetails(selectedProduct.monthlyDetails || []).map((detail, sortedIndex) => {
-                        // Find the original index in the unsorted array
-                        const originalIndex = (selectedProduct.monthlyDetails || []).findIndex(d => d.sequence === detail.sequence);
-                        return (
-                          <div key={detail.sequence} className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:shadow-md transition-all duration-200">
-                            {/* Tenure Period */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-full">
-                                {detail.sequence}
-                              </span>
-                            </div>
-
-                            {/* Bid */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.bid || '-'}
-                              </span>
-                            </div>
-
-                            {/* Prize */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.prize || '-'}
-                              </span>
-                            </div>
-
-                            {/* Comm */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.comm || '-'}
-                              </span>
-                            </div>
-
-                            {/* Bal */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.bal || '-'}
-                              </span>
-                            </div>
-
-                            {/* Profit */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.profit || '-'}
-                              </span>
-                            </div>
-
-                            {/* Due */}
-                            <div className="flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border min-w-[70px] text-center shadow-sm">
-                                {detail.due || '-'}
-                              </span>
-                            </div>
-
-                            {/* Action */}
-                            <div className="flex items-center justify-center">
-                              <button
-                                onClick={() => handleEditRow(selectedProduct, originalIndex)}
-                                className="flex items-center gap-1 px-4 py-2 text-sm bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg"
-                                title="Edit Tenure Period"
-                              >
-                                <FaEdit className="w-4 h-4" />
-                              </button>
-                            </div>
+                  <div className="p-6">
+                    {(selectedProduct.monthlyDetails || []).length > 0 ? (
+                      <div className="space-y-3 overflow-x-auto">
+                        {/* Header Row */}
+                        <div className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl font-bold text-sm text-red-800 shadow-sm border border-red-200">
+                          <div className="text-center flex items-center justify-center gap-1 cursor-pointer bg-red-600 text-white hover:bg-red-700 rounded px-2 py-1" onClick={handleTenureSort}>
+                            Tenure
+                            {tenureSortOrder === 'asc' ? (
+                              <FaChevronUp className="w-3 h-3" />
+                            ) : (
+                              <FaChevronDown className="w-3 h-3" />
+                            )}
                           </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      <p className="text-sm">No monthly details configured</p>
-                    </div>
-                  )}
+                          <div className="text-center">Bid</div>
+                          <div className="text-center">Prize</div>
+                          <div className="text-center">Comm</div>
+                          <div className="text-center">Bal</div>
+                          <div className="text-center">Profit</div>
+                          <div className="text-center">Due</div>
+                          <div className="text-center">Action</div>
+                        </div>
+
+                        {/* Data Rows */}
+                        {getSortedMonthlyDetails(selectedProduct.monthlyDetails || []).map((detail, sortedIndex) => {
+                          // Find the original index in the unsorted array
+                          const originalIndex = (selectedProduct.monthlyDetails || []).findIndex(d => d.sequence === detail.sequence);
+                          return (
+                            <div key={detail.sequence} className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all duration-200">
+                              {/* Tenure Period */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-full">
+                                  {detail.sequence}
+                                </span>
+                              </div>
+
+                              {/* Bid */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.bid || '-'}
+                                </span>
+                              </div>
+
+                              {/* Prize */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.prize || '-'}
+                                </span>
+                              </div>
+
+                              {/* Comm */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.comm || '-'}
+                                </span>
+                              </div>
+
+                              {/* Bal */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.bal || '-'}
+                                </span>
+                              </div>
+
+                              {/* Profit */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.profit || '-'}
+                                </span>
+                              </div>
+
+                              {/* Due */}
+                              <div className="flex items-center justify-center">
+                                <span className="text-sm font-medium text-gray-900 bg-red-50 px-3 py-2 rounded-lg border border-red-200 min-w-[70px] text-center shadow-sm">
+                                  {detail.due || '-'}
+                                </span>
+                              </div>
+
+                              {/* Action */}
+                              <div className="flex items-center justify-center">
+                                <button
+                                  onClick={() => handleEditRow(selectedProduct, originalIndex)}
+                                  className="flex items-center gap-1 px-4 py-2 text-sm bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-md hover:shadow-lg"
+                                  title="Edit Tenure Period"
+                                >
+                                  <FaEdit className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="bg-red-50 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                          <FaEdit className="w-8 h-8 text-red-400" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">No tenure details configured</p>
+                        <p className="text-xs text-gray-500 mt-1">Edit the product to add tenure periods</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -1105,6 +1128,59 @@ const ProductsPage = () => {
                   >
                     <FaSave className="w-5 h-5" />
                     Save Draft
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Delete Confirmation Dialog */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white bg-opacity-20 rounded-full p-2">
+                    <FaTrash className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Delete Product</h3>
+                    <p className="text-sm text-red-100">This action cannot be undone</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="mb-4">
+                  <p className="text-gray-700 mb-2">
+                    Are you sure you want to delete this product?
+                  </p>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-red-800">
+                      <strong>Product:</strong> {productToDelete?.productName}
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      This will permanently remove the product and all its tenure details.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={cancelDelete}
+                    className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteProduct}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  >
+                    Delete Product
                   </button>
                 </div>
               </div>
