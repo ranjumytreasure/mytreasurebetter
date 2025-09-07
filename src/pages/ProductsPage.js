@@ -47,6 +47,10 @@ const ProductsPage = () => {
   const [modalTenureSortOrder, setModalTenureSortOrder] = useState('asc'); // 'asc' or 'desc' for modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [editingRow, setEditingRow] = useState(null); // Track which row is being edited (format: "rowIndex")
+  const [showRowEditModal, setShowRowEditModal] = useState(false);
+  const [editingRowData, setEditingRowData] = useState(null);
+  const [editingRowIndexModal, setEditingRowIndexModal] = useState(null);
 
   // Generate empty monthly details when tenure changes (only for create mode)
   useEffect(() => {
@@ -324,6 +328,83 @@ const ProductsPage = () => {
   const cancelDelete = () => {
     setShowDeleteConfirm(false);
     setProductToDelete(null);
+  };
+
+  // Handle inline editing of individual fields
+  const handleInlineEdit = (productId, rowIndex, field, value) => {
+    const updatedMonthlyDetails = selectedProduct.monthlyDetails.map((detail, index) =>
+      index === rowIndex ? { ...detail, [field]: value } : detail
+    );
+
+    const updatedProduct = {
+      ...selectedProduct,
+      monthlyDetails: updatedMonthlyDetails
+    };
+
+    // Update the product via API
+    updateProduct(productId, { monthlyDetails: updatedMonthlyDetails })
+      .then(() => {
+        // Update local state
+        setSelectedProduct(updatedProduct);
+        toast.success(`${field} updated successfully`);
+        setEditingRow(null); // Close editing mode
+      })
+      .catch(error => {
+        console.error('Error updating field:', error);
+        toast.error('Error updating field');
+      });
+  };
+
+  // Handle row click to open edit modal
+  const handleRowClick = (rowIndex) => {
+    const rowData = selectedProduct.monthlyDetails[rowIndex];
+    setEditingRowData({ ...rowData });
+    setEditingRowIndexModal(rowIndex);
+    setShowRowEditModal(true);
+  };
+
+  // Handle row edit modal save
+  const handleRowEditSave = () => {
+    if (editingRowData && editingRowIndexModal !== null) {
+      const updatedMonthlyDetails = selectedProduct.monthlyDetails.map((detail, index) =>
+        index === editingRowIndexModal ? editingRowData : detail
+      );
+
+      const updatedProduct = {
+        ...selectedProduct,
+        monthlyDetails: updatedMonthlyDetails
+      };
+
+      // Update the product via API
+      updateProduct(selectedProduct.id, { monthlyDetails: updatedMonthlyDetails })
+        .then(() => {
+          // Update local state
+          setSelectedProduct(updatedProduct);
+          toast.success('Tenure period updated successfully');
+          setShowRowEditModal(false);
+          setEditingRowData(null);
+          setEditingRowIndexModal(null);
+        })
+        .catch(error => {
+          console.error('Error updating tenure period:', error);
+          toast.error('Error updating tenure period');
+        });
+    }
+  };
+
+  // Handle row edit modal cancel
+  const handleRowEditCancel = () => {
+    setShowRowEditModal(false);
+    setEditingRowData(null);
+    setEditingRowIndexModal(null);
+  };
+
+  // Handle row edit data change
+  const handleRowEditDataChange = (field, value) => {
+    setEditingRowData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   // Edit Specific Row
@@ -789,7 +870,10 @@ const ProductsPage = () => {
                           // Find the original index in the unsorted array
                           const originalIndex = (selectedProduct.monthlyDetails || []).findIndex(d => d.sequence === detail.sequence);
                           return (
-                            <div key={detail.sequence} className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all duration-200">
+                            <div
+                              key={detail.sequence}
+                              className="grid grid-cols-8 gap-2 md:gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all duration-200"
+                            >
                               {/* Tenure Period */}
                               <div className="flex items-center justify-center">
                                 <span className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-full">
@@ -842,9 +926,9 @@ const ProductsPage = () => {
                               {/* Action */}
                               <div className="flex items-center justify-center">
                                 <button
-                                  onClick={() => handleEditRow(selectedProduct, originalIndex)}
+                                  onClick={() => handleRowClick(originalIndex)}
                                   className="flex items-center gap-1 px-4 py-2 text-sm bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-md hover:shadow-lg"
-                                  title="Edit Tenure Period"
+                                  title="Edit this tenure period"
                                 >
                                   <FaEdit className="w-4 h-4" />
                                 </button>
@@ -1128,6 +1212,119 @@ const ProductsPage = () => {
                   >
                     <FaSave className="w-5 h-5" />
                     Save Draft
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Row Edit Modal */}
+        {showRowEditModal && editingRowData && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white bg-opacity-20 rounded-full p-2">
+                    <FaEdit className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Edit Tenure Period</h3>
+                    <p className="text-sm text-red-100">Period {editingRowData.sequence}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="space-y-4">
+                  {/* Bid */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bid</label>
+                    <input
+                      type="number"
+                      value={editingRowData.bid || ''}
+                      onChange={(e) => handleRowEditDataChange('bid', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter bid amount"
+                    />
+                  </div>
+
+                  {/* Prize */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Prize</label>
+                    <input
+                      type="number"
+                      value={editingRowData.prize || ''}
+                      onChange={(e) => handleRowEditDataChange('prize', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter prize amount"
+                    />
+                  </div>
+
+                  {/* Comm */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Commission</label>
+                    <input
+                      type="number"
+                      value={editingRowData.comm || ''}
+                      onChange={(e) => handleRowEditDataChange('comm', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter commission"
+                    />
+                  </div>
+
+                  {/* Bal */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Balance</label>
+                    <input
+                      type="number"
+                      value={editingRowData.bal || ''}
+                      onChange={(e) => handleRowEditDataChange('bal', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter balance"
+                    />
+                  </div>
+
+                  {/* Profit */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Profit</label>
+                    <input
+                      type="number"
+                      value={editingRowData.profit || ''}
+                      onChange={(e) => handleRowEditDataChange('profit', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter profit"
+                    />
+                  </div>
+
+                  {/* Due */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Due</label>
+                    <input
+                      type="number"
+                      value={editingRowData.due || ''}
+                      onChange={(e) => handleRowEditDataChange('due', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter due amount"
+                    />
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleRowEditCancel}
+                    className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleRowEditSave}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  >
+                    Save Changes
                   </button>
                 </div>
               </div>
