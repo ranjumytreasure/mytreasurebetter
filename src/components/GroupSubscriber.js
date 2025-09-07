@@ -463,6 +463,14 @@ const GroupsSubscriber = () => {
                 <Phone size={12} />
                 <span className="break-words">{subscriber?.phone || "N/A"}</span>
               </div>
+              <div className="text-xs text-gray-600 mb-1">
+                <span className="font-medium">Advance Amount: </span>
+                <span className="text-red-600 font-semibold">
+                  {subscriber?.total_advance_balance !== undefined && subscriber?.total_advance_balance !== null
+                    ? `₹${subscriber.total_advance_balance.toLocaleString()}`
+                    : "N/A"}
+                </span>
+              </div>
               <div className={`flex items-center justify-center gap-1 text-xs ${isOnline ? 'text-green-600' : 'text-gray-500'
                 }`}>
                 {isOnline ? (
@@ -534,6 +542,14 @@ const DeleteSubscriberModal = ({ show, subscriber, onClose, onConfirm, isLoading
           <div className="text-left">
             <p className="text-sm mb-1"><strong>Name:</strong> {subscriber?.name || "Unknown"}</p>
             <p className="text-sm mb-1"><strong>Phone:</strong> {subscriber?.phone || "N/A"}</p>
+            <p className="text-sm mb-1">
+              <strong>Advance Amount:</strong>
+              <span className="text-red-600 font-semibold ml-1">
+                {subscriber?.total_advance_balance !== undefined && subscriber?.total_advance_balance !== null
+                  ? `₹${subscriber.total_advance_balance.toLocaleString()}`
+                  : "N/A"}
+              </span>
+            </p>
             <p className={`text-sm flex items-center gap-1 ${isOnline ? 'text-green-600' : 'text-gray-500'
               }`}>
               {isOnline ? (
