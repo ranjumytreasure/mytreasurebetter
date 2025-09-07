@@ -368,8 +368,8 @@
 
 // export default HomePage;
 
-import  { useState, useEffect } from 'react';
-import {  ReadyGroups, NewGroups, ClosedGroups, UserDetails, ScrollToTop } from '../components';
+import { useState, useEffect } from 'react';
+import { ReadyGroups, NewGroups, ClosedGroups, UserDetails, ScrollToTop } from '../components';
 import { useHistory } from 'react-router-dom';
 import GroupDataInNavbar from '../components/GroupDataInNavbar';
 import loadingImage from '../images/preloader.gif';
@@ -379,6 +379,7 @@ import { useLedgerAccountContext } from "../context/ledgerAccount_context";
 import { useLedgerEntryContext } from "../context/ledgerEntry_context";
 import { useAobContext } from "../context/aob_context";
 import { useGroupsDetailsContext } from "../context/groups_context";
+import { useProductContext } from "../context/product_context";
 import '../style/home.css'; // Make sure this path is correct
 
 const HomePage = () => {

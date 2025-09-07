@@ -10,7 +10,8 @@ import {
     FaCreditCard,
     FaShieldAlt,
     FaBook,
-    FaSignInAlt
+    FaSignInAlt,
+    FaBox
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../context/user_context";
@@ -107,6 +108,8 @@ const CartButtons = ({ scrolled }) => {
                 return <FaShieldAlt className="w-4 h-4" />;
             case 'ledger':
                 return <FaBook className="w-4 h-4" />;
+            case 'products':
+                return <FaBox className="w-4 h-4" />;
             default:
                 return <FaUser className="w-4 h-4" />;
         }
@@ -218,6 +221,18 @@ const CartButtons = ({ scrolled }) => {
                                                 >
                                                     {getIconForMenuItem('Ledger')}
                                                     Ledger
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasPermission(userRole, 'viewAdminSettings') && (
+                                            <li>
+                                                <Link
+                                                    to="/products"
+                                                    onClick={closeSidebar}
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                >
+                                                    {getIconForMenuItem('Products')}
+                                                    Products
                                                 </Link>
                                             </li>
                                         )}

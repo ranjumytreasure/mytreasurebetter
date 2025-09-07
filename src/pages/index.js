@@ -25,6 +25,7 @@ import Receivables from './Receivables'
 import Payables from './Payables'
 import SubscriberProfile from './SubscriberProfile'
 import Ledger from './Ledger'
+import ProductsPage from './ProductsPage'
 
 
 export {
@@ -51,6 +52,7 @@ export {
     Receivables,
     Payables,
     SubscriberProfile,
-    Ledger
+    Ledger,
+    ProductsPage
 
 }
