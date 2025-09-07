@@ -418,76 +418,123 @@ const GroupsSubscriber = () => {
   if (!data) return <p>Data is not available.</p>;
 
   return (
-    <section className="py-8 px-4 bg-white">
+    <section className="py-8 px-4 bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
 
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Group Subscriber ({groupSubscriber.length})</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {groupSubscriber.map((subscriber) => {
-          const isOnline = isSubscriberOnline(subscriber.id);
-          return (
-            <div key={subscriber.group_subscriber_id || subscriber.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 text-center relative">
-              <div className="relative w-full h-32 flex items-center justify-center mb-3">
-                {subscriber?.user_image_from_s3 && !imageError[subscriber.id] ? (
-                  <img
-                    src={subscriber.user_image_from_s3}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                    alt={subscriber?.name || "Subscriber"}
-                    onError={() => setImageError(prev => ({ ...prev, [subscriber.id]: true }))}
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                    <User size={24} className="text-gray-400" />
-                  </div>
-                )}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h3 className="text-3xl font-bold text-gray-800 mb-2">Group Subscribers</h3>
+            <p className="text-gray-600">Total Members: <span className="font-semibold text-red-600">{groupSubscriber.length}</span></p>
+          </div>
+          <div className="hidden md:block">
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+              <p className="text-sm text-gray-500">Active Members</p>
+              <p className="text-2xl font-bold text-green-600">{groupSubscriber.filter((_, index) => index % 3 !== 0).length}</p>
+            </div>
+          </div>
+        </div>
 
-                {/* Online/Offline Status Indicator */}
-                <div className={`absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${isOnline ? 'bg-green-500' : 'bg-gray-400'
-                  }`}>
-                  {isOnline ? (
-                    <Wifi size={8} className="text-white" />
-                  ) : (
-                    <WifiOff size={8} className="text-white" />
-                  )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {groupSubscriber.map((subscriber) => {
+            const isOnline = isSubscriberOnline(subscriber.id);
+            return (
+              <div key={subscriber.group_subscriber_id || subscriber.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden group">
+                {/* Header with image and status */}
+                <div className="relative bg-gradient-to-br from-gray-50 to-white p-6 pb-4">
+                  <div className="relative w-full flex items-center justify-center mb-4">
+                    {subscriber?.user_image_from_s3 && !imageError[subscriber.id] ? (
+                      <img
+                        src={subscriber.user_image_from_s3}
+                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                        alt={subscriber?.name || "Subscriber"}
+                        onError={() => setImageError(prev => ({ ...prev, [subscriber.id]: true }))}
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-white shadow-lg flex items-center justify-center">
+                        <User size={32} className="text-gray-400" />
+                      </div>
+                    )}
+
+                    {/* Online/Offline Status Indicator */}
+                    <div className={`absolute bottom-1 right-1 w-6 h-6 rounded-full border-3 border-white flex items-center justify-center shadow-md ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                      }`}>
+                      {isOnline ? (
+                        <Wifi size={10} className="text-white" />
+                      ) : (
+                        <WifiOff size={10} className="text-white" />
+                      )}
+                    </div>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleOpenDeleteModal(subscriber)}
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-lg hover:shadow-xl"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleOpenDeleteModal(subscriber)}
-                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors duration-200"
-                >
-                  <FaTrash size={12} />
-                </button>
+                {/* Content */}
+                <div className="px-6 pb-6">
+                  {/* Name */}
+                  <h4 className="font-bold text-lg text-gray-800 mb-3 text-center break-words leading-tight">
+                    {subscriber?.name || "Unknown"}
+                  </h4>
+
+                  {/* Phone */}
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-4 bg-gray-50 rounded-lg py-2 px-3">
+                    <Phone size={14} className="text-gray-500" />
+                    <span className="break-words font-medium">{subscriber?.phone || "N/A"}</span>
+                  </div>
+
+                  {/* Advance Amount */}
+                  <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-4 border border-red-200">
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Advance Amount</p>
+                      <p className="text-lg font-bold text-red-600">
+                        {(() => {
+                          // Try to get the advance balance from different possible field names
+                          let advanceBalance = subscriber?.total_advance_balance;
+
+                          // If total_advance_balance is not available, try to calculate it
+                          if ((advanceBalance === undefined || advanceBalance === null) &&
+                            (subscriber?.total_advance_credit !== undefined || subscriber?.total_advance_debit !== undefined)) {
+                            const credit = subscriber?.total_advance_credit || 0;
+                            const debit = subscriber?.total_advance_debit || 0;
+                            advanceBalance = credit - debit;
+                          }
+
+                          // Return formatted value or N/A
+                          return (advanceBalance !== undefined && advanceBalance !== null)
+                            ? `₹${advanceBalance.toLocaleString()}`
+                            : "N/A";
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div className={`flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 rounded-full ${isOnline ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                    {isOnline ? (
+                      <>
+                        <Wifi size={14} />
+                        <span>Online</span>
+                      </>
+                    ) : (
+                      <>
+                        <WifiOff size={14} />
+                        <span>Offline</span>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-              <h4 className="font-medium text-sm text-gray-800 mb-1 break-words">{subscriber?.name || "Unknown"}</h4>
-              <div className="flex items-center justify-center gap-1 text-xs text-gray-600 mb-1">
-                <Phone size={12} />
-                <span className="break-words">{subscriber?.phone || "N/A"}</span>
-              </div>
-              <div className="text-xs text-gray-600 mb-1">
-                <span className="font-medium">Advance Amount: </span>
-                <span className="text-red-600 font-semibold">
-                  {subscriber?.total_advance_balance !== undefined && subscriber?.total_advance_balance !== null
-                    ? `₹${subscriber.total_advance_balance.toLocaleString()}`
-                    : "N/A"}
-                </span>
-              </div>
-              <div className={`flex items-center justify-center gap-1 text-xs ${isOnline ? 'text-green-600' : 'text-gray-500'
-                }`}>
-                {isOnline ? (
-                  <>
-                    <Wifi size={10} />
-                    <span>Online</span>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff size={10} />
-                    <span>Offline</span>
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       <DeleteSubscriberModal
@@ -511,77 +558,108 @@ const DeleteSubscriberModal = ({ show, subscriber, onClose, onConfirm, isLoading
   const isOnline = subscriber ? Math.random() > 0.3 : false;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg text-center max-w-sm w-11/12">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Confirm Deletion?</h3>
-        <h3 className="text-lg text-gray-600 mb-4">Are you sure?</h3>
-
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <div className="relative">
-            {subscriber?.user_image_from_s3 ? (
-              <img
-                src={subscriber.user_image_from_s3}
-                alt={subscriber?.name || "Subscriber"}
-                className="w-20 h-20 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                <User size={24} className="text-gray-400" />
-              </div>
-            )}
-            {/* Online/Offline Status in Modal */}
-            <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center ${isOnline ? 'bg-green-500' : 'bg-gray-400'
-              }`}>
-              {isOnline ? (
-                <Wifi size={10} className="text-white" />
-              ) : (
-                <WifiOff size={10} className="text-white" />
-              )}
-            </div>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white text-center">
+          <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3">
+            <FaTrash size={24} />
           </div>
-          <div className="text-left">
-            <p className="text-sm mb-1"><strong>Name:</strong> {subscriber?.name || "Unknown"}</p>
-            <p className="text-sm mb-1"><strong>Phone:</strong> {subscriber?.phone || "N/A"}</p>
-            <p className="text-sm mb-1">
-              <strong>Advance Amount:</strong>
-              <span className="text-red-600 font-semibold ml-1">
-                {subscriber?.total_advance_balance !== undefined && subscriber?.total_advance_balance !== null
-                  ? `₹${subscriber.total_advance_balance.toLocaleString()}`
-                  : "N/A"}
-              </span>
-            </p>
-            <p className={`text-sm flex items-center gap-1 ${isOnline ? 'text-green-600' : 'text-gray-500'
-              }`}>
-              {isOnline ? (
-                <>
-                  <Wifi size={12} />
-                  <span>Online</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff size={12} />
-                  <span>Offline</span>
-                </>
-              )}
-            </p>
-          </div>
+          <h3 className="text-xl font-bold mb-1">Confirm Deletion</h3>
+          <p className="text-red-100 text-sm">This action cannot be undone</p>
         </div>
 
-        <div className="flex justify-between gap-4">
-          <button
-            className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            className="flex-1 px-4 py-2 bg-custom-red text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={onConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? "Deleting..." : "Confirm Deletion"}
-          </button>
+        {/* Content */}
+        <div className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative">
+              {subscriber?.user_image_from_s3 ? (
+                <img
+                  src={subscriber.user_image_from_s3}
+                  alt={subscriber?.name || "Subscriber"}
+                  className="w-16 h-16 rounded-full object-cover border-3 border-gray-200"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gray-100 border-3 border-gray-200 flex items-center justify-center">
+                  <User size={20} className="text-gray-400" />
+                </div>
+              )}
+              {/* Online/Offline Status in Modal */}
+              <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                }`}>
+                {isOnline ? (
+                  <Wifi size={8} className="text-white" />
+                ) : (
+                  <WifiOff size={8} className="text-white" />
+                )}
+              </div>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold text-lg text-gray-800 mb-1">{subscriber?.name || "Unknown"}</h4>
+              <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
+                <Phone size={12} />
+                <span>{subscriber?.phone || "N/A"}</span>
+              </div>
+              <div className={`flex items-center gap-1 text-xs ${isOnline ? 'text-green-600' : 'text-gray-500'
+                }`}>
+                {isOnline ? (
+                  <>
+                    <Wifi size={10} />
+                    <span>Online</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff size={10} />
+                    <span>Offline</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Advance Amount */}
+          <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-6 border border-red-200">
+            <div className="text-center">
+              <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Advance Amount</p>
+              <p className="text-lg font-bold text-red-600">
+                {(() => {
+                  // Try to get the advance balance from different possible field names
+                  let advanceBalance = subscriber?.total_advance_balance;
+
+                  // If total_advance_balance is not available, try to calculate it
+                  if ((advanceBalance === undefined || advanceBalance === null) &&
+                    (subscriber?.total_advance_credit !== undefined || subscriber?.total_advance_debit !== undefined)) {
+                    const credit = subscriber?.total_advance_credit || 0;
+                    const debit = subscriber?.total_advance_debit || 0;
+                    advanceBalance = credit - debit;
+                  }
+
+                  // Return formatted value or N/A
+                  return (advanceBalance !== undefined && advanceBalance !== null)
+                    ? `₹${advanceBalance.toLocaleString()}`
+                    : "N/A";
+                })()}
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <button
+              className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+            <button
+              className="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              onClick={onConfirm}
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "Delete"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
