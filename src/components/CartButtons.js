@@ -132,121 +132,125 @@ const CartButtons = ({ scrolled }) => {
                                 />
                             </div>
                             {isTooltipVisible && (
-                                <div className="absolute right-0 top-12 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                                    <div className="px-4 py-2 border-b border-gray-100">
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {user.results.firstname || user.results.name || "User"}
-                                        </p>
-                                        <p className="text-xs text-gray-500">{user.results.email}</p>
+                                <>
+                                    {/* Invisible bridge to prevent hover gap */}
+                                    <div className="absolute right-0 top-10 w-56 h-2 z-40" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
+                                    <div className="absolute right-0 top-10 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+                                        <div className="px-4 py-2 border-b border-gray-100">
+                                            <p className="text-sm font-semibold text-gray-800">
+                                                {user.results.firstname || user.results.name || "User"}
+                                            </p>
+                                            <p className="text-xs text-gray-500">{user.results.email}</p>
+                                        </div>
+                                        <ul className="py-1">
+                                            {hasPermission(userRole, 'viewPersonalSettings') && (
+                                                <li>
+                                                    <Link
+                                                        to="/personal-settings"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Personal Settings')}
+                                                        Personal Settings
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewSubscribers') && (
+                                                <li>
+                                                    <Link
+                                                        to="/subscribers"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Subscribers')}
+                                                        Subscribers
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewDashboard') && (
+                                                <li>
+                                                    <Link
+                                                        to="/dashboard"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Dashboard')}
+                                                        Dashboard
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewReceivables') && (
+                                                <li>
+                                                    <Link
+                                                        to="/receivables"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Receivables')}
+                                                        Receivables
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewPayables') && (
+                                                <li>
+                                                    <Link
+                                                        to="/payables"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Payables')}
+                                                        Payables
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewAdminSettings') && (
+                                                <li>
+                                                    <Link
+                                                        to="/admin-settings"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Admin Settings')}
+                                                        Admin Settings
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewAdminSettings') && (
+                                                <li>
+                                                    <Link
+                                                        to="/ledger"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Ledger')}
+                                                        Ledger
+                                                    </Link>
+                                                </li>
+                                            )}
+                                            {hasPermission(userRole, 'viewAdminSettings') && (
+                                                <li>
+                                                    <Link
+                                                        to="/products"
+                                                        onClick={closeSidebar}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                                                    >
+                                                        {getIconForMenuItem('Products')}
+                                                        Products
+                                                    </Link>
+                                                </li>
+                                            )}
+                                        </ul>
+                                        <div className="border-t border-gray-100 pt-1">
+                                            <button
+                                                onClick={handleLogout}
+                                                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                                            >
+                                                <FaUserMinus className="w-4 h-4" />
+                                                Logout
+                                            </button>
+                                        </div>
                                     </div>
-                                    <ul className="py-1">
-                                        {hasPermission(userRole, 'viewPersonalSettings') && (
-                                            <li>
-                                                <Link
-                                                    to="/personal-settings"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Personal Settings')}
-                                                    Personal Settings
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewSubscribers') && (
-                                            <li>
-                                                <Link
-                                                    to="/subscribers"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Subscribers')}
-                                                    Subscribers
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewDashboard') && (
-                                            <li>
-                                                <Link
-                                                    to="/dashboard"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Dashboard')}
-                                                    Dashboard
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewReceivables') && (
-                                            <li>
-                                                <Link
-                                                    to="/receivables"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Receivables')}
-                                                    Receivables
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewPayables') && (
-                                            <li>
-                                                <Link
-                                                    to="/payables"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Payables')}
-                                                    Payables
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewAdminSettings') && (
-                                            <li>
-                                                <Link
-                                                    to="/admin-settings"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Admin Settings')}
-                                                    Admin Settings
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewAdminSettings') && (
-                                            <li>
-                                                <Link
-                                                    to="/ledger"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Ledger')}
-                                                    Ledger
-                                                </Link>
-                                            </li>
-                                        )}
-                                        {hasPermission(userRole, 'viewAdminSettings') && (
-                                            <li>
-                                                <Link
-                                                    to="/products"
-                                                    onClick={closeSidebar}
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-                                                >
-                                                    {getIconForMenuItem('Products')}
-                                                    Products
-                                                </Link>
-                                            </li>
-                                        )}
-                                    </ul>
-                                    <div className="border-t border-gray-100 pt-1">
-                                        <button
-                                            onClick={handleLogout}
-                                            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
-                                        >
-                                            <FaUserMinus className="w-4 h-4" />
-                                            Logout
-                                        </button>
-                                    </div>
-                                </div>
+                                </>
                             )}
                         </div>
                     </div>

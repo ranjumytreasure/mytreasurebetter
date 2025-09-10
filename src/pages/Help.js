@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import people from '../components/HelpData';
-import { FaChevronLeft, FaChevronRight, FaQuoteRight } from 'react-icons/fa';
-import styled from 'styled-components'
-
+import { FaChevronLeft, FaChevronRight, FaQuoteRight, FaPhone, FaEnvelope } from 'react-icons/fa';
 
 const Help = () => {
   const [index, setIndex] = useState(0);
   const { name, job, image, text, phone } = people[index];
+
   const checkNumber = (number) => {
     if (number > people.length - 1) {
       return 0;
@@ -16,18 +15,21 @@ const Help = () => {
     }
     return number;
   };
+
   const nextPerson = () => {
     setIndex((index) => {
       let newIndex = index + 1;
       return checkNumber(newIndex);
     });
   };
+
   const prevPerson = () => {
     setIndex((index) => {
       let newIndex = index - 1;
       return checkNumber(newIndex);
     });
   };
+
   const randomPerson = () => {
     let randomNumber = Math.floor(Math.random() * people.length);
     if (randomNumber === index) {
@@ -36,171 +38,126 @@ const Help = () => {
     setIndex(checkNumber(randomNumber));
   };
 
-  return (<Wrapper>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+            Contact Our <span className="text-red-600">Support Team</span>
+          </h1>
+          <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-red-600 mx-auto rounded-full"></div>
+          <p className="text-gray-600 mt-6 text-lg max-w-2xl mx-auto">
+            Get in touch with our dedicated support team members who are here to help you with any questions or concerns.
+          </p>
+        </div>
 
-    <div className='title'>
-      <h2>Contact Us</h2>
-      <div className='underline'></div>
+        {/* Support Team Card */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+          <div className="p-8 md:p-12">
+            {/* Profile Image Section */}
+            <div className="relative w-32 h-32 mx-auto mb-8">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-red-600 rounded-full transform rotate-6"></div>
+              <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white shadow-lg">
+                <img
+                  src={image}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                <FaQuoteRight className="text-white text-sm" />
+              </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">{name}</h3>
+              <div className="inline-block bg-red-100 text-red-600 px-4 py-1 rounded-full text-sm font-semibold mb-6 uppercase tracking-wide">
+                {job}
+              </div>
+
+              <p className="text-gray-600 leading-relaxed mb-8 text-lg max-w-2xl mx-auto">
+                {text}
+              </p>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-center items-center space-x-4 mb-8">
+                <button
+                  onClick={prevPerson}
+                  className="w-12 h-12 bg-gray-100 hover:bg-red-500 text-gray-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                >
+                  <FaChevronLeft className="text-lg" />
+                </button>
+
+                <div className="flex space-x-2">
+                  {people.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setIndex(idx)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${idx === index ? 'bg-red-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={nextPerson}
+                  className="w-12 h-12 bg-gray-100 hover:bg-red-500 text-gray-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                >
+                  <FaChevronRight className="text-lg" />
+                </button>
+              </div>
+
+              {/* Contact Button */}
+              <button
+                onClick={randomPerson}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl mb-6"
+              >
+                Contact {name}
+              </button>
+
+              {/* Phone Number */}
+              {phone && (
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <FaPhone className="text-red-500" />
+                  <span className="font-medium">{phone}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Info Section */}
+        <div className="mt-12 grid md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl p-6 shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaPhone className="text-red-500 text-xl" />
+            </div>
+            <h3 className="font-semibold text-gray-800 mb-2">Phone Support</h3>
+            <p className="text-gray-600 text-sm">Available 24/7 for urgent queries</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaEnvelope className="text-red-500 text-xl" />
+            </div>
+            <h3 className="font-semibold text-gray-800 mb-2">Email Support</h3>
+            <p className="text-gray-600 text-sm">Get detailed responses within 24 hours</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaQuoteRight className="text-red-500 text-xl" />
+            </div>
+            <h3 className="font-semibold text-gray-800 mb-2">Live Chat</h3>
+            <p className="text-gray-600 text-sm">Instant support during business hours</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <article className='review'>
-      <div className='img-container'>
-        <img src={image} alt={name} className='person-img' />
-        <span className='quote-icon'>
-          <FaQuoteRight />
-        </span>
-      </div>
-      <h4 className='author'>{name}</h4>
-      <p className='job'>{job}</p>
-      <p className='info'>{text}</p>
+  );
+};
 
-      <div className='button-container'>
-        <button className='prev-btn' onClick={prevPerson}>
-          <FaChevronLeft />
-        </button>
-        <button className='next-btn' onClick={nextPerson}>
-          <FaChevronRight />
-        </button>
-      </div>
-      <button className='random-btn' onClick={randomPerson}>
-        Contact me
-      </button>
-      <p className='phone'>{phone}</p>
-    </article>
-
-  </Wrapper>
-  )
-}
-
-const Wrapper = styled.section`
-  min-height: 90vh;
-  display: grid;
-  place-items: center;
-
-.title {
-  text-align: center;  
-  
-  
-}
-.underline {
-  height: 0.25rem;
-  width: 5rem;
-  background: var(--clr-primary-5);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.review {
-    width: 80vw;
-    max-width: var(--fixed-width);
-  background: var(--clr-white);
-  padding: 1.5rem 2rem;
-  border-radius: var(--radius);
-  box-shadow: var(--light-shadow);
-  transition: var(--transition);
-  text-align: center;
-  margin-top:1px;
-  
-}
-.review:hover {
-  box-shadow: var(--dark-shadow);
-}
-.img-container {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  margin: 0 auto;
-  margin-bottom: 1.5rem;
-}
-.person-img {
-  width: 100%;
-  display: block;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  position: relative;
-}
-.quote-icon {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  transform: translateY(25%);
-  background: var(--clr-primary-5);
-  color: var(--clr-white);
-}
-.img-container::before {
-  content: '';
-  width: 100%;
-  height: 100%;
-  background: var(--clr-primary-5);
-  position: absolute;
-  top: -0.25rem;
-  right: -0.5rem;
-  border-radius: 50%;
-}
-.author {
-  margin-bottom: 0.25rem;
-}
-.job {
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  color: var(--clr-primary-5);
-  font-size: 0.85rem;
-}
-.info {
-  margin-bottom: 0.75rem;
-}
-.prev-btn,
-.next-btn {
-  color: var(--clr-primary-7);
-  font-size: 1.25rem;
-  background: transparent;
-  border-color: transparent;
-  margin: 0 0.5rem;
-  transition: var(--transition);
-  cursor: pointer;
-}
-.prev-btn:hover,
-.next-btn:hover {
-  color: var(--clr-primary-5);
-}
-.random-btn {
-  margin-top: 0.5rem;
-  background: var(--clr-primary-10);
-  color: var(--clr-primary-5);
-  padding: 0.25rem 0.5rem;
-  text-transform: capitalize;
-  border-radius: var(--radius);
-  transition: var(--transition);
-  border-color: transparent;
-  cursor: pointer;
-}
-.random-btn:hover {
-  background: var(--clr-primary-5);
-  color: var(--clr-primary-1);
-}
-.phone{
-  margin-top: 0.5rem;
-  background: var(--clr-primary-10);
-  color: var(--clr-primary-5);
-  padding: 0.25rem 0.5rem;
-  text-transform: capitalize;
-  border-radius: var(--radius);
-  transition: var(--transition);
-  border-color: transparent;
-  cursor: pointer;
-
-}
-.phone:hover{
-  background: var(--clr-primary-5);
-  color: var(--clr-primary-1);
-
-}
-`
 
 export default Help
