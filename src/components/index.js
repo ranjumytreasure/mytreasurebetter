@@ -86,6 +86,8 @@ import AddAccountModal from './AddAccountModal'
 import ReceivablePayementModal from './ReceivablePayementModal'
 import PayablePaymentModal from './PayablePaymentModal'
 import YourDue from './YourDue'
+import PlansSelection from './PlansSelection'
+import PlanUpgradeForm from './PlanUpgradeForm'
 
 export {
   FeaturedProducts,
@@ -116,5 +118,5 @@ export {
   ProfileCard,
   AdminSettings, AddEmployee, ImageUploader, EmployeeList, ListView, AddAob, EmployeeProfilecard, EmployeeRegionWiseDue, AreaSubscribersPage, DashboardMasterInfo, DashboardGroups, ReceivablesList, PayablesList, DashboardAreaWiseGroups, EPC, ForgetPassword, AssignGroupAmountPopup, AvatarUploader,
   SendReminderModal, EditableField, AddEntryModal, FilterBar, LedgerTable, LedgerHeader,
-  AddAccountModal, ReceivablePayementModal, PayablePaymentModal, YourDue, ScrollToTop
+  AddAccountModal, ReceivablePayementModal, PayablePaymentModal, YourDue, ScrollToTop, PlansSelection, PlanUpgradeForm
 }
