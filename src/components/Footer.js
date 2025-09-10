@@ -128,10 +128,11 @@ const Footer = () => {
                   <div className="text-gray-300">
                     <p className="font-medium">Head Office</p>
                     <p className="text-sm">
-                      123 Business Park,<br />
-                      Financial District,<br />
-                      Mumbai - 400001,<br />
-                      Maharashtra, India
+                      Mytreasure Pvt Ltd,<br />
+                      Raja Rajeshwari Nagar,<br />
+                      Saravanampatti,<br />
+                      Coimbatore, Tamil Nadu 641035,<br />
+                      India
                     </p>
                   </div>
                 </div>
