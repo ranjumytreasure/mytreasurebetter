@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import ReactFlagsSelect from "react-flags-select";
 import "./flags.css";
 import Alert from '../components/Alert';
@@ -52,7 +51,7 @@ function Company() {
         { value: "ZA", label: "South Africa", countryCode: "+27" }
     ];
 
-    
+
     useEffect(() => {
         const defaultCountry = countries.find((c) => c.value === selectedCountry);
         if (defaultCountry) {
@@ -62,7 +61,7 @@ function Company() {
                 countryCode: defaultCountry.countryCode,
             }));
         }
-    
+
         console.log("We are from useEffect");
         console.log(defaultCountry?.label); // ✅ Logs the correct country
         console.log(defaultCountry?.countryCode); // ✅ Logs the correct countryCode
@@ -70,17 +69,17 @@ function Company() {
     useEffect(() => {
         console.log("FormData updated:", formData);
     }, [formData]);
-    
+
     useEffect(() => {
         if (user?.results?.userCompany) {
             setEditMode(true);
             const companyData = user.results.userCompany;
             console.log('Kandrul');
             console.log(companyData);
-    
+
             // Find the country object based on the country name from DB
             const countryObj = countries.find((c) => c.countryCode === companyData.country_code) || {};
-    
+
             // ✅ Set all form data in one go to prevent overwrites
             setFormData(prev => ({
                 ...prev,
@@ -98,16 +97,16 @@ function Company() {
                 latitude: companyData.latitude || 0,
                 longitude: companyData.longitude || 0,
                 phone: companyData.phone || '',
-                    email: companyData.email || '',
+                email: companyData.email || '',
                 companyId: companyData.id || '',
                 sourceSystem: 'WEB',
             }));
-    
+
             // ✅ Set preview URL for company logo
             if (companyData.logo_s3_image) {
                 setPreviewUrl(companyData.logo_s3_image);
             }
-    
+
             // ✅ Ensure selected country is updated
             if (selectedCountry !== (countryObj.value || '')) {
                 setSelectedCountry(countryObj.value || '');
@@ -134,10 +133,10 @@ function Company() {
             }));
         }
     }, [user]); // Include countries in dependency array if needed
-    
 
-    
-    
+
+
+
 
 
 
@@ -192,62 +191,60 @@ function Company() {
         e.preventDefault();
         setIsLoading(true); // Show loading bar when data fetching starts
 
-     
+
 
 
         try {
             console.log('Pannipaya');
             let companyLogoUrl = formData.companyLogo;
             console.log('companyLogoUrl', formData.companyLogo);
-            console.log( formData.companyLogo);
-            if(!editMode)
-            {
+            console.log(formData.companyLogo);
+            if (!editMode) {
                 console.log('came to insert')
-                    companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage)
-             } else 
-                {
-                    console.log(image?.file)
-                    console.log('came to edit')
-                    if (image && typeof image === "object" && image.file) {
-                        console.log('inside about to upload')
-                        companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage);
-                    }
-            //         console.log('came to edit')
-            // console.log('Original Image URL:', formData.companyLogo);
-            
-
-            // console.log('Selected Image:', image?.file);
-            // console.log('step 1')
-           
-            
-            // if (image?.file ) {
-               
-            //     console.log('step 2')
-               
-            //     console.log(image?.file)
-            //     console.log(user?.results?.userCompany?.logo )
-
-            //     const existingImageNumber = user?.results?.userCompany?.logo 
-            //     ? extractImageNumber(user.results.userCompany.logo) 
-            //     : "";
-            //     console.log('Extracted Existing Image Number:', existingImageNumber);
-
-            //     const newFileName = image.file.name;
-            //     const newImageNumber = newFileName ? extractImageNumber(newFileName) : "";
-
-            //     console.log('Extracted New Image Number:', newImageNumber);
-
-            //     if (existingImageNumber !== newImageNumber) {
-            //         console.log('Uploading new image...');
-            //         // companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage);
-            //     } 
-            
-            // } else {
-            //     console.log('No new image selected, preserving old image.');
-            //     companyLogoUrl = user.results.userCompany.logo;
-            // }
-            // console.log('mani')
+                companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage)
+            } else {
+                console.log(image?.file)
+                console.log('came to edit')
+                if (image && typeof image === "object" && image.file) {
+                    console.log('inside about to upload')
+                    companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage);
                 }
+                //         console.log('came to edit')
+                // console.log('Original Image URL:', formData.companyLogo);
+
+
+                // console.log('Selected Image:', image?.file);
+                // console.log('step 1')
+
+
+                // if (image?.file ) {
+
+                //     console.log('step 2')
+
+                //     console.log(image?.file)
+                //     console.log(user?.results?.userCompany?.logo )
+
+                //     const existingImageNumber = user?.results?.userCompany?.logo 
+                //     ? extractImageNumber(user.results.userCompany.logo) 
+                //     : "";
+                //     console.log('Extracted Existing Image Number:', existingImageNumber);
+
+                //     const newFileName = image.file.name;
+                //     const newImageNumber = newFileName ? extractImageNumber(newFileName) : "";
+
+                //     console.log('Extracted New Image Number:', newImageNumber);
+
+                //     if (existingImageNumber !== newImageNumber) {
+                //         console.log('Uploading new image...');
+                //         // companyLogoUrl = await uploadImage(image.file, API_BASE_URL, setErrorMessage);
+                //     } 
+
+                // } else {
+                //     console.log('No new image selected, preserving old image.');
+                //     companyLogoUrl = user.results.userCompany.logo;
+                // }
+                // console.log('mani')
+            }
             // Include membershipId in the formData
             const updatedFormData = {
                 ...formData,
@@ -300,8 +297,8 @@ function Company() {
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    
-   
+
+
 
     const showAlert = (show = false, type = '', msg = '') => {
         console.log('hi');
@@ -338,179 +335,272 @@ function Company() {
     };
 
     return (
-        <Wrapper className='section-center'>
-            <div className="contain">
-                <h3>{editMode ? 'Edit Company' : 'New Company'}</h3>
-                <ReactFlagsSelect
-                    selected={selectedCountry}
-                    onSelect={handleCountryChange}
-                    countries={countries.map((country) => country.value)}
-                    showSelectedLabel={showSelectedLabel}
-                    searchable={searchable}
-                />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+            <div className="max-w-4xl mx-auto">
+                {/* Header Section */}
+                <div className="text-center mb-8">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                        {editMode ? 'Edit Your' : 'Create New'} <span className="text-red-600">Company</span>
+                    </h1>
+                    <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-red-600 mx-auto rounded-full mb-6"></div>
+                    <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                        {editMode
+                            ? 'Update your company information and keep your profile current.'
+                            : 'Set up your company profile to get started with Treasure Chit Fund management.'
+                        }
+                    </p>
+                </div>
 
-                <form className="form" onSubmit={handleSubmit}>
+                {/* Main Form Card */}
+                <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="p-8 md:p-12">
+                        {/* Country Selection */}
+                        <div className="mb-8">
+                            <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                Select Country
+                            </label>
+                            <div className="max-w-xs">
+                                <ReactFlagsSelect
+                                    selected={selectedCountry}
+                                    onSelect={handleCountryChange}
+                                    countries={countries.map((country) => country.value)}
+                                    showSelectedLabel={showSelectedLabel}
+                                    searchable={searchable}
+                                />
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
 
 
-                    {/* AvatarUploader Component */}
-                    <AvatarUploader handleSetImage={handleSetImage} currentImage={previewUrl} />
+                            {/* Avatar Upload Section */}
+                            <div className="text-center mb-8">
+                                <label className="block text-sm font-semibold text-gray-700 mb-4">
+                                    Company Logo
+                                </label>
+                                <AvatarUploader handleSetImage={handleSetImage} currentImage={previewUrl} />
+                            </div>
 
-                    <input className="formInput" type="text" placeholder="Company Name" name="companyName" onChange={handleChange} value={formData.companyName} />
-                    <input className="formInput" type="text" placeholder="Company Tagline" name="tagLine" onChange={handleChange} value={formData.tagLine} />
-                    <input className="formInput" type="text" placeholder="Registration No" name="registrationNo" onChange={handleChange} value={formData.registrationNo} />
-                    <input className="formInput" type="text" placeholder="Company Since" name="companySince" onChange={handleChange} value={formData.companySince} />
-                    <input className="formInput" type="text" placeholder="Company Street Address" name="companyStreetAddress" onChange={handleChange} value={formData.companyStreetAddress} />
-                    <input className="formInput" type="text" placeholder="City" name="city" onChange={handleChange} value={formData.city} />
-                    <input className="formInput" type="text" placeholder="State" name="state" onChange={handleChange} value={formData.state} />
+                            {/* Form Grid */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {/* Company Name */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Company Name *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter your company name"
+                                        name="companyName"
+                                        onChange={handleChange}
+                                        value={formData.companyName}
+                                    />
+                                </div>
 
-                    <input className="formInput" type="text" placeholder="Zipcode" name="zipcode" onChange={handleChange} value={formData.zipcode} />
+                                {/* Company Tagline */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Company Tagline *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter your company tagline"
+                                        name="tagLine"
+                                        onChange={handleChange}
+                                        value={formData.tagLine}
+                                    />
+                                </div>
 
-                    <input className="formInput" type="text" placeholder="Company Phone" name="phone" onChange={handleChange} value={formData.phone} />
-                    <input className="formInput" type="email" placeholder="Company Email" name="email" onChange={handleChange} value={formData.email} />
+                                {/* Registration No */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Registration Number
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter registration number"
+                                        name="registrationNo"
+                                        onChange={handleChange}
+                                        value={formData.registrationNo}
+                                    />
+                                </div>
 
-                    <div className="terms-checkbox">
-                        <input type="checkbox" id="termsCheckbox" onChange={handleCheckboxChange} />
-                        <label htmlFor="termsCheckbox">
-                            By continuing, you agree to our Terms of Use, Privacy Policy, E-sign & communication Authorization.
-                        </label>
+                                {/* Company Since */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Company Since *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="e.g., 2020"
+                                        name="companySince"
+                                        onChange={handleChange}
+                                        value={formData.companySince}
+                                    />
+                                </div>
+
+                                {/* Street Address */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Street Address *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter your street address"
+                                        name="companyStreetAddress"
+                                        onChange={handleChange}
+                                        value={formData.companyStreetAddress}
+                                    />
+                                </div>
+
+                                {/* City */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        City *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter city"
+                                        name="city"
+                                        onChange={handleChange}
+                                        value={formData.city}
+                                    />
+                                </div>
+
+                                {/* State */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        State *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter state"
+                                        name="state"
+                                        onChange={handleChange}
+                                        value={formData.state}
+                                    />
+                                </div>
+
+                                {/* Zipcode */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Zipcode *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter zipcode"
+                                        name="zipcode"
+                                        onChange={handleChange}
+                                        value={formData.zipcode}
+                                    />
+                                </div>
+
+                                {/* Phone */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Company Phone *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="text"
+                                        placeholder="Enter phone number"
+                                        name="phone"
+                                        onChange={handleChange}
+                                        value={formData.phone}
+                                    />
+                                </div>
+
+                                {/* Email */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Company Email *
+                                    </label>
+                                    <input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                                        type="email"
+                                        placeholder="Enter company email"
+                                        name="email"
+                                        onChange={handleChange}
+                                        value={formData.email}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Terms and Conditions */}
+                            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+                                <div className="flex items-start space-x-3">
+                                    <input
+                                        type="checkbox"
+                                        id="termsCheckbox"
+                                        onChange={handleCheckboxChange}
+                                        className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                                    />
+                                    <label htmlFor="termsCheckbox" className="text-sm text-gray-700 leading-relaxed">
+                                        By continuing, you agree to our{' '}
+                                        <span className="text-red-600 font-semibold">Terms of Use</span>,{' '}
+                                        <span className="text-red-600 font-semibold">Privacy Policy</span>,{' '}
+                                        <span className="text-red-600 font-semibold">E-sign</span> &{' '}
+                                        <span className="text-red-600 font-semibold">communication Authorization</span>.
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Alert Messages */}
+                            {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
+
+                            {/* Submit Button */}
+                            <div className="text-center pt-6">
+                                {editMode ? (
+                                    <button
+                                        className={`w-full md:w-auto px-12 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform ${isButtonDisabled || isLoading
+                                            ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+                                            : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white hover:scale-105 shadow-lg hover:shadow-xl'
+                                            }`}
+                                        type="submit"
+                                        disabled={isButtonDisabled || isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center space-x-2">
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                <span>Updating...</span>
+                                            </div>
+                                        ) : (
+                                            'Update Company'
+                                        )}
+                                    </button>
+                                ) : (
+                                    <button
+                                        className={`w-full md:w-auto px-12 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform ${isButtonDisabled || isLoading
+                                            ? 'bg-gray-400 cursor-not-allowed text-gray-600'
+                                            : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white hover:scale-105 shadow-lg hover:shadow-xl'
+                                            }`}
+                                        type="submit"
+                                        disabled={isButtonDisabled || isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center space-x-2">
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                <span>Creating...</span>
+                                            </div>
+                                        ) : (
+                                            'Create Company'
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+                        </form>
                     </div>
-                    {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-
-                    {editMode ? (
-                        <button
-                            className={`formComSubmit ${isButtonDisabled || isLoading ? 'disabled' : ''}`}
-                            type="submit"
-                            disabled={isButtonDisabled || isLoading}
-                        >
-                            {isLoading ? 'Editing...' : 'Edit'}
-                        </button>
-                    ) : (
-                        <button
-                            className={`formComSubmit ${isButtonDisabled || isLoading ? 'disabled' : ''}`}
-                            type="submit"
-                            disabled={isButtonDisabled || isLoading}
-                        >
-                            {isLoading ? 'Submitting...' : 'Submit'}
-                        </button>
-                    )}
-
-                </form>
+                </div>
             </div>
-        </Wrapper>
+        </div>
     );
 }
-const Wrapper = styled.section`
-display: flex;
-flex-direction: column;
-align-items: center;
-
-.contain {  
-    width: 35rem;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
-padding-top: 35px;
-display: flex;
-flex-direction: column;
-background: var(--clr-white);
-border-radius: var(--radius);
-box-shadow: var(--light-shadow);
-transition: var(--transition);
-min-height: 900px; 
-align-items: center;
-  }
-  .contain:hover {
-      box-shadow: var(--dark-shadow);
-    }
-  
-
-.form {
-    display:flex;
-    flex-direction: column;
-align-items: center;      
-width:35rem;
-    @media (max-width: 768px) {
-        width: 90%; /* Adjust the width for screens with a max-width of 768px */
-        height: 90vh; /* Adjust the height for smaller screens */
-        padding: 0.5rem; /* Reduce padding for smaller screens */
-      }
-    
-      @media (max-width: 480px) {
-        width: 95%; /* Further adjust the width for screens with a max-width of 480px */
-        height: 85vh; /* Further adjust the height for smaller screens */
-        padding: 0.25rem; /* Reduce padding for smaller screens */
-      }
-}
-
-.formInput {
-    border-radius: 5px;
-    border-color: #e5e5e5;
-    border-style: solid;
-    border-width: 0.5px;
-    margin-bottom: 10px;
-    padding: 10px;
-    width:250px;
-}
-.custom-button {
-    background-color: #FF5733; 
-    width:250px;
-  }
-.formComSubmit {
-    cursor:pointer;
-    border-radius: 5px;
-    background-color:#cd3240;
-    border: 2px solid transparent;
-    color: white; 
-    width: 300px;
-    padding: 8px;
-margin-top:20px;
-align-items: center;
-}
-/* Disabled button style */
-.formComSubmit.disabled {
-    background-color: #ccc; 
-    cursor: not-allowed;
-    width: 250px;
-}
-
-.terms-checkbox {
-    display: flex;
-    align-items: center;
-    margin-top: 10px; /* Adjust the margin as needed */
-  }
-  
-  .terms-checkbox input[type="checkbox"] {
-    margin-right: 10px; /* Adjust the margin between the checkbox and label */
-  }
-  
-  .terms-checkbox label {
-    font-size: 14px; /* Adjust the font size as needed */
-    color: #333; /* Adjust the text color */
-  }   
-  
-  .p {
-    margin-top:1rem;
-  }
-
-  .alert {
-    margin-bottom: 1rem;
-    height: 1.25rem;
-    display: grid;
-    align-items: center;
-    text-align: center;
-    font-size: 0.7rem;
-    border-radius: 0.25rem;
-    letter-spacing: var(--spacing);
-    text-transform: capitalize;
-  }
-  
-  .alert-danger {
-    color: #721c24;
-    background: #f8d7da;
-  }
-  
-  .alert-success {
-    color: #155724;
-    background: #d4edda;
-  }
-`
 export default Company;
