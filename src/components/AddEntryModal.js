@@ -24,6 +24,10 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
   const { groups, selectedGroupDetails } = state;
   const groupSubscribers = selectedGroupDetails?.groupSubcriberResult || [];
 
+  // Debug logging to see subscriber data structure
+  console.log("Group Subscribers:", groupSubscribers);
+  console.log("Selected Group Details:", selectedGroupDetails);
+
 
 
   const today = new Date().toISOString().split("T")[0];
@@ -60,7 +64,6 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
 
 
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -81,7 +84,7 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
 
     const selectedGroup = groups.find((g) => String(g.id) === String(selectedGroupId));
     const selectedSubscriber = groupSubscribers.find(
-      (sub) => String(sub.id) === String(selectedSubscriberId)
+      (sub) => String(sub.subscriber_id) === String(selectedSubscriberId)
     );
 
     const payload = {
@@ -94,6 +97,11 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
       amount: parseFloat(formData.amount),
     };
 
+    // Debug logging to see what's being sent
+    console.log("Selected Subscriber ID:", selectedSubscriberId);
+    console.log("Selected Subscriber Object:", selectedSubscriber);
+    console.log("Payload being sent:", payload);
+
     setTempData(payload);
     setIsConfirming(true);
   };
@@ -103,10 +111,18 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
     setAlert({ show, type, msg });
   };
   const handleConfirm = async () => {
+    console.log("=== CONFIRMATION STEP ===");
+    console.log("Data being sent to backend:", tempData);
+    console.log("Subscriber ID being sent:", tempData?.subscriberId);
+    console.log("Subscriber Name being sent:", tempData?.subscriberName);
+
     setIsLoading(true);
     try {
       const response = await addLedgerEntry(tempData);
       const responseData = await response.json(); // Extract JSON
+
+      console.log("Backend response:", response);
+      console.log("Backend response data:", responseData);
 
       if (response.ok) { // <-- check on response, not responseData
         fetchLedgerEntries();
@@ -120,6 +136,7 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
         showAlert(true, 'danger', responseData.message || 'Failed to add ledger entry');
       }
     } catch (error) {
+      console.error("Error during confirmation:", error);
       showAlert(true, 'danger', 'An unexpected error occurred');
     }
     setIsLoading(false);  // Stop loader
@@ -160,8 +177,8 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
           </div>
         )
       }
-      <div className="modal-overlay">
-        <div className="modal">
+      <div className="modal-overlay fixed top-0 left-0 w-full h-full bg-black bg-opacity-30 flex justify-center items-start pt-24 md:pt-24 z-[9999]">
+        <div className="modal bg-white p-8 md:p-8 rounded-lg w-[95%] md:w-[90%] max-w-none md:max-w-md shadow-lg max-h-[calc(95vh-100px)] md:max-h-[calc(90vh-100px)] overflow-y-auto mx-2 md:mx-4">
           <h2>New Ledger Entry</h2>
 
           {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
@@ -190,9 +207,9 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
               <p><strong>Description:</strong> {tempData.description}</p>
               <div className="amount-highlight">₹ {tempData.amount}</div>
 
-              <div className="modal-actions">
-                <button onClick={() => setIsConfirming(false)}>Edit</button>
-                <button onClick={handleConfirm} disabled={isConfirmDisabled()}>Confirm</button>
+              <div className="modal-actions flex flex-col md:flex-row justify-between gap-2 md:gap-0 mt-6">
+                <button onClick={() => setIsConfirming(false)} className="w-full md:w-auto">Edit</button>
+                <button onClick={handleConfirm} disabled={isConfirmDisabled()} className="w-full md:w-auto">Confirm</button>
               </div>
             </div>
           ) : (
@@ -338,7 +355,10 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
                   <select
                     id="subscriberId"
                     value={selectedSubscriberId}
-                    onChange={(e) => setSelectedSubscriberId(e.target.value)}
+                    onChange={(e) => {
+                      console.log("Selected subscriber value:", e.target.value);
+                      setSelectedSubscriberId(e.target.value);
+                    }}
                     required
                   >
                     <option value="">Select Subscriber</option>
@@ -346,11 +366,14 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
                       .filter((cust) =>
                         cust.name.toLowerCase().includes((formData.subscriberSearch || "").toLowerCase())
                       )
-                      .map((cust) => (
-                        <option key={cust.id} value={cust.id}>
-                          {cust.name} - {cust.phone}
-                        </option>
-                      ))}
+                      .map((cust) => {
+                        console.log("Subscriber data:", cust);
+                        return (
+                          <option key={cust.id} value={cust.subscriber_id}>
+                            {cust.name} - {cust.phone}
+                          </option>
+                        );
+                      })}
                   </select>
 
                 </>
@@ -378,11 +401,11 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
                 required
               />
 
-              <div className="modal-actions">
-                <button type="button" className="cancel" onClick={handleClose}>
+              <div className="modal-actions flex flex-col md:flex-row justify-between gap-2 md:gap-0 mt-6">
+                <button type="button" className="cancel w-full md:w-auto" onClick={handleClose}>
                   Cancel
                 </button>
-                <button type="submit">Save</button>
+                <button type="submit" className="w-full md:w-auto">Save</button>
               </div>
             </form>
           )}
