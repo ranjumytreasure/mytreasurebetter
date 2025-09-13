@@ -55,35 +55,13 @@ const Groups = ({ data }) => {
 
 
   const { nextAuctionDate, startTime, endTime, type, groupSubcriberResult } = data.results;
-  const ActionButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  .action-btn {
-    background-color: #28a745;
-    color: #fff;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-
-    &:hover {
-      background-color: #218838;
-    }
-  }
-`;
 
   return (<section className='section'>
 
 
     <Wrapper className='section-center' >
       <div>
-        <ActionButtonsWrapper>
+        <div className="flex justify-end gap-4 mb-6">
           <PDFDownloadLink
             document={
               <GroupAccountsPdf
@@ -97,16 +75,14 @@ const Groups = ({ data }) => {
               loading ? (
                 'Loading document...'
               ) : (
-                <button className='action-btn'>
-                  <FiDownload style={{ marginRight: '8px' }} />
+                <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors duration-200">
+                  <FiDownload size={16} />
                   Download PDF
                 </button>
               )
             }
           </PDFDownloadLink>
-
-
-        </ActionButtonsWrapper>
+        </div>
         <GroupsAccounts groupTransactionInfo={groupTransactionInfo} type={type} />
       </div>
       <GroupDetailsCard groups={groups}

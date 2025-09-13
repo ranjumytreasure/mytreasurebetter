@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import { SubContext } from '../context/subscribecontext';
 import styled from "styled-components";
-import { MdBusiness, MdLocationOn, MdLink, MdDataObject, MdTimeline, MdTimeToLeave } from "react-icons/md";
+import { MdBusiness, MdLocationOn, MdLink, MdDataObject, MdTimeline, MdTimeToLeave, MdCalendarToday, MdSchedule, MdTimer } from "react-icons/md";
 import { FontAwesomeIcon } from "react-icons/fa";
 import { useHistory, useParams } from "react-router-dom";
 import List from "../components/List";
@@ -137,253 +137,213 @@ const GroupDetailsCard = ({ groups, yourdue, customerdue, nextAuctionDate, start
         history.push(`/groups/${groupId}/customer-due`);
     };
     return (
-        <Wrapper>
-            <header>
-                <div className="groupscount">
-                    <div className="circle red" style={{ color: "#fff" }}>
-                        {groups[0]?.groupsCompleted} / {groups[0]?.totalTenture}
-                    </div>
-                    <p style={{ fontSize: "14px", marginTop: "4px", paddingLeft: "2px" }}>Groups</p>
-                </div>
-                <div className="duecount" onClick={handleYourDueClick}>
-                    <div className="circle red" style={{ color: "#fff" }}>
-                        {yourdue[0]?.pending_amount}
-                    </div>
-                    <p style={{ fontSize: "14px", marginTop: "4px", paddingLeft: "2px" }}>Your Due</p>
-                </div>
-                <div className="duecount" onClick={handleCustomerDueClick}>
-                    <div className="circle red" style={{ color: "#fff" }}>
-                        {customerdue[0]?.pending_amount}
-                    </div>
-                    <p style={{ fontSize: "14px", marginTop: "4px", paddingLeft: "4px" }}>Customer Due</p>
-                </div>
-                {/* <div className='more'>
-          <div className="circle red" style={{color:"#fff"}}>
-
-          </div>
-          <p>More</p>
-        </div> */}
-            </header>
-
-            <div className="links" style={{ paddingLeft: "8px" }}>
-                <p>
-                    <MdDataObject></MdDataObject> <span style={{ width: "110px" }}>Auction Date</span>: {nextAuctionDate}{" "}
-                </p>
-                <p>
-                    <MdTimeline></MdTimeline> <span style={{ width: "110px" }}>Start Time</span>: {startTime}{" "}
-                </p>
-                <p>
-                    <MdTimeToLeave></MdTimeToLeave> <span style={{ width: "110px" }}>End Time</span>: {endTime}{" "}
-                </p>
-                <p>
-                    <MdLocationOn></MdLocationOn> <span style={{ width: "110px" }}>Location</span>: {location || "earth"}{" "}
-                </p>
-                {/* <a href={'https://${blog}'}>
-          <MdLink></MdLink>
-          {blog}
-        </a> */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg relative mt-6">
+            {/* Header */}
+            <div className="absolute -top-4 left-6 bg-custom-red text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
+                Group Highlights
             </div>
 
-            {isGroupProgress !== "CLOSED" && (
-                <button className="buttonStyle" onClick={handleGoToAuctions}>
-                    <Gavel size={16} style={{ marginRight: '8px' }} />
-                    Go To Auction
-                </button>
-            )}
-            {/* <SendReminderModal/> */}
-            {commisionType === "LUMPSUM" ? (
-                is_commision_taken ? (
-                    <button className="buttonStyleGreen" disabled="true">
-                        Lumpsum Commision Taken
-                    </button>
-                ) : (
-                    <button className="buttonStyle" onClick={openModal}>
-                        Take Lumpsum Commision
-                    </button>
-                )
-            ) : null}
-            {isModalOpen && (
-                <Modal>
-                    <ModalContent>
-                        <div style={{ textAlign: "left" }}>
-                            {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-                            <h2 className="popup-header-text">Take Lumpsum Commission</h2>
-                            <div style={{ marginTop: "24px" }}>
-                                Auction Date:
-                                <input type="date" value={auctDate} onChange={(e) => setAuctDate(e.target.value)} style={{ margin: "0 4px 0 16px" }} />
-                            </div>
-                            <div style={{ marginTop: "12px" }}>
-                                Commision:
-                                <input type="text" value={localCommision} placeholder="Enter Commission Value" onChange={(e) => setLocalCommision(e.target.value)} style={{ margin: "0 4px 0 16px" }} />
-                            </div>
-                            <div style={{ marginTop: "12px" }}>
-                                <label>
-                                    <input type="radio" id="withDue" name="commissionType" value="withDue" onChange={() => setLumsumCommissionType("withDue")} style={{ margin: "0 4px 0 0" }} />
-                                    <label htmlFor="withDue">With Due</label>
-                                </label>
-                                {groupType === "ACCUMULATIVE" ? (
-                                    <label>
-                                        <input type="radio" id="withReserve" name="commissionType" value="withReserve" onChange={() => setLumsumCommissionType("withReserve")} style={{ margin: "0 4px 0 16px" }} />
-                                        <label htmlFor="withReserve">With Reserve</label>
-                                    </label>
-                                ) : null}
-                            </div>
+            <div className="p-6 pt-8">
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                    {/* Groups Count */}
+                    <div className="text-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
+                            <span className="text-white font-bold text-lg">
+                                {groups[0]?.groupsCompleted || 0} / {groups[0]?.totalTenture || 0}
+                            </span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Groups</p>
+                        <p className="text-xs text-gray-500">Completed / Total</p>
+                    </div>
+
+                    {/* Your Due */}
+                    <div className="text-center cursor-pointer group" onClick={handleYourDueClick}>
+                        <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                            <span className="text-white font-bold text-lg">
+                                ₹{yourdue[0]?.pending_amount || 0}
+                            </span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Your Due</p>
+                        <p className="text-xs text-gray-500">Pending Amount</p>
+                    </div>
+
+                    {/* Customer Due */}
+                    <div className="text-center cursor-pointer group" onClick={handleCustomerDueClick}>
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                            <span className="text-white font-bold text-lg">
+                                ₹{customerdue[0]?.pending_amount || 0}
+                            </span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Customer Due</p>
+                        <p className="text-xs text-gray-500">Pending Amount</p>
+                    </div>
+                </div>
+
+                {/* Auction Details */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <MdDataObject className="text-red-500" />
+                        Auction Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center gap-3">
+                            <MdCalendarToday className="text-blue-500 w-5 h-5" />
                             <div>
-                                <button onClick={handleSubmit} className="successBtn">
+                                <p className="text-sm font-medium text-gray-700">Auction Date</p>
+                                <p className="text-gray-600">{nextAuctionDate || "Not scheduled"}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <MdSchedule className="text-green-500 w-5 h-5" />
+                            <div>
+                                <p className="text-sm font-medium text-gray-700">Start Time</p>
+                                <p className="text-gray-600">{startTime || "Not set"}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <MdTimer className="text-red-500 w-5 h-5" />
+                            <div>
+                                <p className="text-sm font-medium text-gray-700">End Time</p>
+                                <p className="text-gray-600">{endTime || "Not set"}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <MdLocationOn className="text-orange-500 w-5 h-5" />
+                            <div>
+                                <p className="text-sm font-medium text-gray-700">Location</p>
+                                <p className="text-gray-600">{location || "Earth"}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                    {isGroupProgress !== "CLOSED" && (
+                        <button
+                            onClick={handleGoToAuctions}
+                            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                        >
+                            <Gavel size={18} />
+                            Go To Auction
+                        </button>
+                    )}
+
+                    {commisionType === "LUMPSUM" && (
+                        is_commision_taken ? (
+                            <button
+                                className="w-full bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                disabled
+                            >
+                                <Gavel size={18} />
+                                Lumpsum Commission Taken
+                            </button>
+                        ) : (
+                            <button
+                                onClick={openModal}
+                                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                            >
+                                <Gavel size={18} />
+                                Take Lumpsum Commission
+                            </button>
+                        )
+                    )}
+                </div>
+            </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
+
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <Gavel className="w-5 h-5 text-green-600" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-800">Take Lumpsum Commission</h2>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Auction Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={auctDate}
+                                        onChange={(e) => setAuctDate(e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Commission Amount
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={localCommision}
+                                        placeholder="Enter Commission Value"
+                                        onChange={(e) => setLocalCommision(e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                        Commission Type
+                                    </label>
+                                    <div className="space-y-3">
+                                        <label className="flex items-center gap-3">
+                                            <input
+                                                type="radio"
+                                                id="withDue"
+                                                name="commissionType"
+                                                value="withDue"
+                                                onChange={() => setLumsumCommissionType("withDue")}
+                                                className="w-4 h-4 text-red-600 focus:ring-red-500"
+                                            />
+                                            <span className="text-gray-700">With Due</span>
+                                        </label>
+                                        {groupType === "ACCUMULATIVE" && (
+                                            <label className="flex items-center gap-3">
+                                                <input
+                                                    type="radio"
+                                                    id="withReserve"
+                                                    name="commissionType"
+                                                    value="withReserve"
+                                                    onChange={() => setLumsumCommissionType("withReserve")}
+                                                    className="w-4 h-4 text-red-600 focus:ring-red-500"
+                                                />
+                                                <span className="text-gray-700">With Reserve</span>
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 mt-8">
+                                <button
+                                    onClick={handleSubmit}
+                                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
                                     Submit
                                 </button>
-                                <button onClick={closeModal} className="cancelBtn">
+                                <button
+                                    onClick={closeModal}
+                                    className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
                                     Close
                                 </button>
                             </div>
                         </div>
-                    </ModalContent>
-                </Modal>
+                    </div>
+                </div>
             )}
-        </Wrapper>
+        </div>
     );
 };
-const Wrapper = styled.article`
-    background: var(--clr-white);
-    padding: 20px 12px;
-    border-top-right-radius: var(--radius);
-    border-bottom-left-radius: var(--radius);
-    border-bottom-right-radius: var(--radius);
-    position: relative;
-    &::before {
-        content: "Highlights";
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform: translateY(-100%);
-        background: var(--clr-white);
-        color: var(--clr-grey-5);
-        border-top-right-radius: var(--radius);
-        border-top-left-radius: var(--radius);
-        text-transform: capitalize;
-        padding: 0.5rem 1rem 0 1rem;
-        letter-spacing: var(--spacing);
-        font-size: 1rem;
-        font-weight:500;
-    }
-
-    header {
-        display: grid;
-        grid-template-columns: auto auto auto;
-        align-items: center;
-        justify-content: left;
-        column-gap: 1rem;
-        row-gap: 2px;
-        margin-bottom: 2rem;
-
-        h4 {
-            margin-bottom: 0.25rem;
-        }
-        p {
-            margin-bottom: 0;
-        }
-    }
-    .circle {
-        width: 5rem;
-        height: 5rem;
-        border-radius: 50%;
-        background-color: #cd3240;
-        // margin-right: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .groupscount {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .duecount {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    .more {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .links {
-        p,
-        a {
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            svg {
-                margin-right: 0.5rem;
-                font-size: 1.3rem;
-            }
-        }
-        a {
-            color: var(--clr-primary-5);
-            transition: var(--transition);
-            svg {
-                color: var(--clr-grey-5);
-            }
-            &:hover {
-                color: var(--clr-primary-3);
-            }
-        }
-    }
-
-    gotoauction {
-        display: flex;
-        flex-direction: column;
-        align-items: left;
-    }
-
-    .label {
-        flex: 1; /* Distribute the available space equally among the labels */
-        text-align: left; /* Center-align the text within each label */
-    }
-    
-    .buttonStyle {
-        border-radius: 5px;
-        background-color: #cd3240;
-        border: 2px solid transparent;
-        color: var(--clr-white);
-        width: 290px;
-        padding: 8px;
-        margin-top: 20px;
-        margin-right:12px;
-        align-items: center;
-        cursor: pointer;
-    }
-`;
-const Modal = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-`;
-
-const ModalContent = styled.div`
-    width: 100%;
-    max-width: 600px;
-    background: white;
-    padding: 24px 28px 28px;
-    border-radius: 8px;
-    text-align: center;
-    display: flex;
-    flex-direction: column; /* Display items in a column */
-    align-items: center; /* Center items horizontally */
-    gap: 1rem; /* Add spacing between items */
-`;
 
 export default GroupDetailsCard;

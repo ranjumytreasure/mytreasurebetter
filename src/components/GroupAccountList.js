@@ -22,7 +22,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
     const renderFixedView = () => (
         <div className="overflow-x-auto">
             <div className="bg-custom-red text-white rounded-lg overflow-hidden">
-                <div className="grid grid-cols-7 gap-4 p-4 text-sm font-semibold">
+                <div className="grid grid-cols-7 p-4 text-sm font-semibold" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr 1fr' }}>
                     <div className="flex items-center gap-1">
                         <Hash size={16} />
                         <span>S.No</span>
@@ -59,7 +59,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
                     const formattedAuctionDate = formatDate(auctionDate);
 
                     return (
-                        <div key={index} className="grid grid-cols-7 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                        <div key={index} className="grid grid-cols-7 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr 1fr' }}>
                             <div className="font-medium text-gray-800">
                                 {sno ?? 0}
                             </div>
@@ -92,7 +92,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
         return (
             <div className="overflow-x-auto">
                 <div className="bg-custom-red text-white rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-6 gap-2 p-4 text-sm font-semibold">
+                    <div className="grid grid-cols-6 p-4 text-sm font-semibold" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr' }}>
                         <div className="flex items-center gap-1">
                             <Hash size={16} />
                             <span>S.No</span>
@@ -134,7 +134,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
                         } = item;
 
                         return (
-                            <div key={index} className="grid grid-cols-6 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                            <div key={index} className="grid grid-cols-6 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr' }}>
                                 <div className="font-medium text-gray-800">{sno ?? 0}</div>
                                 <div className={`${auctionStatus === 'completed' ? 'bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center' : 'text-gray-700'}`}>
                                     {formatDate(auctionDate)}
@@ -155,7 +155,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
         return (
             <div className="overflow-x-auto">
                 <div className="bg-custom-red text-white rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-6 gap-2 p-4 text-sm font-semibold">
+                    <div className="grid grid-cols-6 p-4 text-sm font-semibold" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr' }}>
                         <div className="flex items-center gap-1">
                             <Hash size={16} />
                             <span>S.No</span>
@@ -197,7 +197,7 @@ const GroupAccountList = ({ items, removeItem, editItem, type }) => {
                         } = item;
 
                         return (
-                            <div key={index} className="grid grid-cols-6 gap-2 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                            <div key={index} className="grid grid-cols-6 p-4 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200" style={{ gridTemplateColumns: '50px 80px 1fr 1fr 1fr 1fr' }}>
                                 <div className="font-medium text-gray-800">{sno ?? 0}</div>
                                 <div className={`${auctionStatus === 'completed' ? 'bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center' : 'text-gray-700'}`}>
                                     {formatDate(auctionDate)}
