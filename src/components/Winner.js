@@ -21,6 +21,7 @@ const Winner = ({ location }) => {
     const groupName = winningSub?.winnerObject?.groupName || 'Auction Group';
     const groupAmount = winningSub?.winnerObject?.group_amount || 0;
     const reserveAmount = winningSub?.winnerObject?.reserveAmount || 0;
+    const profitAmount = winningSub?.winnerObject?.profitAmount || 0;
     const groupType = winningSub?.winnerObject?.groupType || '';
     const payableAmount = winningSub?.winnerObject?.payableamnt || 0;
 
@@ -95,6 +96,29 @@ const Winner = ({ location }) => {
 
     const formatCurrency = (amount) => {
         return `₹${Number(amount).toLocaleString("en-IN")}`;
+    };
+
+    // Helper function to get the appropriate amount based on group type
+    const getDisplayAmount = () => {
+        const groupTypeLower = groupType?.toLowerCase() || '';
+
+        if (groupTypeLower === 'accumulative') {
+            return {
+                label: 'Reserve Amount',
+                amount: reserveAmount
+            };
+        } else if (groupTypeLower === 'deductive' || groupTypeLower === 'fixed') {
+            return {
+                label: 'Profit Amount',
+                amount: profitAmount
+            };
+        } else {
+            // Default fallback - show reserve amount
+            return {
+                label: 'Reserve Amount',
+                amount: reserveAmount
+            };
+        }
     };
 
     return (
@@ -217,10 +241,10 @@ const Winner = ({ location }) => {
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 flex items-center gap-2">
                                                 <FaCoins className="w-4 h-4" />
-                                                Reserve Amount:
+                                                {getDisplayAmount().label}:
                                             </span>
                                             <span className="font-semibold text-gray-900">
-                                                {formatCurrency(reserveAmount)}
+                                                {formatCurrency(getDisplayAmount().amount)}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center">
