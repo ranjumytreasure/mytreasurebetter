@@ -181,6 +181,7 @@ const AuctionsPage = () => {
             const errorMsg = errorData?.message?.trim() || "bidError.";
             toast.error(errorMsg);
             console.log("PlaceBidError:", errorData);
+            setIsPlacingBid(false); // Re-enable the Place Bid button
         });
 
         socket.on("existsAuction", (existsAuctionId) => {
