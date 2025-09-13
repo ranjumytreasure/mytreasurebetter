@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useBilling } from '../context/billing_context';
 import { useUserContext } from '../context/user_context';
+import { API_BASE_URL } from '../utils/apiConfig';
 import Loading from '../components/Loading';
 import PlansSelection from '../components/PlansSelection';
 import PlanUpgradeForm from '../components/PlanUpgradeForm';
@@ -26,14 +27,8 @@ const MyBillingPage = () => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [showUpgradeForm, setShowUpgradeForm] = useState(false);
     const [showPaymentHistoryDebug, setShowPaymentHistoryDebug] = useState(false);
+    const [paymentRefreshKey, setPaymentRefreshKey] = useState(0);
 
-    // Debug logging
-    console.log('=== MY BILLING PAGE DEBUG ===');
-    console.log('User:', user);
-    console.log('User token:', user?.results?.token);
-    console.log('Membership ID:', user?.results?.userAccounts?.[0]?.parent_membership_id);
-    console.log('Billing state:', { subscription, payments, availablePlans, isLoading, error });
-    console.log('================================');
 
     useEffect(() => {
         fetchCurrentSubscription();
@@ -89,6 +84,15 @@ const MyBillingPage = () => {
         return nextDate.toISOString().split('T')[0];
     };
 
+    // Function to generate overdue cycles (simplified without grace period)
+    const generateOverdueCycles = (subscription, payments) => {
+        if (!subscription || !payments) return [];
+
+        // For now, return empty array - overdue cycles should be created by backend
+        // This function can be enhanced later if needed for frontend-generated cycles
+        return [];
+    };
+
     // Function to validate billing cycle dates
     const validateBillingCycle = (cycle, previousCycle) => {
         if (!cycle || !subscription?.billing_cycle) return { isValid: true, message: '' };
@@ -112,7 +116,10 @@ const MyBillingPage = () => {
 
     // Comprehensive payment history analysis
     const analyzePaymentHistory = () => {
-        if (!payments || !payments.cycle_payments) {
+        // Handle both array and object structures
+        const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+
+        if (!cyclePayments || cyclePayments.length === 0) {
             return {
                 totalCycles: 0,
                 paidCycles: 0,
@@ -126,7 +133,7 @@ const MyBillingPage = () => {
         }
 
         const analysis = {
-            totalCycles: payments.cycle_payments.length,
+            totalCycles: cyclePayments.length,
             paidCycles: 0,
             unpaidCycles: 0,
             pendingCycles: 0,
@@ -136,15 +143,17 @@ const MyBillingPage = () => {
             cycleDetails: []
         };
 
-        payments.cycle_payments.forEach((cycle, index) => {
-            const previousCycle = index > 0 ? payments.cycle_payments[index - 1] : null;
+        cyclePayments.forEach((cycle, index) => {
+            const previousCycle = index > 0 ? cyclePayments[index - 1] : null;
             const validation = validateBillingCycle(cycle, previousCycle);
 
-            // Count by status
-            if (cycle.status === 'paid') {
+            // Count by status - first cycle should show as paid/free
+            const displayStatus = (cycle.cycle_number === 1 && (cycle.status === 'pending' || cycle.status === 'unpaid')) ? 'paid' : cycle.status;
+
+            if (displayStatus === 'paid' || displayStatus === 'success') {
                 analysis.paidCycles++;
                 analysis.totalPaid += parseFloat(cycle.amount) || 0;
-            } else if (cycle.status === 'unpaid') {
+            } else if (displayStatus === 'unpaid' || displayStatus === 'pending') {
                 analysis.unpaidCycles++;
                 analysis.totalDue += parseFloat(cycle.amount) || 0;
             } else {
@@ -178,22 +187,24 @@ const MyBillingPage = () => {
 
     // Debug function to check billing cycle logic
     const debugBillingCycles = () => {
-        if (payments && payments.cycle_payments) {
+        const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+
+        if (cyclePayments && cyclePayments.length > 0) {
             console.log('=== BILLING CYCLE DEBUG ===');
             console.log('Subscription billing cycle:', subscription?.billing_cycle);
-            console.log('All cycle payments:', payments.cycle_payments);
+            console.log('All cycle payments:', cyclePayments);
 
             const analysis = analyzePaymentHistory();
             console.log('Payment History Analysis:', analysis);
 
-            payments.cycle_payments.forEach((cycle, index) => {
+            cyclePayments.forEach((cycle, index) => {
                 console.log(`Cycle ${cycle.cycle_number}:`);
                 console.log(`  Due Date: ${cycle.due_date}`);
                 console.log(`  Payment Date: ${cycle.payment_date || 'Not paid'}`);
                 console.log(`  Status: ${cycle.status}`);
 
                 // Validate against previous cycle
-                const previousCycle = index > 0 ? payments.cycle_payments[index - 1] : null;
+                const previousCycle = index > 0 ? cyclePayments[index - 1] : null;
                 const validation = validateBillingCycle(cycle, previousCycle);
 
                 if (!validation.isValid) {
@@ -223,15 +234,26 @@ const MyBillingPage = () => {
         try {
             // Combine billingDetails and paymentData for the backend
             const combinedData = {
-                ...paymentData,
-                billing_details: billingDetails
+                membership_id: user?.results?.userAccounts?.[0]?.parent_membership_id,
+                billing_details: {
+                    plan_id: billingDetails.plan_id,
+                    plan_name: billingDetails.plan_name,
+                    amount: billingDetails.amount,
+                    currency: billingDetails.currency || 'INR',
+                    billing_cycle: billingDetails.billing_cycle,
+                    features: billingDetails.features
+                },
+                ...paymentData
             };
 
             const result = await recordPayment(combinedData);
             if (result.success) {
-                alert('Payment recorded successfully!');
+                alert('Plan upgraded successfully!');
                 setShowUpgradeForm(false);
                 setSelectedPlan(null);
+                // Refresh billing data
+                await fetchCurrentSubscription();
+                await fetchPaymentHistory();
             } else {
                 alert(`Payment failed: ${result.error}`);
             }
@@ -243,8 +265,25 @@ const MyBillingPage = () => {
     const handleCyclePayment = async (cycleData) => {
         try {
             const result = await payCycleBill(cycleData);
+
             if (result.success) {
-                alert('Cycle payment recorded successfully!');
+                // Show success message
+                alert(`Payment of ${formatAmount(cycleData.amount)} recorded successfully!`);
+
+                // Force refresh the billing data to show updated status
+                await fetchCurrentSubscription();
+                await fetchPaymentHistory();
+
+                // Force UI re-render
+                setPaymentRefreshKey(prev => prev + 1);
+
+                // Additional refresh to ensure UI updates
+                setTimeout(async () => {
+                    await fetchCurrentSubscription();
+                    await fetchPaymentHistory();
+                    setPaymentRefreshKey(prev => prev + 1);
+                }, 1000);
+
             } else {
                 alert(`Payment failed: ${result.error}`);
             }
@@ -254,15 +293,25 @@ const MyBillingPage = () => {
     };
 
     const payCycle = (cycle) => {
+        // Create payment data according to billing_payments model structure
         const paymentData = {
+            subscription_id: subscription?.id, // Link to current subscription
             cycle_number: cycle.cycle_number,
-            amount: cycle.amount,
+            amount: parseFloat(cycle.amount),
             payment_method: 'UPI',
             transaction_id: `TXN_${Date.now()}`,
-            gateway_response: { method: 'UPI' },
+            gateway_response: {
+                method: 'UPI',
+                status: 'success',
+                timestamp: new Date().toISOString()
+            },
             invoice_number: `INV_${Date.now()}`,
-            payment_reference: `REF_${Date.now()}`
+            payment_reference: `REF_${Date.now()}`,
+            status: 'success',
+            payment_date: new Date().toISOString()
         };
+
+
         handleCyclePayment(paymentData);
     };
 
@@ -303,13 +352,6 @@ const MyBillingPage = () => {
 
     const getCurrentPlan = () => {
         if (subscription) {
-            console.log('=== GET CURRENT PLAN DEBUG ===');
-            console.log('Full subscription object:', subscription);
-            console.log('Subscription ID:', subscription.id);
-            console.log('Subscription plan_id:', subscription.plan_id);
-            console.log('Subscription plan_name:', subscription.plan_name);
-            console.log('================================');
-
             return {
                 id: subscription.id,  // Use actual UUID instead of plan_id
                 name: subscription.plan_name || subscription.plan_id || 'VeryBasic Plan',
@@ -322,24 +364,21 @@ const MyBillingPage = () => {
     const getBillingStatus = () => {
         if (!subscription) return { status: 'unknown', message: 'No subscription', color: 'gray' };
 
-        const today = new Date();
-        const endDate = new Date(subscription.end_date);
-        const graceEndDate = new Date(endDate);
-        graceEndDate.setDate(endDate.getDate() + (subscription.grace_period_days || 60));
+        // Determine status based on remaining_days and payment history
+        if (subscription.remaining_days > 0) {
+            // Check if there are any unpaid cycles
+            const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+            const unpaidCycles = cyclePayments.filter(cycle =>
+                cycle.status === 'unpaid' || cycle.status === 'pending'
+            );
 
-        if (subscription.payment_status === 'paid') {
-            return { status: 'paid', message: 'Paid', color: 'green' };
-        } else if (today <= graceEndDate) {
-            return { status: 'grace', message: 'In grace period', color: 'blue' };
+            if (unpaidCycles.length > 0) {
+                return { status: 'overdue', message: 'Overdue', color: 'red' };
+            } else {
+                return { status: 'paid', message: 'Paid', color: 'green' };
+            }
         } else {
-            const daysOverdue = Math.floor((today - graceEndDate) / (1000 * 60 * 60 * 24));
-            const monthsOverdue = Math.ceil(daysOverdue / 30);
-            const overdueAmount = subscription.amount * monthsOverdue;
-            return {
-                status: 'overdue',
-                message: `${formatAmount(overdueAmount)} unpaid`,
-                color: 'red'
-            };
+            return { status: 'expired', message: 'Expired', color: 'red' };
         }
     };
 
@@ -391,7 +430,7 @@ const MyBillingPage = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">
-                        My Billing{subscription && ` - ${subscription.plan_name} Plan - ${formatAmount(subscription.amount)}${subscription.payment_status === 'paid' ? ' Paid' : ''}`}
+                        My Billing{subscription && ` - ${subscription.plan_name} Plan - ${formatAmount(subscription.amount)}${getBillingStatus().status === 'paid' ? ' Paid' : getBillingStatus().status === 'overdue' ? ' Overdue' : ''}`}
                     </h1>
                     <p className="mt-2 text-gray-600">
                         Manage your subscription and view payment history.
@@ -463,13 +502,13 @@ const MyBillingPage = () => {
                                                 <div className="flex justify-between">
                                                     <span className="text-gray-600">Start Date</span>
                                                     <span className="font-medium">
-                                                        {formatDate(subscription.start_date)}
+                                                        {formatDate(subscription.plan_start_date)}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span className="text-gray-600">End Date</span>
                                                     <span className="font-medium">
-                                                        {formatDate(subscription.end_date)}
+                                                        {formatDate(subscription.plan_end_date)}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
@@ -516,7 +555,10 @@ const MyBillingPage = () => {
                                 </div>
 
                                 {/* Payment History Summary */}
-                                {payments && payments.cycle_payments && payments.cycle_payments.length > 0 && (() => {
+                                {(() => {
+                                    const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                    return cyclePayments && cyclePayments.length > 0;
+                                })() && (() => {
                                     const analysis = analyzePaymentHistory();
 
                                     return (
@@ -569,7 +611,10 @@ const MyBillingPage = () => {
                                 })()}
 
                                 {/* Debug Panel */}
-                                {showPaymentHistoryDebug && payments && payments.cycle_payments && (() => {
+                                {showPaymentHistoryDebug && (() => {
+                                    const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                    return cyclePayments && cyclePayments.length > 0;
+                                })() && (() => {
                                     const analysis = analyzePaymentHistory();
 
                                     return (
@@ -590,11 +635,18 @@ const MyBillingPage = () => {
                                     );
                                 })()}
 
-                                {payments && payments.cycle_payments && payments.cycle_payments.length > 0 ? (
-                                    <div className="overflow-x-auto">
+
+                                {(() => {
+                                    const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                    return cyclePayments && cyclePayments.length > 0;
+                                })() ? (
+                                    <div className="overflow-x-auto" key={paymentRefreshKey}>
                                         <table className="min-w-full divide-y divide-gray-200">
                                             <thead className="bg-gray-50">
                                                 <tr>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Plan
+                                                    </th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Cycle
                                                     </th>
@@ -616,56 +668,74 @@ const MyBillingPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
-                                                {payments.cycle_payments.map((cycle, index) => {
-                                                    const previousCycle = index > 0 ? payments.cycle_payments[index - 1] : null;
-                                                    const validation = validateBillingCycle(cycle, previousCycle);
+                                                {(() => {
+                                                    // Generate overdue cycles if needed
+                                                    const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                                    const overdueCycles = generateOverdueCycles(subscription, payments);
+                                                    const allCycles = [...cyclePayments, ...overdueCycles];
 
-                                                    return (
-                                                        <tr key={cycle.id}>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                <span>Cycle {cycle.cycle_number}</span>
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                {formatDate(cycle.due_date)}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                                {formatAmount(cycle.amount)}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cycle.status === 'paid'
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : cycle.status === 'unpaid'
-                                                                        ? 'bg-red-100 text-red-800'
-                                                                        : 'bg-yellow-100 text-yellow-800'
-                                                                    }`}>
-                                                                    {cycle.status}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                {cycle.payment_date ? formatDate(cycle.payment_date) : '-'}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                {cycle.status === 'paid' ? (
-                                                                    <button
-                                                                        onClick={() => downloadReceipt(cycle)}
-                                                                        className="text-blue-600 hover:text-blue-800 font-medium"
-                                                                    >
-                                                                        Download Receipt
-                                                                    </button>
-                                                                ) : cycle.status === 'unpaid' ? (
-                                                                    <button
-                                                                        onClick={() => payCycle(cycle)}
-                                                                        className="text-red-600 hover:text-red-800 font-medium"
-                                                                    >
-                                                                        Pay Now
-                                                                    </button>
-                                                                ) : (
-                                                                    <span className="text-gray-400">Pending</span>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
+                                                    return allCycles.map((cycle, index) => {
+                                                        const previousCycle = index > 0 ? allCycles[index - 1] : null;
+                                                        const validation = validateBillingCycle(cycle, previousCycle);
+
+                                                        // Determine display status - first cycle should show as paid/free
+                                                        const displayStatus = (cycle.cycle_number === 1 && (cycle.status === 'pending' || cycle.status === 'unpaid')) ? 'paid' : cycle.status;
+
+
+                                                        return (
+                                                            <tr key={cycle.id}>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    <span className="font-medium text-blue-600">
+                                                                        {cycle.plan_name || 'Unknown Plan'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    <span>Cycle {cycle.cycle_number}</span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    {formatDate(cycle.due_date)}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                                    {formatAmount(cycle.amount)}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${displayStatus === 'paid'
+                                                                        ? 'bg-green-100 text-green-800'
+                                                                        : displayStatus === 'unpaid'
+                                                                            ? 'bg-red-100 text-red-800'
+                                                                            : displayStatus === 'free'
+                                                                                ? 'bg-blue-100 text-blue-800'
+                                                                                : 'bg-yellow-100 text-yellow-800'
+                                                                        }`}>
+                                                                        {displayStatus === 'free' ? 'Free' : displayStatus}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    {cycle.payment_date ? formatDate(cycle.payment_date) : '-'}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    {(displayStatus === 'paid' || displayStatus === 'free') ? (
+                                                                        <button
+                                                                            onClick={() => downloadReceipt(cycle)}
+                                                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 font-medium text-sm"
+                                                                        >
+                                                                            Download Receipt
+                                                                        </button>
+                                                                    ) : (displayStatus === 'unpaid' || displayStatus === 'pending') ? (
+                                                                        <button
+                                                                            onClick={() => payCycle(cycle)}
+                                                                            className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 font-medium text-sm"
+                                                                        >
+                                                                            Pay ({formatAmount(cycle.amount)})
+                                                                        </button>
+                                                                    ) : (
+                                                                        <span className="text-gray-400">Pending</span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    });
+                                                })()}
                                             </tbody>
                                         </table>
                                     </div>
@@ -678,28 +748,10 @@ const MyBillingPage = () => {
                                         </div>
                                         <h3 className="text-lg font-medium text-gray-900 mb-2">No Payment History</h3>
                                         <p className="text-gray-600">You haven't made any payments yet.</p>
+
                                     </div>
                                 )}
 
-                                {/* Pay Button */}
-                                {payments && payments.cycle_payments && payments.cycle_payments.length > 0 && (
-                                    <div className="mt-6 pt-6 border-t border-gray-200">
-                                        <button
-                                            onClick={() => {
-                                                // Find the first unpaid cycle to pay
-                                                const unpaidCycle = payments.cycle_payments.find(cycle => cycle.status === 'unpaid');
-                                                if (unpaidCycle) {
-                                                    payCycle(unpaidCycle);
-                                                } else {
-                                                    alert('No unpaid cycles found. Your subscription is up to date!');
-                                                }
-                                            }}
-                                            className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
-                                        >
-                                            Pay Outstanding Amount
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -718,8 +770,9 @@ const MyBillingPage = () => {
 
                                     <button
                                         onClick={() => {
-                                            if (payments && payments.cycle_payments) {
-                                                const paidCycles = payments.cycle_payments.filter(cycle => cycle.status === 'paid');
+                                            const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                            if (cyclePayments && cyclePayments.length > 0) {
+                                                const paidCycles = cyclePayments.filter(cycle => cycle.status === 'paid');
                                                 if (paidCycles.length > 0) {
                                                     downloadReceipt(paidCycles[0]);
                                                 } else {
@@ -730,6 +783,27 @@ const MyBillingPage = () => {
                                         className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-200"
                                     >
                                         Download Latest Receipt
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            const cyclePayments = Array.isArray(payments) ? payments : (payments?.cycle_payments || []);
+                                            if (cyclePayments && cyclePayments.length > 0) {
+                                                const outstandingCycles = cyclePayments.filter(cycle => {
+                                                    // Skip first cycle if it's free/paid, otherwise include unpaid cycles
+                                                    const isFirstCycleFree = cycle.cycle_number === 1 && (cycle.status === 'pending' || cycle.status === 'unpaid');
+                                                    return (cycle.status === 'unpaid' || cycle.status === 'pending') && !isFirstCycleFree;
+                                                });
+                                                if (outstandingCycles.length > 0) {
+                                                    payCycle(outstandingCycles[0]);
+                                                } else {
+                                                    alert('No outstanding payments found');
+                                                }
+                                            }
+                                        }}
+                                        className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                    >
+                                        Pay Outstanding
                                     </button>
                                 </div>
                             </div>

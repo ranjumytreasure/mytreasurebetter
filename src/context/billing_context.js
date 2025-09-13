@@ -53,10 +53,6 @@ export const BillingProvider = ({ children }) => {
             return;
         }
 
-        console.log('=== FETCHING SUBSCRIPTION ===');
-        console.log('Membership ID:', membershipId);
-        console.log('API URL:', `${API_BASE_URL}/billing-subscription/${membershipId}`);
-
         dispatch({ type: 'FETCH_START' });
 
         try {
@@ -66,17 +62,12 @@ export const BillingProvider = ({ children }) => {
                 },
             });
 
-            console.log('Response status:', res.status);
-            console.log('Response ok:', res.ok);
-
             if (!res.ok) {
                 const errorText = await res.text();
-                console.log('Error response:', errorText);
                 throw new Error(`Failed to fetch subscription: ${res.status}`);
             }
 
             const data = await res.json();
-            console.log('Response data:', data);
 
             if (data.success && data.data) {
                 dispatch({ type: 'FETCH_SUBSCRIPTION_SUCCESS', payload: data.data.subscription });
@@ -84,7 +75,6 @@ export const BillingProvider = ({ children }) => {
                 dispatch({ type: 'FETCH_ERROR', payload: data.message || 'No subscription data found' });
             }
         } catch (error) {
-            console.log('Fetch error:', error);
             dispatch({ type: 'FETCH_ERROR', payload: error.message });
         }
     };
@@ -98,6 +88,7 @@ export const BillingProvider = ({ children }) => {
             return;
         }
 
+
         dispatch({ type: 'FETCH_START' });
 
         try {
@@ -107,16 +98,34 @@ export const BillingProvider = ({ children }) => {
                 },
             });
 
-            if (!res.ok) throw new Error('Failed to fetch payments');
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Failed to fetch payments: ${res.status}`);
+            }
+
             const data = await res.json();
 
             if (data.success && data.data) {
-                dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: data.data });
+
+                // Handle different data structures from backend
+                let paymentData;
+                if (Array.isArray(data.data)) {
+                    // If data.data is an array, wrap it in cycle_payments
+                    paymentData = { cycle_payments: data.data };
+                } else if (data.data.cycle_payments) {
+                    // If data.data has cycle_payments property, use it as is
+                    paymentData = data.data;
+                } else {
+                    // If data.data is an object but no cycle_payments, treat it as empty
+                    paymentData = { cycle_payments: [] };
+                }
+
+                dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: paymentData });
             } else {
-                dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: [] });
+                dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: { cycle_payments: [] } });
             }
         } catch (error) {
-            dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: [] });
+            dispatch({ type: 'FETCH_PAYMENTS_SUCCESS', payload: { cycle_payments: [] } });
         }
     };
 
@@ -192,15 +201,13 @@ export const BillingProvider = ({ children }) => {
         }
 
         try {
+            // Ensure membership_id is included in the request body
             const requestBody = {
                 membership_id: membershipId,
                 ...paymentData
             };
 
-            console.log('=== BILLING PAYMENT REQUEST ===');
-            console.log('API URL:', `${API_BASE_URL}/billing-payments`);
-            console.log('Request Body:', requestBody);
-            console.log('================================');
+            console.log('Recording payment with data:', requestBody);
 
             const response = await fetch(`${API_BASE_URL}/billing-payments`, {
                 method: 'POST',
@@ -211,21 +218,22 @@ export const BillingProvider = ({ children }) => {
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response ok:', response.ok);
-
             if (response.ok) {
                 const result = await response.json();
-                console.log('Success response:', result);
+                console.log('Payment recorded successfully:', result);
+
+                // Refresh billing data after successful payment
                 await fetchCurrentSubscription();
                 await fetchPaymentHistory();
+
                 return { success: true, data: result };
             } else {
                 const errorData = await response.json();
-                console.log('Error response:', errorData);
+                console.error('Payment failed:', errorData);
                 return { success: false, error: errorData.message || 'Payment failed' };
             }
         } catch (error) {
+            console.error('Payment error:', error);
             return { success: false, error: error.message };
         }
     };

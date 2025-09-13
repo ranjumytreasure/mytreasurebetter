@@ -56,8 +56,6 @@ const PlansSelection = ({ currentPlan, availablePlans, onSelectPlan }) => {
         }
     ];
 
-    const plans = availablePlans && availablePlans.length > 0 ? availablePlans : defaultPlans;
-
     const formatAmount = (amount) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -73,21 +71,21 @@ const PlansSelection = ({ currentPlan, availablePlans, onSelectPlan }) => {
         const currentPlanName = currentPlan.name.toLowerCase().trim();
         const planName = plan.name.toLowerCase().trim();
 
-        // Debug logging
-        console.log('=== PLAN COMPARISON DEBUG ===');
-        console.log('Current Plan Name:', currentPlanName);
-        console.log('Plan Name:', planName);
-        console.log('Direct Match:', currentPlanName === planName);
-        console.log('=============================');
-
-        // Direct match
+        // Direct exact match
         if (currentPlanName === planName) return true;
 
-        // Handle variations like "VeryBasic Plan" vs "VeryBasic"
-        if (currentPlanName.includes(planName) || planName.includes(currentPlanName)) return true;
+        // Handle variations like "VeryBasic Plan" vs "VeryBasic" 
+        // Extract the core plan name (remove "Plan" suffix if present)
+        const currentCoreName = currentPlanName.replace(/\s+plan$/, '');
+        const planCoreName = planName.replace(/\s+plan$/, '');
+
+        // Match core names exactly
+        if (currentCoreName === planCoreName) return true;
 
         return false;
     };
+
+    const plans = availablePlans && availablePlans.length > 0 ? availablePlans : defaultPlans;
 
     const getPlanCardClass = (plan) => {
         const baseClass = "relative rounded-lg shadow-sm border-2 p-6 transition-all duration-200";

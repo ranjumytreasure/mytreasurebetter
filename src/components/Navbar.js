@@ -48,40 +48,75 @@ const Nav = () => {
     }).format(amount || 0);
   };
 
-  // Get billing status and grace period
+  // Get billing status and grace period - Frontend calculation
   const getBillingStatus = () => {
     if (!subscription) return { status: 'unknown', message: 'No subscription', color: 'gray', daysLeft: 0 };
 
-    // Use the calculated values from backend
-    const graceStatus = subscription.grace_status;
-    const daysRemaining = subscription.days_remaining || 0;
-    const daysOverdue = subscription.days_overdue || 0;
-    const overdueAmount = subscription.overdue_amount || 0;
-    const monthsOverdue = subscription.months_overdue || 0;
+    const today = new Date();
+    const startDate = new Date(subscription.start_date);
+    const endDate = new Date(subscription.end_date);
+
+    // Grace period should be calculated from subscription start date, not end date
+    const graceEndDate = new Date(startDate);
+    graceEndDate.setDate(startDate.getDate() + (subscription.grace_period_days || 60));
     const amount = subscription.amount || 0;
 
-    if (graceStatus === 'paid') {
+    console.log('=== GRACE PERIOD DEBUG ===');
+    console.log('Start Date:', startDate);
+    console.log('End Date:', endDate);
+    console.log('Grace Period Days:', subscription.grace_period_days || 60);
+    console.log('Grace End Date:', graceEndDate);
+    console.log('Today:', today);
+    console.log('=========================');
+
+    // Check if subscription is active (using remaining_days)
+    if (subscription.remaining_days > 0) {
       return {
-        status: 'paid',
-        message: `${formatAmount(amount)} Paid`,
+        status: 'active',
+        message: `${formatAmount(amount)} Active`,
         color: 'green',
-        daysLeft: 0
+        daysLeft: subscription.remaining_days
       };
-    } else if (graceStatus === 'in_grace') {
-      const message = daysRemaining > 0 ? `${formatAmount(amount)} - ${daysRemaining} days left` : `${formatAmount(amount)} - Grace period active`;
-      const color = daysRemaining <= 7 ? 'red' : 'blue';
-      return { status: 'grace', message, color, daysLeft: daysRemaining };
-    } else if (graceStatus === 'overdue') {
-      const totalOverdue = overdueAmount > 0 ? overdueAmount : (amount * monthsOverdue);
-      return {
-        status: 'overdue',
-        message: `${formatAmount(totalOverdue)} Unpaid`,
-        color: 'red',
-        daysLeft: -daysOverdue
-      };
-    } else {
-      return { status: 'unknown', message: 'Unknown status', color: 'gray', daysLeft: 0 };
     }
+
+    // Calculate months since subscription started
+    const monthsSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24 * 30));
+
+    // Grace period only applies to the first month (month 0)
+    const isFirstMonth = monthsSinceStart === 0;
+
+    // Check if still in grace period (only for first month)
+    if (isFirstMonth && today <= graceEndDate) {
+      const daysLeft = Math.ceil((graceEndDate - today) / (1000 * 60 * 60 * 24));
+      return {
+        status: 'grace',
+        message: `Grace period ${daysLeft} days left`,
+        color: 'blue',
+        daysLeft: daysLeft
+      };
+    }
+
+    // After grace period or for subsequent months, calculate overdue
+    let monthsOverdue;
+    if (isFirstMonth) {
+      // First month: calculate from grace period end
+      const daysOverdue = Math.floor((today - graceEndDate) / (1000 * 60 * 60 * 24));
+      monthsOverdue = Math.ceil(daysOverdue / 30);
+    } else {
+      // Subsequent months: calculate from subscription end date
+      const daysOverdue = Math.floor((today - endDate) / (1000 * 60 * 60 * 24));
+      monthsOverdue = Math.ceil(daysOverdue / 30);
+    }
+
+    const overdueAmount = amount * monthsOverdue;
+
+    return {
+      status: 'overdue',
+      message: `${formatAmount(overdueAmount)} Due`,
+      color: 'red',
+      daysLeft: -Math.floor((today - (isFirstMonth ? graceEndDate : endDate)) / (1000 * 60 * 60 * 24)),
+      monthsOverdue: monthsOverdue
+    };
   };
 
   // Icon mapping for navigation links

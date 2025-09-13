@@ -90,10 +90,8 @@ const PlanUpgradeForm = ({ selectedPlan, currentPlan, onBack, onProceedToPayment
             amount: selectedOption.price,
             currency: 'INR',
             billing_cycle: selectedBillingCycle,
-            start_date: startDate,
-            end_date: endDate,
-            grace_period_days: 60,
-            payment_status: 'in_grace',
+            plan_start_date: startDate,
+            plan_end_date: null, // Active plan
             status: 'active',
             remaining_days: selectedOption.multiplier * 30,
             auto_renew: false
