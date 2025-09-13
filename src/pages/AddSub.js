@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGroupDetailsContext } from "../context/group_context";
+import { useCompanySubscriberContext } from "../context/companysubscriber_context";
 import { useParams, useHistory } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import { FiTrash2 } from "react-icons/fi";
@@ -18,6 +19,8 @@ const AddSub = () => {
     noofCompanySubscriber,
   } = useGroupDetailsContext();
 
+  const { companySubscribers } = useCompanySubscriberContext();
+
   const [open, setOpen] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
 
@@ -33,6 +36,9 @@ const AddSub = () => {
 
   const addedSubscribers = data?.results?.groupSubcriberResult?.length ?? 0;
   const outstandingSubscribers = totalSubscribers - addedSubscribers;
+
+  // Get company subscriber count from context
+  const actualCompanySubscriberCount = companySubscribers?.length ?? 0;
 
   // --- Handlers ---
   const handleOpenPopup = () => setOpen(true);
@@ -141,7 +147,7 @@ const AddSub = () => {
             <PopupActions>
               <PopupBtnPrimary onClick={handleAddNewClick}>➕ Add New</PopupBtnPrimary>
               <PopupBtnCompany onClick={handleCompanySubscriberClick}>
-                🏢 Company Subscribers ({noofCompanySubscriber ?? 0})
+                🏢 Company Subscribers ({actualCompanySubscriberCount})
               </PopupBtnCompany>
             </PopupActions>
           </PopupCard>

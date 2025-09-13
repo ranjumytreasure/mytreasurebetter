@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { useUserContext } from '../context/user_context';
 import List from '../components/List';
@@ -339,430 +338,192 @@ function AddSubcriber() {
     }
   };
   return (
-    <Wrapper className="section-center">
-      <section className="container">
-        <div className="button-container">
-          <button className="back-button" onClick={handleBackButtonClick}>
-            &#8592; {/* Unicode character for a left arrow */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={handleBackButtonClick}
+            className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
           </button>
-          {/* <button className="show-list-btn" onClick={toggleList}>
-            Show List
-          </button> */}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-800">Add New Subscriber</h1>
+            <p className="text-gray-600">Join a member to your group</p>
+          </div>
+          <div className="w-24"></div> {/* Spacer for centering */}
         </div>
 
-        <form className="addsubscriber-form" onSubmit={handleAddSubscriber}>
-          {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
-          <h3>Add Subscribers</h3>
-          <div>
-            <label htmlFor="country-select">Select your nationality:</label>
-            <ReactFlagsSelect
-              id="country-select"
-              selected={selectedCountry}
-              onSelect={handleCountryChange}
-              countries={countries.map((country) => country.value)}
-              showSelectedLabel={true}
-              searchable={true}
-            />
-          </div>
-          <p>
-            Selected Country: {countries.find((c) => c.value === selectedCountry)?.label} (
-            {countries.find((c) => c.value === selectedCountry)?.countryCode})
-          </p>
-          <AvatarUploader handleSetImage={handleSetImage} currentImage={currentImage} />
-
-          <div className="name-container">
-            {/* <AvatarGenerator
-              seed={name || "Default"}
-              width="50"
-              height="50"
-              setUserImageUrl={setAvatarImage}
-            /> */}
-            <input
-              type="text"
-              className="subcriber"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div>
-
-
-            <input
-              type="text"
-              className="subcriber"
-              placeholder="e.g. 9942393237"
-              value={mob}
-              onChange={(e) => setMob(e.target.value)}
-            />
-          </div>
-          <div>
-            <button type="submit" className="submit-btn" disabled={isLoading}>
-              {isLoading ? "Adding Subscriber" : isEditing ? "Edit" : "Add"}
-            </button>
-          </div>
-          {/* <div>
-            <AvatarGroup avatars={avatars} />
-          </div> */}
-        </form>
-
-        {/* {list?.length > 0 && (
-          <div className="subcriber-container">
-
-            {showList && (
-              <div className="list-modal">
-                <button className="close-list-btn" onClick={toggleList}>
-                  X
-                </button>
-                <List items={list} removeItem={removeItem} />
+        {/* Main Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Form Header */}
+          <div className="bg-gradient-to-r from-red-500 to-red-600 px-8 py-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
               </div>
-            )}
+              <div>
+                <h2 className="text-xl font-bold text-white">Subscriber Information</h2>
+                <p className="text-red-100">Fill in the details below</p>
+              </div>
+            </div>
           </div>
-        )} */}
 
-        {/* assign group amount of subscriber Pop-up */}
+          {/* Form Content */}
+          <div className="p-8">
+            <form onSubmit={handleAddSubscriber} className="space-y-6">
+              {/* Country Selection */}
+              <div className="space-y-2">
+                <label htmlFor="country-select" className="block text-sm font-semibold text-gray-700">
+                  Select Nationality
+                </label>
+                <div className="relative">
+                  <ReactFlagsSelect
+                    id="country-select"
+                    selected={selectedCountry}
+                    onSelect={handleCountryChange}
+                    countries={countries.map((country) => country.value)}
+                    showSelectedLabel={true}
+                    searchable={true}
+                    className="w-full"
+                  />
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    <span className="font-medium">Selected:</span> {countries.find((c) => c.value === selectedCountry)?.label}
+                    <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                      {countries.find((c) => c.value === selectedCountry)?.countryCode}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Avatar Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Profile Picture
+                </label>
+                <div className="flex justify-center">
+                  <AvatarUploader handleSetImage={handleSetImage} currentImage={currentImage} />
+                </div>
+              </div>
+
+              {/* Name Input */}
+              <div className="space-y-2">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Mobile Number Input */}
+              <div className="space-y-2">
+                <label htmlFor="mobile" className="block text-sm font-semibold text-gray-700">
+                  Mobile Number
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="mobile"
+                    placeholder="e.g. 9942393237"
+                    value={mob}
+                    onChange={(e) => setMob(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  />
+                </div>
+                <p className="text-xs text-gray-500">Enter mobile number without country code</p>
+              </div>
+
+              {/* Alert Messages */}
+              {alert.show && (
+                <div className="pt-2">
+                  <div className={`p-4 rounded-lg border ${alert.type === 'success'
+                      ? 'bg-green-50 border-green-200 text-green-800'
+                      : alert.type === 'danger'
+                        ? 'bg-red-50 border-red-200 text-red-800'
+                        : 'bg-blue-50 border-blue-200 text-blue-800'
+                    }`}>
+                    <div className="flex items-center gap-2">
+                      {alert.type === 'success' && (
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {alert.type === 'danger' && (
+                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                      <span className="font-medium">{alert.msg}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Adding Subscriber...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      {isEditing ? "Update Subscriber" : "Add Subscriber"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Confirmation Modal */}
         {showConfirmation && (
-          <AssignGroupAmountPopup confirmAddSubscriber={confirmAddSubscriber}
-            cancelAddSubscriber={cancelAddSubscriber}>
-          </AssignGroupAmountPopup>
+          <AssignGroupAmountPopup
+            confirmAddSubscriber={confirmAddSubscriber}
+            cancelAddSubscriber={cancelAddSubscriber}
+          />
         )}
-      </section>
-    </Wrapper>
+      </div>
+    </div>
   );
 }
 
-const Wrapper = styled.section`
-  .container{
-    width: 90vw;
-    height: 600px;
-    margin: 0 auto;
-    max-width: 35rem;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
-    background: var(--clr-white);
-    border-radius: var(--radius);
-    box-shadow: var(--light-shadow);
-    transition: var(--transition);
-    padding: 2rem;
-    position:relative;
-    align-items: center;
-  }
-  .container:hover {
-      box-shadow: var(--dark-shadow);
-    }
-    .addsubscriber-form h3 {
-      color: var(--clr-primary-1);
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    .addsubscriber-form {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;    
-    width:500px;
-    height:400px;
-    align-items:center; 
-
-    }
-    .form-control {
-      display: flex;
-      padding: 10px;
-      flex-direction: column;
-      width: 400px;
-      
-    }
-    .name-container{
-      display: grid;
-      align-items: center;
-      grid-template-columns: auto auto ;
-      margin-bottom:10px;
-    }
-    .subcriber {
-      padding: 0.25rem;   
-      padding-left: 1rem;
-      background: var(--clr-grey-10);
-      border-top-left-radius: var(--radius);
-      border-bottom-left-radius: var(--radius);
-      border-top-Right-radius: var(--radius);
-      border-bottom-Right-radius: var(--radius);
-      border-color: transparent;
-      font-size: 1rem;
-      flex: 1 0 auto;
-      margin-bottom:10px;
-      color: var(--clr-grey-5);
-    }
-    .subcriber::placeholder {
-      font-family: var(--ff-secondary);
-      color: var(--clr-grey-5);
-    }
-    .submit-btn {
-      bottom: 20px; /* Adjust as needed */
-      right: 20px; /* Adjust as needed */
-      padding: 0.5rem 1rem;
-      background: var(--clr-red-dark); /* Use your application's primary color */
-      border: none;
-      color: var(--clr-white); /* Use an appropriate text color for readability */
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.2s;
-      width: 200px;
-      margin-top:2px;
-    }
-    
-    .submit-btn:hover {
-      background: var(--clr-primary-5);
-      color: var(--clr-white);
-    }
-    
-    .subcriber-container {
-      
-      margin-top: o.5rem;
-    }
-    .subcriber-item {
-      margin-top:12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      transition: var(--transition);
-      padding: 0.25rem 1rem;
-      border-radius: var(--radius);
-      text-transform: capitalize;
-      img {
-        height: 100%;
-        width: 45px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-    }
-    
-    .subcriber-item:hover {
-      color: var(--clr-grey-5);
-      background: var(--clr-grey-10);
-    }
-    
-    .subcriber-item:hover .title {
-      color: var(--clr-grey-5);
-    }
-    .title {
-      margin-bottom: 0;
-      color: var(--clr-grey-1);
-      letter-spacing: 2px;
-      transition: var(--transition);
-    }
-    
-    .edit-btn,
-    .delete-btn {
-      background: transparent;
-      border-color: transparent;
-      cursor: pointer;
-      font-size: 0.7rem;
-      margin: 0 0.15rem;
-      transition: var(--transition);
-    }
-    
-    .edit-btn {
-      color: var(--clr-green-light);
-    }
-    
-    .edit-btn:hover {
-      color: var(--clr-green-dark);
-    }
-    
-    .delete-btn {
-      color: var(--clr-red-light);
-    }
-    
-    .delete-btn:hover {
-      color: var(--clr-red-dark);
-    }
-    
-    .clear-btn {
-      text-transform: capitalize;
-      width: 10rem;
-      height: 1.5rem;
-      display: grid;
-      align-items: center;
-      background: transparent;
-      border-color: transparent;
-      color: var(--clr-red-light);
-      margin: 0 auto;
-      font-size: 0.85rem;
-      letter-spacing: var(--spacing);
-      cursor: pointer;
-      transition: var(--transition);
-      margin-top: 1.25rem;
-    }
-    
-    .clear-btn:hover {
-      color: var(--clr-red-dark);
-    }
-    .country-code {
-      padding: 0.25rem;
-      padding-left: 1rem;
-      background: var(--clr-grey-10);
-      border-top-left-radius: var(--radius);
-      border-bottom-left-radius: var(--radius);
-      border-top-Right-radius: var(--radius);
-      border-bottom-Right-radius: var(--radius);
-      border-color: transparent;
-      font-size: 1rem;
-      flex: 1 0 auto;
-      color: var(--clr-grey-5);
-    }
-    
-    .country-code::placeholder {
-      font-family: var(--ff-secondary);
-      color: var(--clr-grey-5);
-    }
-    .alert {
-      margin-bottom: 1rem;
-      height: 1.25rem;
-      display: grid;
-      align-items: center;
-      text-align: center;
-      font-size: 0.7rem;
-      border-radius: 0.25rem;
-      letter-spacing: var(--spacing);
-      text-transform: capitalize;
-    }
-    
-    .alert-danger {
-      color: #721c24;
-      background: #f8d7da;
-    }
-    
-    .alert-success {
-      color: #155724;
-      background: #d4edda;
-    }
-    .followers {
-      overflow: scroll;
-      height: 260px;
-      display: grid;
-      grid-template-rows: repeat(auto-fill, minmax(45px, 1fr));
-      gap: 1.25rem 1rem;
-      padding: 1rem 2rem;
-    }
-    
-    .list-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      background: var(--clr-white);
-      border-radius: var(--radius);
-      box-shadow: var(--light-shadow);
-      overflow-y: scroll;
-      padding: 1rem;
-      z-index: 1000; /* Ensure it appears above other elements */
-      @media (max-width: 768px) {
-        width: 90%; /* Adjust the width for screens with a max-width of 768px */
-        height: 90vh; /* Adjust the height for smaller screens */
-        padding: 0.5rem; /* Reduce padding for smaller screens */
-      }
-    
-      @media (max-width: 480px) {
-        width: 95%; /* Further adjust the width for screens with a max-width of 480px */
-        height: 85vh; /* Further adjust the height for smaller screens */
-        padding: 0.25rem; /* Reduce padding for smaller screens */
-      }
-    }
-    
-    .close-list-btn {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 0.5rem;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      color: var(--clr-grey-1);
-      transition: color 0.2s;
-    }
-    
-    .close-list-btn:hover {
-      color: var(--clr-grey-5);
-    }
-    .button-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 1rem;   
-      
-    }
-    
-    .clear-image-btn
-    {
-      
-      bottom: 20px; /* Adjust as needed */
-      right: 20px; /* Adjust as needed */
-      padding: 0.5rem 1rem;
-      background: var(--clr-red-dark); /* Use your application's primary color */
-      border: none;
-      color: var(--clr-white); /* Use an appropriate text color for readability */
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.2s; 
-    }
-    .clear-image-btn:hover {
-      background: var(--clr-primary-5); /* Change color on hover to match your theme */
-    }
-    .show-list-btn {
-      
-      bottom: 20px; /* Adjust as needed */
-      right: 20px; /* Adjust as needed */
-      padding: 0.5rem 1rem;
-      background: var(--clr-red-dark); /* Use your application's primary color */
-      border: none;
-      color: var(--clr-white); /* Use an appropriate text color for readability */
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .show-list-btn:hover {
-      background: var(--clr-primary-5); /* Change color on hover to match your theme */
-    }
-    .back-button {
-      background: var(--clr-red-dark);
-      color: var(--clr-white);
-      border: none;
-      border-radius: var(--radius);
-      padding: 0.5rem ;
-
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.2s;
-    
-      &:hover {
-        background: var(--clr-primary-5); /* Change color on hover to match your theme */
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .form-control {
-        flex-direction: column;
-        align-items: center;
-      }
-    
-      .subcriber, .country-code, .submit-btn {
-        width: 100%;
-        margin: 0.5rem 0;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .country-code {
-        font-size: 0.85rem;
-      }
-    } `
 export default AddSubcriber;
