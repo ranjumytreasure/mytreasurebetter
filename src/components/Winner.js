@@ -11,14 +11,26 @@ const Winner = ({ location }) => {
     const [error, setError] = useState(null);
     const [altText, setAltText] = useState('');
     const [confettiActive, setConfettiActive] = useState(true);
-    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     // Get winningSub from location state or use fallback
     const winningSub = location?.state?.winningSub || {};
     const imageUrl = winningSub?.winnerObject?.userImage;
     const amount = winningSub?.winnerObject?.winnerAmount || reserve || '5000';
-    const winnerName = winningSub?.winnerObject?.winnerName || 'Winner';
+    const winnerName = winningSub?.winnerObject?.name || 'Winner';
+    const winnerPhone = winningSub?.winnerObject?.phone || '';
     const groupName = winningSub?.winnerObject?.groupName || 'Auction Group';
+    const groupAmount = winningSub?.winnerObject?.group_amount || 0;
+    const reserveAmount = winningSub?.winnerObject?.reserveAmount || 0;
+    const groupType = winningSub?.winnerObject?.groupType || '';
+    const payableAmount = winningSub?.winnerObject?.payableamnt || 0;
+
+    // Debug logging to see what data we're receiving
+    console.log('Full winningSub data:', winningSub);
+    console.log('Winner Object:', winningSub?.winnerObject);
+    console.log('Winner Name:', winnerName);
+    console.log('Winner Phone:', winnerPhone);
+    console.log('Group Name:', groupName);
+    console.log('Payable Amount:', payableAmount);
 
     const [height, setHeight] = useState(null);
     const [width, setWidth] = useState(null);
@@ -54,35 +66,9 @@ const Winner = ({ location }) => {
         }
     };
 
-    const handlePayNow = async () => {
-        setIsProcessingPayment(true);
-
-        try {
-            // Here you would integrate with your payment gateway
-            // For now, we'll simulate a payment process
-            console.log('Processing payment for amount:', amount);
-            console.log('Winner details:', winningSub);
-
-            // Simulate payment processing delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // In a real implementation, you would:
-            // 1. Call your payment API
-            // 2. Handle the payment response
-            // 3. Update the payment status
-            // 4. Redirect to payment success/failure page
-
-            alert(`Payment of ${formatCurrency(amount)} has been processed successfully!`);
-
-            // You could redirect to a payment success page or update the UI
-            // history.push('/payment-success');
-
-        } catch (error) {
-            console.error('Payment processing error:', error);
-            alert('Payment processing failed. Please try again.');
-        } finally {
-            setIsProcessingPayment(false);
-        }
+    const handlePayNow = () => {
+        // Redirect to payables page
+        history.push('/payables');
     };
 
     const fetchCompanyLogoUrl = async (logoKey) => {
@@ -179,6 +165,9 @@ const Winner = ({ location }) => {
                                 </div>
 
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{winnerName}</h2>
+                                {winnerPhone && (
+                                    <p className="text-gray-600 mb-2">📱 {winnerPhone}</p>
+                                )}
                                 <p className="text-gray-600 mb-4">Auction Winner</p>
 
                                 <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full">
@@ -199,9 +188,49 @@ const Winner = ({ location }) => {
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 flex items-center gap-2">
                                                 <FaUser className="w-4 h-4" />
-                                                Group:
+                                                Winner Name:
                                             </span>
-                                            <span className="font-semibold text-gray-900">{groupName}</span>
+                                            <span className="font-semibold text-gray-900">{winnerName}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                📱 Phone:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">{winnerPhone || 'Not Available'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaUser className="w-4 h-4" />
+                                                Group Name:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">{groupName || 'Not Available'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaCoins className="w-4 h-4" />
+                                                Group Amount:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">
+                                                {formatCurrency(groupAmount)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaCoins className="w-4 h-4" />
+                                                Reserve Amount:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">
+                                                {formatCurrency(reserveAmount)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 flex items-center gap-2">
+                                                <FaUser className="w-4 h-4" />
+                                                Group Type:
+                                            </span>
+                                            <span className="font-semibold text-gray-900">
+                                                {groupType}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 flex items-center gap-2">
@@ -250,17 +279,11 @@ const Winner = ({ location }) => {
                                 <FaCreditCard className="w-5 h-5 text-purple-600" />
                                 Payment Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Amount to Pay:</span>
-                                    <span className="font-bold text-2xl text-purple-600">
-                                        {formatCurrency(amount)}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Payment Method:</span>
-                                    <span className="font-semibold text-gray-900">Credit/Debit Card</span>
-                                </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Amount to Pay:</span>
+                                <span className="font-bold text-2xl text-purple-600">
+                                    {formatCurrency(payableAmount)}
+                                </span>
                             </div>
                             <p className="text-sm text-gray-600 mt-3">
                                 Click "Pay Now" to proceed with the payment for your winning bid.
@@ -271,28 +294,27 @@ const Winner = ({ location }) => {
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-gray-200">
                             <button
                                 onClick={handlePayNow}
-                                disabled={isProcessingPayment}
-                                className="flex-1 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="flex-1 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                             >
                                 <FaCreditCard className="w-5 h-5" />
-                                {isProcessingPayment ? 'Processing...' : 'Pay Now'}
+                                Pay Now
                             </button>
 
-                            <button
-                                onClick={handleContinueClick}
-                                className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                            >
-                                <FaHome className="w-5 h-5" />
-                                Go to Home
-                            </button>
-
-                            {groupId && groupId !== 'undefined' && (
+                            {groupId && groupId !== 'undefined' ? (
                                 <button
                                     onClick={handleBackToGroup}
                                     className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                                 >
                                     <FaArrowLeft className="w-5 h-5" />
                                     Back to Group
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleContinueClick}
+                                    className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                >
+                                    <FaHome className="w-5 h-5" />
+                                    Go to Home
                                 </button>
                             )}
                         </div>
