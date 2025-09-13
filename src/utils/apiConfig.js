@@ -5,13 +5,14 @@ console.log("=================================", process.env.REACT_APP_DEPLOY_EN
 
 export const API_BASE_URL = isProduction
   ? 'https://mytreasure.in/api/v1'
-  // : 'https://treasure-mani.onrender.com/api/v1';
-  : 'https://treasure-services-mani.onrender.com/api/v1';
+  : 'https://treasure-mani.onrender.com/api/v1';
+//: 'https://treasure-services-mani.onrender.com/api/v1';
 
 export const WEBSOCKET_URL = isProduction
   ? 'wss://mytreasure.in'
-  : 'wss://treasure-services-mani.onrender.com';
- // : 'wss://treasure-mani.onrender.com';
+  : 'wss://treasure-mani.onrender.com';
+//: 'wss://treasure-services-mani.onrender.com';
+
 
 
 
