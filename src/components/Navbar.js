@@ -239,69 +239,6 @@ const Nav = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Indicator */}
-      <div className="lg:hidden">
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {isLoggedIn && hasPermission(userRole, 'viewHome') && (
-            <Link
-              to="/home"
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${scrolled
-                ? 'text-white hover:text-red-100 hover:bg-white/10'
-                : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                }`}
-            >
-              <FaHome className="w-4 h-4" />
-              Home
-            </Link>
-          )}
-          {isLoggedIn && (
-            <Link
-              to="/my-billing"
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-all duration-300 relative ${scrolled
-                ? 'text-white hover:text-red-100 hover:bg-white/10'
-                : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                }`}
-            >
-              <div className="relative">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                {getBillingStatus().status !== 'unknown' && (
-                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${getBillingStatus().color === 'red' ? 'bg-red-500' :
-                    getBillingStatus().color === 'blue' ? 'bg-blue-500' :
-                      getBillingStatus().color === 'green' ? 'bg-green-500' : 'bg-gray-500'
-                    }`}></span>
-                )}
-              </div>
-              <span>Billing</span>
-              {getBillingStatus().status !== 'unknown' && (
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${getBillingStatus().color === 'red' ? 'bg-red-100 text-red-800' :
-                  getBillingStatus().color === 'blue' ? 'bg-blue-100 text-blue-800' :
-                    getBillingStatus().color === 'green' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                  {getBillingStatus().message}
-                </span>
-              )}
-            </Link>
-          )}
-          {links.map((link) => {
-            const { id, text, url } = link;
-            return (
-              <Link
-                key={id}
-                to={url}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${scrolled
-                  ? 'text-white hover:text-red-100 hover:bg-white/10'
-                  : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                  }`}
-              >
-                {getIconForLink(text)}
-                {text}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
     </nav>
   );
 };
