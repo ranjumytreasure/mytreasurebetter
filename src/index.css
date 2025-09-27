@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Subscriber App Styles */
+@import './styles/subscriber.css';
+
 /* Custom utility classes */
 @layer utilities {
   .bg-custom-red {

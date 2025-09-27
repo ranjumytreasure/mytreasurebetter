@@ -27,6 +27,7 @@ const CartButtons = ({ scrolled }) => {
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
     const [image, setImage] = useState('');
     const [previewUrl, setPreviewUrl] = useState('https://i.imgur.com/ndu6pfe.png'); // Default image
+    const [isMobile, setIsMobile] = useState(false);
 
     const getImageSrc = (userImage) => {
         if (!userImage) return "default-avatar.png"; // Fallback image
@@ -34,6 +35,18 @@ const CartButtons = ({ scrolled }) => {
             ? userImage
             : `data:image/jpeg;base64,${userImage}`;
     };
+
+    /** ✅ Mobile Detection */
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     /** ✅ Load User Data */
     useEffect(() => {
@@ -133,9 +146,9 @@ const CartButtons = ({ scrolled }) => {
                             </div>
                             {isTooltipVisible && (
                                 <>
-                                    {/* Invisible bridge to prevent hover gap */}
-                                    <div className="absolute right-0 top-10 w-56 h-2 z-40" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
-                                    <div className="absolute right-0 top-10 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50" onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+                                    {/* Invisible bridge to prevent hover gap - mobile: above, desktop: below */}
+                                    <div className={`absolute w-56 h-2 z-40 ${isMobile ? 'bottom-10 right-0' : 'top-10 right-0'}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
+                                    <div className={`absolute w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 ${isMobile ? 'bottom-10' : 'top-10'} -right-44`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
                                         <div className="px-4 py-2 border-b border-gray-100">
                                             <p className="text-sm font-semibold text-gray-800">
                                                 {user.results.firstname || user.results.name || "User"}

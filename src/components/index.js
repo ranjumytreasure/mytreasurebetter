@@ -52,6 +52,7 @@ import GroupAccountWiseOverallDue from './GroupAccountWiseOverallDue'
 import GroupWiseOverallUserDue from './GroupWiseOverallUserDue'
 import ScrollToTop from './ScrollToTop'
 import GroupAccountWiseOverallUserDue from './GroupAccountWiseOverallUserDue'
+import GroupOverview from './GroupOverview'
 import PersonalSettings from './PersonalSettings'
 
 import GroupSubscriberDetailsPopup from './GroupSubscriberDetailsPopup'
@@ -110,7 +111,7 @@ export {
   PageHero,
   StripeCheckout, SignUp, VerifyOTP, Login, Home, Section, SubscriberList, AddNewPopup, TabsNavbar, NewGroups, ReadyGroups, ClosedGroups, List, Alert, AvatarGroup, Groups, GroupSubscriber, GroupDataInNavbar, LoadingBar, GroupsHeader, RecevableReceiptList, Modal, Company, UserInfo, Winner, UserDetails, Subscribers, Popup, AvatarGenerator, GroupWiseOverallDue,
   GroupAccountWiseOverallDue, GroupWiseOverallUserDue,
-  GroupAccountWiseOverallUserDue,
+  GroupAccountWiseOverallUserDue, GroupOverview,
   PersonalSettings,
   GroupSubscriberDetailsPopup,
   BidSubscriberList,
