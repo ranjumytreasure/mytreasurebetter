@@ -28,6 +28,7 @@ const CartButtons = ({ scrolled }) => {
     const [image, setImage] = useState('');
     const [previewUrl, setPreviewUrl] = useState('https://i.imgur.com/ndu6pfe.png'); // Default image
     const [isMobile, setIsMobile] = useState(false);
+    const [popupPosition, setPopupPosition] = useState('right-0');
 
     const getImageSrc = (userImage) => {
         if (!userImage) return "default-avatar.png"; // Fallback image
@@ -101,7 +102,38 @@ const CartButtons = ({ scrolled }) => {
         history.push("/");
     };
 
-    const showTooltip = () => setIsTooltipVisible(true);
+    const calculatePopupPosition = () => {
+        if (typeof window !== 'undefined') {
+            const screenWidth = window.innerWidth;
+            const popupWidth = 224; // w-56 = 14rem = 224px
+            const avatarPosition = 40; // Approximate avatar position from right edge
+
+            if (isMobile) {
+                // For mobile, center the popup or position it to avoid cutoff
+                if (screenWidth < 400) {
+                    // Very small screens - position to avoid left cutoff
+                    setPopupPosition('-right-32');
+                } else {
+                    // Regular mobile - center it
+                    setPopupPosition('-right-28');
+                }
+            } else {
+                // Desktop logic
+                if (avatarPosition + popupWidth > screenWidth - 20) {
+                    // Position to the left of the avatar
+                    setPopupPosition('-right-56');
+                } else {
+                    // Position to the right of the avatar
+                    setPopupPosition('right-0');
+                }
+            }
+        }
+    };
+
+    const showTooltip = () => {
+        calculatePopupPosition();
+        setIsTooltipVisible(true);
+    };
     const hideTooltip = () => setIsTooltipVisible(false);
 
     // Icon mapping for menu items
@@ -147,8 +179,8 @@ const CartButtons = ({ scrolled }) => {
                             {isTooltipVisible && (
                                 <>
                                     {/* Invisible bridge to prevent hover gap - mobile: above, desktop: below */}
-                                    <div className={`absolute w-56 h-2 z-40 ${isMobile ? 'bottom-10 right-0' : 'top-10 right-0'}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
-                                    <div className={`absolute w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 ${isMobile ? 'bottom-10' : 'top-10'} -right-44`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+                                    <div className={`absolute w-56 h-2 z-40 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
+                                    <div className={`absolute w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
                                         <div className="px-4 py-2 border-b border-gray-100">
                                             <p className="text-sm font-semibold text-gray-800">
                                                 {user.results.firstname || user.results.name || "User"}
