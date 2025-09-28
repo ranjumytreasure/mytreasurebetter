@@ -187,10 +187,10 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                 isOpen={!!selectedSubscriber}
                 onRequestClose={closeModal}
                 contentLabel="Subscriber Details"
-                className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[9999]"
             >
-                <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
                     {modalLoading ? (
                         <div className="flex flex-col items-center justify-center py-16 px-8">
                             <img src={loadingImage} alt="loading" className="w-20 h-20 mb-4" />
@@ -202,7 +202,7 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                         selectedSubscriber && (
                             <div className="font-sans text-gray-800">
                                 {/* Header + Action Buttons */}
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-red-100">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-3 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-red-100">
                                     <div className="flex items-center gap-4">
                                         <div className="relative">
                                             <img
@@ -264,7 +264,7 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                                 </div>
 
                                 {/* Financial Summary Section */}
-                                <div className="p-6 bg-white">
+                                <div className="p-3 sm:p-6 bg-white">
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         <div className="bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-lg border border-red-200">
                                             <p className="text-xs font-medium text-red-600 uppercase tracking-wide">Total Amount</p>
@@ -282,11 +282,11 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                                 </div>
 
                                 {/* Auction Table */}
-                                <div className="p-6 pt-0">
+                                <div className="p-3 sm:p-6 pt-0">
                                     {subscriberData ? (
                                         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                                             <div className="overflow-x-auto">
-                                                <table className="w-full min-w-[600px]">
+                                                <table className="w-full min-w-[400px] sm:min-w-[600px]">
                                                     <thead>
                                                         <tr className="bg-custom-red text-white">
                                                             <th className="px-4 py-3 text-left text-sm font-semibold">Auction</th>
