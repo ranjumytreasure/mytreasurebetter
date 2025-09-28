@@ -261,6 +261,22 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
     };
 
     const renderCreditDetails = () => {
+        // Calculate total credit amount dynamically
+        const calculateTotalCredit = () => {
+            if (!outstandingAdvanceTransactionInfo || outstandingAdvanceTransactionInfo.length === 0) {
+                return 0;
+            }
+
+            const totalCredit = outstandingAdvanceTransactionInfo.reduce((sum, transaction) => {
+                const amount = parseFloat(transaction.amount) || 0;
+                return sum + amount;
+            }, 0);
+
+            return totalCredit;
+        };
+
+        const totalCreditAmount = calculateTotalCredit();
+
         if (!outstandingAdvanceTransactionInfo || outstandingAdvanceTransactionInfo.length === 0) {
             return (
                 <div className="bg-white rounded-lg shadow-md p-6">
@@ -276,7 +292,13 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
         return (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
-                    <h3 className="text-lg font-semibold">Credit Details</h3>
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Credit Details</h3>
+                        <div className="text-right">
+                            <div className="text-sm text-blue-100">Total Credit</div>
+                            <div className="text-xl font-bold">₹{totalCreditAmount.toLocaleString()}</div>
+                        </div>
+                    </div>
                 </div>
                 <div className="p-4 space-y-3">
                     {outstandingAdvanceTransactionInfo.map((transaction, index) => (

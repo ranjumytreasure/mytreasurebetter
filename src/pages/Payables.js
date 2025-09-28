@@ -150,6 +150,7 @@ const Payables = () => {
                   pbdue,
                   rbdue,
                   unique_id,
+                  payment_for,
                 } = person;
 
                 return (
@@ -196,6 +197,17 @@ const Payables = () => {
                         <p className="text-gray-800 font-semibold">{group_name}</p>
                         <p className="text-gray-600 text-sm">Auction: {formatDate(auct_date)}</p>
                       </div>
+
+                      {/* Payment Purpose */}
+                      {payment_for && (
+                        <div className="mb-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                          <div className="flex items-center gap-2 text-yellow-700 mb-1">
+                            <FiTrendingUp className="w-4 h-4" />
+                            <span className="text-sm font-medium">Payment Purpose</span>
+                          </div>
+                          <p className="text-yellow-800 font-medium text-sm">{payment_for}</p>
+                        </div>
+                      )}
 
                       {/* Financial Summary */}
                       <div className="grid grid-cols-3 gap-3 mb-4">

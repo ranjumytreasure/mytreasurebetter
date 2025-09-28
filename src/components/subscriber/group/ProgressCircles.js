@@ -6,13 +6,31 @@ const ProgressCircles = ({ groupDetails, selectedCircle, onCircleClick, auctionS
         totalGroups = 0,
         groupsCompleted = 0,
         totalDue = 0,
-        profit = 0
+        profit = 0,
+        outstandingAdvanceTransactionInfo = []
     } = groupDetails || {};
 
     // Use real-time auction status from WebSocket events
     const auctionStatus = realTimeAuctionStatus || groupDetails?.auctionStatus || 'CLOSED';
 
     const progressPercentage = totalGroups > 0 ? (groupsCompleted / totalGroups) * 100 : 0;
+
+    // Calculate dynamic credit amount from credit transactions (similar to due calculation)
+    const calculateDynamicCredit = () => {
+        if (!outstandingAdvanceTransactionInfo || outstandingAdvanceTransactionInfo.length === 0) {
+            return 0;
+        }
+
+        // Sum up all credit amounts from outstandingAdvanceTransactionInfo
+        const totalCredit = outstandingAdvanceTransactionInfo.reduce((sum, transaction) => {
+            const amount = parseFloat(transaction.amount) || 0;
+            return sum + amount;
+        }, 0);
+
+        return totalCredit;
+    };
+
+    const dynamicCreditAmount = calculateDynamicCredit();
 
     const circles = [
         {
@@ -42,7 +60,7 @@ const ProgressCircles = ({ groupDetails, selectedCircle, onCircleClick, auctionS
         {
             id: 'credit',
             label: 'Credit',
-            value: `₹${(profit || 0).toLocaleString()}`,
+            value: `₹${(dynamicCreditAmount || 0).toLocaleString()}`,
             percentage: 100,
             color: '#2196F3',
             icon: '📈'

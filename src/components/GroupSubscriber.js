@@ -326,16 +326,28 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
 import { useUserContext } from "../context/user_context";
 import { useGroupDetailsContext } from "../context/group_context";
+import { useCompanySubscriberContext } from "../context/companysubscriber_context";
 import { User, Phone, Wifi, WifiOff } from "lucide-react";
+import Scenario1Modal from "./Scenario1Modal";
+import Scenario2Modal from "./Scenario2Modal";
+import Scenario3Modal from "./Scenario3Modal";
+import Scenario4Modal from "./Scenario4Modal";
 
 const DEFAULT_IMAGE = "/default-image.jpg"; // fallback image path
 
 const GroupsSubscriber = () => {
 
-  const { data, deleteGroupSubscriberbyCompositekey } = useGroupDetailsContext();
+  const { data, deleteGroupSubscriberbyCompositekey, checkDeletionScenario, deleteGroupSubscriberWithScenario } = useGroupDetailsContext();
+  const { companySubscribers, fetchCompanySubscribers } = useCompanySubscriberContext();
 
   const [groupSubscriber, setGroupSubscriber] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showScenarioModal, setShowScenarioModal] = useState(false);
+  const [showScenario1Modal, setShowScenario1Modal] = useState(false);
+  const [showScenario2Modal, setShowScenario2Modal] = useState(false);
+  const [showScenario3Modal, setShowScenario3Modal] = useState(false);
+  const [showScenario4Modal, setShowScenario4Modal] = useState(false);
+  const [scenarioData, setScenarioData] = useState(null);
   const [selectedSubscriber, setSelectedSubscriber] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState({});
@@ -385,14 +397,68 @@ const GroupsSubscriber = () => {
     return () => clearInterval(interval);
   }, [groupSubscriber]);
 
-  const handleOpenDeleteModal = (subscriber) => {
+  const handleOpenDeleteModal = async (subscriber) => {
+    console.log('🔍 Opening delete modal for subscriber:', subscriber);
     setSelectedSubscriber(subscriber);
-    setShowDeleteModal(true);
+
+    // Check scenario first
+    try {
+      const result = await checkDeletionScenario(
+        subscriber.group_id || data?.results?.group_id,
+        subscriber.subscriber_id,
+        subscriber.group_subscriber_id
+      );
+
+      if (result.success) {
+        setScenarioData(result.data);
+        const scenario = result.data.scenario;
+
+        console.log('🔍 Scenario determined:', scenario);
+
+        // Show appropriate modal based on scenario
+        if (scenario === 1) {
+          setShowScenario1Modal(true);
+        } else if (scenario === 2) {
+          setShowScenario2Modal(true);
+        } else if (scenario === 3) {
+          setShowScenario3Modal(true);
+        } else if (scenario === 4) {
+          setShowScenario4Modal(true);
+        }
+      } else {
+        toast.error(result.message || 'Failed to check deletion scenario');
+      }
+    } catch (error) {
+      console.error('Error checking scenario:', error);
+      toast.error('Error checking deletion scenario');
+    }
   };
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedSubscriber(null);
+  };
+
+  const handleCloseScenarioModal = () => {
+    setShowScenarioModal(false);
+    setShowScenario1Modal(false);
+    setShowScenario2Modal(false);
+    setShowScenario3Modal(false);
+    setShowScenario4Modal(false);
+    setSelectedSubscriber(null);
+    setScenarioData(null);
+  };
+
+  const handleScenarioSuccess = () => {
+    console.log('🔍 Scenario action completed successfully');
+    setShowScenarioModal(false);
+    setShowScenario1Modal(false);
+    setShowScenario2Modal(false);
+    setShowScenario3Modal(false);
+    setShowScenario4Modal(false);
+    setSelectedSubscriber(null);
+    setScenarioData(null);
+    // The context will automatically refresh the data
   };
 
   const handleConfirmDelete = async () => {
@@ -543,6 +609,37 @@ const GroupsSubscriber = () => {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         isLoading={isLoading}
+      />
+
+      <Scenario1Modal
+        isOpen={showScenario1Modal}
+        onClose={handleCloseScenarioModal}
+        subscriber={selectedSubscriber}
+        groupId={selectedSubscriber?.group_id || data?.results?.group_id}
+      />
+
+      <Scenario2Modal
+        isOpen={showScenario2Modal}
+        onClose={handleCloseScenarioModal}
+        subscriber={selectedSubscriber}
+        groupId={selectedSubscriber?.group_id || data?.results?.group_id}
+        scenarioData={scenarioData}
+      />
+
+      <Scenario3Modal
+        isOpen={showScenario3Modal}
+        onClose={handleCloseScenarioModal}
+        subscriber={selectedSubscriber}
+        groupId={selectedSubscriber?.group_id || data?.results?.group_id}
+        scenarioData={scenarioData}
+      />
+
+      <Scenario4Modal
+        isOpen={showScenario4Modal}
+        onClose={handleCloseScenarioModal}
+        subscriber={selectedSubscriber}
+        groupId={selectedSubscriber?.group_id || data?.results?.group_id}
+        scenarioData={scenarioData}
       />
     </section>
   );

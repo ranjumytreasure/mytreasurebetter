@@ -94,13 +94,18 @@ export const SubscriberProvider = ({ children }) => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/subscribers/group-transactions/dashboard?page=${page}&size=${size}`, {
+            // Try the correct API endpoint - check if this endpoint exists in your backend
+            const response = await fetch(`${API_BASE_URL}/subscribers/transactions?page=${page}&size=${size}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'application/json'
                 }
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const data = await response.json();
 
@@ -112,6 +117,11 @@ export const SubscriberProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Error fetching transaction dashboard:', error);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
             throw error;
         } finally {
             setLoading(false);

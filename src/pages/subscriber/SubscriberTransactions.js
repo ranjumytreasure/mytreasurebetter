@@ -13,8 +13,17 @@ const SubscriberTransactions = () => {
     const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
-        fetchTransactionDashboard(currentPage, pageSize);
-    }, [currentPage, pageSize]);
+        const loadTransactions = async () => {
+            try {
+                await fetchTransactionDashboard(currentPage, pageSize);
+            } catch (error) {
+                console.error('Failed to load transactions:', error);
+                // You can add a toast notification here if you have one
+            }
+        };
+
+        loadTransactions();
+    }, [currentPage, pageSize, fetchTransactionDashboard]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -86,8 +95,8 @@ const SubscriberTransactions = () => {
                             <div className="flex items-center gap-2">
                                 <button
                                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === 1
-                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                            : 'bg-red-600 text-white hover:bg-red-700'
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-red-600 text-white hover:bg-red-700'
                                         }`}
                                     disabled={currentPage === 1}
                                     onClick={() => handlePageChange(currentPage - 1)}
@@ -102,8 +111,8 @@ const SubscriberTransactions = () => {
                                             <button
                                                 key={pageNum}
                                                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === pageNum
-                                                        ? 'bg-red-600 text-white'
-                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                    ? 'bg-red-600 text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                     }`}
                                                 onClick={() => handlePageChange(pageNum)}
                                             >
@@ -115,8 +124,8 @@ const SubscriberTransactions = () => {
 
                                 <button
                                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === transactionDashboard.totalPages
-                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                            : 'bg-red-600 text-white hover:bg-red-700'
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-red-600 text-white hover:bg-red-700'
                                         }`}
                                     disabled={currentPage === transactionDashboard.totalPages}
                                     onClick={() => handlePageChange(currentPage + 1)}
