@@ -84,7 +84,6 @@ const SubscriberSidebar = () => {
                 </div>
 
                 {/* Debug: Log user data */}
-                {console.log('=== SUBSCRIBER SIDEBAR USER DATA ===', user)}
 
                 {/* Welcome Section */}
                 <div className="mt-4 mb-6 p-4 bg-gradient-to-r from-red-600 to-red-700 rounded-xl text-white shadow-lg">

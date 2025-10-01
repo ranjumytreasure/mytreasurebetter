@@ -2,9 +2,6 @@ import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, groupAccountId }) => {
-    console.log('CircleContentDisplay - groupDetails:', groupDetails);
-    console.log('CircleContentDisplay - auctionStatus:', auctionStatus);
-    console.log('CircleContentDisplay - groupAccountId:', groupAccountId);
 
     const {
         groupTransactionInfo,
@@ -16,7 +13,6 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
     const history = useHistory();
     const { groupId, grpSubId } = useParams();
 
-    console.log('Extracted values:', { groupTransactionInfo, transactionInfo, outstandingAdvanceTransactionInfo, groupAuctionStatus });
 
 
 
@@ -163,7 +159,6 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
 
     const renderAuctionDetails = () => {
         const isAuctionOpen = auctionStatus === 'OPEN';
-        console.log('Auction status:', auctionStatus, 'isAuctionOpen:', isAuctionOpen);
 
         // If auction is closed, show simple closed message
         if (!isAuctionOpen) {

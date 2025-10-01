@@ -93,7 +93,7 @@ const GroupCard = ({ group, onGroupClick }) => {
                 <div className="flex justify-between items-start mb-2">
                     <div>
                         <h3 className="text-lg font-bold mb-1 text-white">
-                            {groupName || group?.name || group?.groupName || 'Group'}
+                            {group?.group_name || groupName || group?.name || group?.groupName || 'Group'}
                         </h3>
                         <p className="text-xl font-extrabold text-white">₹{amount.toLocaleString()}</p>
                     </div>

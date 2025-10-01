@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSubscriberContext } from '../../context/subscriber/SubscriberContext';
 import GroupProgressCards from '../../components/subscriber/dashboard/GroupProgressCards';
 import GroupList from '../../components/subscriber/dashboard/GroupList';
@@ -19,19 +19,19 @@ const SubscriberDashboard = () => {
     // Removed modal-related state variables since we're using filters now
 
     useEffect(() => {
-        loadDashboardData();
-    }, [selectedProgress]);
-
-    const loadDashboardData = async () => {
-        try {
-            await Promise.all([
-                fetchGroupDashboard(selectedProgress),
-                fetchTransactionDashboard(1, 5) // Get recent 5 transactions
-            ]);
-        } catch (error) {
-            console.error('Error loading dashboard:', error);
-        }
-    };
+        // Only load data once when component mounts
+        const loadData = async () => {
+            try {
+                // Load group dashboard first
+                await fetchGroupDashboard(selectedProgress);
+                // Then load transactions
+                await fetchTransactionDashboard(1, 5);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        };
+        loadData();
+    }, []); // Empty dependency array - only run once
 
     // Remove the modal behavior - progress cards will just filter the groups
     // const handleInProgressClick = () => {
@@ -53,9 +53,6 @@ const SubscriberDashboard = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-gray-100 py-8 transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Debug: Log user data */}
-                {console.log('=== SUBSCRIBER DASHBOARD USER DATA ===', user)}
-
                 {/* Welcome Header removed */}
 
                 {/* Group Progress Summary */}

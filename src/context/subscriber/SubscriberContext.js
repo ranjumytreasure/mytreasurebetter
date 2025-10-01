@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { API_BASE_URL } from '../../utils/apiConfig';
 
 const SubscriberContext = createContext();
@@ -49,7 +49,7 @@ export const SubscriberProvider = ({ children }) => {
         }
     };
 
-    const signOut = () => {
+    const signOut = useCallback(() => {
         setUser(null);
         setIsAuthenticated(false);
         setGroupDashboard(null);
@@ -57,10 +57,10 @@ export const SubscriberProvider = ({ children }) => {
         setGroupDetails(null);
         localStorage.removeItem('subscriber_token');
         localStorage.removeItem('subscriber_user');
-    };
+    }, []);
 
     // Data fetching methods
-    const fetchGroupDashboard = async (progress = 'INPROGRESS') => {
+    const fetchGroupDashboard = useCallback(async (progress = 'INPROGRESS') => {
         if (!user?.token) return;
 
         setLoading(true);
@@ -87,15 +87,14 @@ export const SubscriberProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?.token]);
 
     const fetchTransactionDashboard = async (page = 1, size = 10) => {
         if (!user?.token) return;
 
-        setLoading(true);
         try {
-            // Try the correct API endpoint - check if this endpoint exists in your backend
-            const response = await fetch(`${API_BASE_URL}/subscribers/transactions?page=${page}&size=${size}`, {
+            // Using the exact same endpoint as mobile app
+            const response = await fetch(`${API_BASE_URL}/subscribers/group-transactions/dashboard?page=${page}&size=${size}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -103,28 +102,39 @@ export const SubscriberProvider = ({ children }) => {
                 }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const data = await response.json();
 
-            if (data.error === false) {
-                setTransactionDashboard(data.results);
-                return data.results;
+            // Check response exactly like mobile app does
+            if (data.code === 200) {
+                const transactionData = {
+                    transactions: data.results.transactions || [],
+                    totalItems: data.results.totalItems || 0,
+                    totalPages: data.results.totalPages || 0,
+                    currentPage: data.results.currentPage || page
+                };
+                setTransactionDashboard(transactionData);
+                return transactionData;
             } else {
                 throw new Error(data.message || 'Failed to fetch transaction dashboard');
             }
         } catch (error) {
             console.error('Error fetching transaction dashboard:', error);
-            console.error('Error details:', {
-                name: error.name,
-                message: error.message,
-                stack: error.stack
-            });
-            throw error;
-        } finally {
-            setLoading(false);
+
+            // If token expired, sign out
+            if (error.message?.includes('Token Expired') || error.message?.includes('session has expired')) {
+                signOut();
+                return;
+            }
+
+            // Return empty state on error
+            const emptyData = {
+                transactions: [],
+                totalItems: 0,
+                totalPages: 0,
+                currentPage: page
+            };
+            setTransactionDashboard(emptyData);
+            return emptyData;
         }
     };
 

@@ -73,7 +73,6 @@ const ProgressCircles = ({ groupDetails, selectedCircle, onCircleClick, auctionS
     const handleCircleClick = (circleId) => {
         // If auction circle is clicked and auction is open, go directly to auction page
         if (circleId === 'auction' && auctionStatus === 'OPEN' && groupAccountId) {
-            console.log('Navigating directly to auction page');
             history.push(`/customer/groups/${groupId}/${grpSubId}/auction`);
             return;
         }
