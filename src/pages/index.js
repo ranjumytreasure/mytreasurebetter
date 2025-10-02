@@ -27,6 +27,7 @@ import SubscriberProfile from './SubscriberProfile'
 import Ledger from './Ledger'
 import ProductsPage from './ProductsPage'
 import MyBillingPage from './MyBillingPage'
+import SubscriberPasswordUpdate from './SubscriberPasswordUpdate'
 
 
 export {
@@ -55,6 +56,7 @@ export {
     SubscriberProfile,
     Ledger,
     ProductsPage,
-    MyBillingPage
+    MyBillingPage,
+    SubscriberPasswordUpdate
 
 }

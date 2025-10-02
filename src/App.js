@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Sidebar, Footer, SignUp, VerifyOTP, Login, ForgetPassword, Home, Navbar, Company, Winner, Subscribers, PersonalSettings, Dashboard, AdminSettings, AreaSubscribersPage, ScrollToTop } from './components';
-import { LandingPage, SubscriberStepForm, GroupStepForm, AddGroupSubscriber, HomePage, GroupsPage, AuctionsPage, AddSubcriber, GroupAccountDetails, AddCompanySubcriber, Faq, AddSub, Help, UserDue, CustomerDue, PrivacyPolicy, TermsandConditions, SingleSubscriberPage, SingleEmployeePage, DashboardPage, Receivables, Payables, SubscriberProfile, Ledger, ProductsPage, MyBillingPage } from './pages';
+import { LandingPage, SubscriberStepForm, GroupStepForm, AddGroupSubscriber, HomePage, GroupsPage, AuctionsPage, AddSubcriber, GroupAccountDetails, AddCompanySubcriber, Faq, AddSub, Help, UserDue, CustomerDue, PrivacyPolicy, TermsandConditions, SingleSubscriberPage, SingleEmployeePage, DashboardPage, Receivables, Payables, SubscriberProfile, Ledger, ProductsPage, MyBillingPage, SubscriberPasswordUpdate } from './pages';
 import { UserProvider } from './context/user_context';
 import { SubscriberProvider } from './context/subscriber/SubscriberContext';
 import SubscriberLayout from './components/subscriber/layout/SubscriberLayout';
@@ -124,6 +124,7 @@ function App() {
                                                                                 <Route path="/Privacy&Policy" component={PrivacyPolicy} />
                                                                                 <Route path="/Terms&Conditions" component={TermsandConditions} />
 
+                                                                                <PrivateRoute path="/subscriber/:id/update-password" component={SubscriberPasswordUpdate} />
                                                                                 <PrivateRoute path="/subscriber/:id" component={SubscriberProfile} />
                                                                                 {/* <PrivateRoute path="/subscriber/:id" component={SingleSubscriberPage} /> */}
 

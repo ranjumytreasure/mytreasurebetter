@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { API_BASE_URL } from '../utils/apiConfig';
 import loadingImage from '../images/preloader.gif';
@@ -16,6 +16,7 @@ import "../style/SubscriberProfile.css";
 
 const SubscriberProfile = () => {
   const { user, userRole } = useUserContext();
+  const history = useHistory();
   const [visibleSection, setVisibleSection] = useState("metrics");
   const [subscriberOutstanding, setSubscriberOutstanding] = useState(null);
   const [inprogress, setInprogress] = useState(null);
@@ -824,6 +825,7 @@ const SubscriberProfile = () => {
           <li onClick={() => setVisibleSection('nominee')}>Nominee</li>
           <li onClick={() => setVisibleSection('business')}>Business</li>
           <li onClick={() => setVisibleSection('dependents')}>Dependents</li>
+          <li onClick={() => history.push(`/subscriber/${subscriberId}/update-password`)} className="change-password-link">Change Password</li>
         </ul>
       </div>
 
