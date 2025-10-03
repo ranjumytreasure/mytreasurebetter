@@ -25,65 +25,67 @@ const GroupHeader = ({ groupDetails }) => {
     };
 
     return (
-        <div className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg p-4 mb-4 shadow-lg">
-            {/* Header Row */}
-            <div className="flex justify-between items-start mb-3">
+        <div className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 shadow-lg">
+            {/* Header Row - Optimized Layout */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 gap-3 lg:gap-0">
                 <div className="flex-1">
-                    <h1 className="text-lg font-bold text-white mb-1">{groupName}</h1>
-                    <div className="text-xl font-extrabold text-white">₹{amount.toLocaleString()}</div>
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 leading-tight">{groupName}</h1>
+                    <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white drop-shadow-lg">₹{amount.toLocaleString()}</div>
                 </div>
-                <div className="flex flex-col gap-2 items-end">
+                <div className="flex flex-row lg:flex-col gap-2 items-start lg:items-end">
                     <span
-                        className="px-3 py-1 rounded-full text-xs font-semibold text-white uppercase tracking-wide"
+                        className="px-3 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider shadow-md"
                         style={{ backgroundColor: getGroupTypeColor(type) }}
                     >
                         {type}
                     </span>
                     {isGovApproved && (
-                        <span className="bg-green-500 px-2 py-1 rounded-full text-xs font-medium text-white">
+                        <span className="bg-green-500 px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-md">
                             ✓ Gov Approved
                         </span>
                     )}
                 </div>
             </div>
 
-            {/* Info Grid - Compact */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                <div className="text-center">
-                    <div className="text-xs opacity-80 mb-1">Start Date</div>
-                    <div className="text-sm font-semibold">{new Date(startDate).toLocaleDateString()}</div>
+            {/* Info Grid - Compact Layout */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4">
+                <div className="text-center bg-white/10 rounded-md p-3 backdrop-blur-sm">
+                    <div className="text-xs opacity-90 mb-1 font-medium">Start Date</div>
+                    <div className="text-sm font-bold">{new Date(startDate).toLocaleDateString()}</div>
                 </div>
-                <div className="text-center">
-                    <div className="text-xs opacity-80 mb-1">End Date</div>
-                    <div className="text-sm font-semibold">{new Date(endDate).toLocaleDateString()}</div>
+                <div className="text-center bg-white/10 rounded-md p-3 backdrop-blur-sm">
+                    <div className="text-xs opacity-90 mb-1 font-medium">End Date</div>
+                    <div className="text-sm font-bold">{new Date(endDate).toLocaleDateString()}</div>
                 </div>
-                <div className="text-center">
-                    <div className="text-xs opacity-80 mb-1">Commission</div>
-                    <div className="text-sm font-semibold">₹{commissionAmount}</div>
+                <div className="text-center bg-white/10 rounded-md p-3 backdrop-blur-sm">
+                    <div className="text-xs opacity-90 mb-1 font-medium">Commission</div>
+                    <div className="text-sm font-bold">₹{commissionAmount}</div>
                 </div>
-                <div className="text-center">
-                    <div className="text-xs opacity-80 mb-1">Type</div>
-                    <div className="text-sm font-semibold">{commissionType}</div>
+                <div className="text-center bg-white/10 rounded-md p-3 backdrop-blur-sm">
+                    <div className="text-xs opacity-90 mb-1 font-medium">Type</div>
+                    <div className="text-sm font-bold">{commissionType}</div>
                 </div>
             </div>
 
-            {/* Status Row - Compact */}
-            <div className="flex flex-wrap gap-2 justify-center">
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${bidStatus === 'BIDTAKEN' ? 'bg-green-500/30 border border-green-500/50' : 'bg-yellow-500/30 border border-yellow-500/50'
-                    }`}>
-                    <span>{bidStatus === 'BIDTAKEN' ? '✓' : '⏳'}</span>
-                    <span>{bidStatus === 'BIDTAKEN' ? 'Bid Placed' : 'No Bid'}</span>
-                </div>
+            {/* Status Row - Compact Layout */}
+            <div className="flex flex-wrap gap-2 lg:gap-3 justify-center lg:justify-start">
+                {type !== 'ACCUMULATIVE' && bidStatus !== 'BIDTAKEN' && (
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md bg-yellow-500/40 border border-yellow-400/60">
+                        <span className="text-sm">⏳</span>
+                        <span className="text-xs">No Bid</span>
+                    </div>
+                )}
 
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${auctionStatus === 'OPEN' ? 'bg-green-500/30 border border-green-500/50' : 'bg-red-500/30 border border-red-500/50'
-                    }`}>
-                    <span>{auctionStatus === 'OPEN' ? '🟢' : '🔴'}</span>
-                    <span>{auctionStatus === 'OPEN' ? 'Open' : 'Closed'}</span>
-                </div>
+                {type !== 'ACCUMULATIVE' && auctionStatus !== 'OPEN' && (
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md bg-red-500/40 border border-red-400/60">
+                        <span className="text-sm">🔴</span>
+                        <span className="text-xs">Auction Closed</span>
+                    </div>
+                )}
 
-                <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-500/30 border border-blue-500/50">
-                    <span>📅</span>
-                    <span>{new Date(auctionDate).toLocaleDateString()}</span>
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md bg-blue-500/40 border border-blue-400/60">
+                    <span className="text-sm">📅</span>
+                    <span className="text-xs">Next Auction: {new Date(auctionDate).toLocaleDateString()}</span>
                 </div>
             </div>
         </div>

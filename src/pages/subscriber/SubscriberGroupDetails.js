@@ -239,34 +239,36 @@ const SubscriberGroupDetails = () => {
     }
 
     return (
-        <div className="subscriber-group-details">
-            <div className="group-details-header">
-                <button onClick={handleBackClick} className="back-btn">
-                    ← Back to Groups
-                </button>
-                <h1>Group Details</h1>
-            </div>
+        <div className="subscriber-group-details min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-6xl mx-auto">
+                <div className="group-details-header mb-6 sm:mb-8">
+                    <button onClick={handleBackClick} className="back-btn text-base sm:text-lg lg:text-xl font-semibold bg-white hover:bg-gray-50 px-4 py-3 rounded-xl transition-all duration-200 shadow-lg border border-gray-200 hover:border-gray-300">
+                        ← Back to Groups
+                    </button>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mt-4 text-center sm:text-left">Group Details</h1>
+                </div>
 
-            <div className="group-details-content-improved">
-                {/* Group Header */}
-                <GroupHeader groupDetails={groupDetails} />
+                <div className="group-details-content-improved space-y-6 sm:space-y-8 lg:space-y-10">
+                    {/* Group Header */}
+                    <GroupHeader groupDetails={groupDetails} />
 
-                {/* Progress Circles */}
-                <ProgressCircles
-                    groupDetails={groupDetails}
-                    selectedCircle={selectedCircle}
-                    onCircleClick={handleCircleClick}
-                    auctionStatus={auctionStatus}
-                    groupAccountId={groupAccountId}
-                />
+                    {/* Progress Circles */}
+                    <ProgressCircles
+                        groupDetails={groupDetails}
+                        selectedCircle={selectedCircle}
+                        onCircleClick={handleCircleClick}
+                        auctionStatus={auctionStatus}
+                        groupAccountId={groupAccountId}
+                    />
 
-                {/* Dynamic Content Display */}
-                <CircleContentDisplay
-                    selectedCircle={selectedCircle}
-                    groupDetails={groupDetails}
-                    auctionStatus={auctionStatus}
-                    groupAccountId={groupAccountId}
-                />
+                    {/* Dynamic Content Display */}
+                    <CircleContentDisplay
+                        selectedCircle={selectedCircle}
+                        groupDetails={groupDetails}
+                        auctionStatus={auctionStatus}
+                        groupAccountId={groupAccountId}
+                    />
+                </div>
             </div>
         </div>
     );

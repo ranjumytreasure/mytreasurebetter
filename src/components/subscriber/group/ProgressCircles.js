@@ -81,31 +81,115 @@ const ProgressCircles = ({ groupDetails, selectedCircle, onCircleClick, auctionS
         onCircleClick(circleId);
     };
 
+    // Check if there are pending dues - multiple ways to detect
+    const hasPendingDues = () => {
+        return (
+            (groupDetails?.pendingAmount > 0) ||
+            (groupDetails?.totalDue > 0 && groupDetails?.paidAmount < groupDetails?.totalDue) ||
+            (groupDetails?.customerDue > 0) ||
+            (groupDetails?.receivableAmount > 0)
+        );
+    };
+
+    // Animation logic for circles with custom styles
+    const getCircleAnimation = (circleId) => {
+        if (circleId === 'due' && hasPendingDues()) {
+            return 'due-pulse-animation';
+        }
+        if (circleId === 'auction' && auctionStatus === 'OPEN') {
+            return 'auction-bounce-animation';
+        }
+        return '';
+    };
+
+    const getCircleMessage = (circleId) => {
+        if (circleId === 'due' && hasPendingDues()) {
+            return (
+                <div
+                    className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                    style={{
+                        animation: 'pulse 2s infinite'
+                    }}
+                >
+                    💰 Pay Due Now!
+                </div>
+            );
+        }
+        if (circleId === 'auction' && auctionStatus === 'OPEN') {
+            return (
+                <div
+                    className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                    style={{
+                        animation: 'bounce 1.5s infinite'
+                    }}
+                >
+                    🎯 Auction Open!
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
-        <div className="progress-circles-container">
-            <h3 className="circles-title">Group Overview</h3>
-            <div className="progress-circles-straight">
+        <div className="progress-circles-container mb-6 sm:mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto px-4">
                 {circles.map((circle) => (
-                    <div key={circle.id} className="progress-circle-wrapper">
+                    <div key={circle.id} className="flex justify-center relative">
                         <div
-                            className={`progress-circle clickable ${selectedCircle === circle.id ? 'active' : ''}`}
+                            className={`progress-circle clickable ${selectedCircle === circle.id ? 'active' : ''} w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 cursor-pointer transition-all duration-300 hover:scale-105 ${getCircleAnimation(circle.id)}`}
                             onClick={() => handleCircleClick(circle.id)}
                         >
                             <div
-                                className="circle-background"
+                                className="circle-background w-full h-full rounded-full flex items-center justify-center relative transition-all duration-300 shadow-lg"
                                 style={{
                                     background: `conic-gradient(${circle.color} ${circle.percentage * 3.6}deg, #e0e0e0 0deg)`
                                 }}
                             >
-                                <div className="circle-content">
-                                    <div className="circle-icon">{circle.icon}</div>
-                                    <div className="circle-value">{circle.value}</div>
-                                    <div className="circle-label">{circle.label}</div>
+                                <div className="circle-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full flex flex-col items-center justify-center shadow-md border-2 border-gray-100">
+                                    <div className="circle-icon text-lg sm:text-xl md:text-2xl mb-1">{circle.icon}</div>
+                                    <div className="circle-value text-xs sm:text-sm md:text-base font-bold text-gray-800 mb-1 text-center leading-tight">
+                                        {circle.value}
+                                    </div>
+                                    <div className="circle-label text-xs sm:text-xs md:text-sm text-gray-600 font-medium text-center uppercase tracking-wide">
+                                        {circle.label}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        {getCircleMessage(circle.id)}
                     </div>
                 ))}
+            </div>
+
+            {/* Additional Info Section */}
+            <div className="mt-6 sm:mt-8 text-center">
+                <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto px-4">
+                    Tap any circle above to view detailed information about that aspect of your group
+                </p>
+                {(hasPendingDues() || auctionStatus === 'OPEN') && (
+                    <div className="mt-4">
+                        {hasPendingDues() && (
+                            <p
+                                className="text-red-600 text-sm font-semibold"
+                                style={{
+                                    animation: 'pulse 2s infinite'
+                                }}
+                            >
+                                💰 You have pending dues to pay - Click on Due circle above!
+                            </p>
+                        )}
+                        {auctionStatus === 'OPEN' && (
+                            <p
+                                className="text-green-600 text-sm font-semibold"
+                                style={{
+                                    animation: 'bounce 1.5s infinite'
+                                }}
+                            >
+                                🎯 Auction is live - Click on Auction circle to participate!
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
