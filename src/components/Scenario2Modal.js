@@ -14,7 +14,8 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
     const [selectedSubscriber, setSelectedSubscriber] = useState(null);
     const [showSubscriberSelection, setShowSubscriberSelection] = useState(false);
     const [showReplacementConfirmation, setShowReplacementConfirmation] = useState(false);
-    const [showClearDuesConfirmation, setShowClearDuesConfirmation] = useState(false);
+    // COMMENTED OUT - Clear Dues confirmation state blocked for now
+    // const [showClearDuesConfirmation, setShowClearDuesConfirmation] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -27,33 +28,34 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
         sub.phone?.includes(searchTerm)
     ) || [];
 
-    const handleClearDues = () => {
-        setShowClearDuesConfirmation(true);
-    };
+    // COMMENTED OUT - Clear Dues functionality blocked for now
+    // const handleClearDues = () => {
+    //     setShowClearDuesConfirmation(true);
+    // };
 
-    const handleConfirmClearDues = async () => {
-        setLoading(true);
-        try {
-            const result = await deleteGroupSubscriberWithScenario(
-                groupId || subscriber.group_id,
-                subscriber.subscriber_id,
-                subscriber.group_subscriber_id,
-                'clear_dues'
-            );
+    // const handleConfirmClearDues = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const result = await deleteGroupSubscriberWithScenario(
+    //             groupId || subscriber.group_id,
+    //             subscriber.subscriber_id,
+    //             subscriber.group_subscriber_id,
+    //             'clear_dues'
+    //         );
 
-            if (result?.success) {
-                toast.success(result.message || 'Receivables cleared and subscriber removed');
-                onClose();
-            } else {
-                toast.error(result?.message || 'Failed to clear dues');
-            }
-        } catch (error) {
-            console.error('Error clearing dues:', error);
-            toast.error('Error clearing dues');
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         if (result?.success) {
+    //             toast.success(result.message || 'Receivables cleared and subscriber removed');
+    //             onClose();
+    //         } else {
+    //             toast.error(result?.message || 'Failed to clear dues');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error clearing dues:', error);
+    //         toast.error('Error clearing dues');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const handleTransferToNew = () => {
         setSelectedAction('transfer_to_new');
@@ -96,7 +98,7 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
         setSelectedSubscriber(null);
         setShowSubscriberSelection(false);
         setShowReplacementConfirmation(false);
-        setShowClearDuesConfirmation(false);
+        // setShowClearDuesConfirmation(false);
         setSearchTerm('');
         onClose();
     };
@@ -152,27 +154,26 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
                     </div>
 
                     {/* Action Selection */}
-                    {!showSubscriberSelection && !showReplacementConfirmation && !showClearDuesConfirmation && (
+                    {!showSubscriberSelection && !showReplacementConfirmation && (
                         <div className="space-y-4">
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">Choose Action:</h4>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Clear Dues Option */}
-                                <div className="border border-red-200 rounded-xl p-6 hover:bg-red-50 transition-colors cursor-pointer"
-                                    onClick={handleClearDues}>
+                                {/* Clear Dues Option - DISABLED */}
+                                <div className="border border-gray-200 rounded-xl p-6 bg-gray-50 opacity-60 cursor-not-allowed">
                                     <div className="flex items-center gap-3 mb-3">
-                                        <X size={20} className="text-red-600" />
-                                        <h5 className="font-semibold text-red-800">Clear Dues</h5>
+                                        <X size={20} className="text-gray-400" />
+                                        <h5 className="font-semibold text-gray-500">Clear Dues</h5>
                                     </div>
-                                    <p className="text-red-700 text-sm">
+                                    <p className="text-gray-500 text-sm">
                                         Remove all receivables and delete the subscriber. This action cannot be undone.
                                     </p>
                                     <div className="mt-4">
                                         <button
-                                            disabled={loading}
-                                            className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                            disabled={true}
+                                            className="w-full bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
                                         >
-                                            {loading ? 'Clearing...' : 'Clear Dues'}
+                                            Disabled
                                         </button>
                                     </div>
                                 </div>
@@ -354,8 +355,8 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
                         </div>
                     )}
 
-                    {/* Clear Dues Confirmation */}
-                    {showClearDuesConfirmation && (
+                    {/* COMMENTED OUT - Clear Dues Confirmation blocked for now */}
+                    {/* {showClearDuesConfirmation && (
                         <div className="space-y-6">
                             <div className="bg-red-50 border border-red-200 rounded-xl p-6">
                                 <div className="flex items-center gap-3 mb-4">
@@ -412,7 +413,7 @@ const Scenario2Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
                                 </button>
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

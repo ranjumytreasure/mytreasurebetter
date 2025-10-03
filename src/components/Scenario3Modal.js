@@ -26,29 +26,30 @@ const Scenario3Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
         sub.phone?.includes(searchTerm)
     ) || [];
 
-    const handleCreatePayable = async () => {
-        setLoading(true);
-        try {
-            const result = await deleteGroupSubscriberWithScenario(
-                groupId || subscriber.group_id,
-                subscriber.subscriber_id,
-                subscriber.group_subscriber_id,
-                'create_payable'
-            );
+    // COMMENTED OUT - Clear Dues functionality blocked for now
+    // const handleCreatePayable = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const result = await deleteGroupSubscriberWithScenario(
+    //             groupId || subscriber.group_id,
+    //             subscriber.subscriber_id,
+    //             subscriber.group_subscriber_id,
+    //             'create_payable'
+    //         );
 
-            if (result?.success) {
-                toast.success(result.message || 'Refund payable created and subscriber removed');
-                onClose();
-            } else {
-                toast.error(result?.message || 'Failed to create payable');
-            }
-        } catch (error) {
-            console.error('Error creating payable:', error);
-            toast.error('Error creating payable');
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         if (result?.success) {
+    //             toast.success(result.message || 'Refund payable created and subscriber removed');
+    //             onClose();
+    //         } else {
+    //             toast.error(result?.message || 'Failed to create payable');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error creating payable:', error);
+    //         toast.error('Error creating payable');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const handleFullReplacement = () => {
         setSelectedAction('full_replacement');
@@ -153,22 +154,21 @@ const Scenario3Modal = ({ isOpen, onClose, subscriber, groupId, scenarioData }) 
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">Choose Action:</h4>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Create Payable Option */}
-                                <div className="border border-red-200 rounded-xl p-6 hover:bg-red-50 transition-colors cursor-pointer"
-                                    onClick={handleCreatePayable}>
+                                {/* Create Payable Option - DISABLED */}
+                                <div className="border border-gray-200 rounded-xl p-6 bg-gray-50 opacity-60 cursor-not-allowed">
                                     <div className="flex items-center gap-3 mb-3">
-                                        <RefreshCw size={20} className="text-red-600" />
-                                        <h5 className="font-semibold text-red-800">Create Payable</h5>
+                                        <RefreshCw size={20} className="text-gray-400" />
+                                        <h5 className="font-semibold text-gray-500">Create Payable</h5>
                                     </div>
-                                    <p className="text-red-700 text-sm">
+                                    <p className="text-gray-500 text-sm">
                                         Create a refund payable for all receipts paid and remove the subscriber.
                                     </p>
                                     <div className="mt-4">
                                         <button
-                                            disabled={loading}
-                                            className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                            disabled={true}
+                                            className="w-full bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
                                         >
-                                            {loading ? 'Creating...' : 'Create Refund'}
+                                            Disabled
                                         </button>
                                     </div>
                                 </div>
