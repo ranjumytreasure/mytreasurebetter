@@ -6,7 +6,8 @@ function Menu({ onSelect, selectedMenu }) {
         'Area of Business',
         // 'Subscribers',
         'Employees',
-       
+        'Manage Groups',
+
 
     ];
 

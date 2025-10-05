@@ -16,6 +16,7 @@ import AddAob from '../components/AddAob';
 import Subscribers from '../components/Subscribers';
 import Company from '../components/Company'
 import UsersPage from './UsersPage';
+import ManageGroups from '../components/ManageGroups';
 
 function AdminSettings() {
 
@@ -45,6 +46,8 @@ function AdminSettings() {
         return <Subscribers />;
       case 'company':
         return <Company />;
+      case 'managegroups':
+        return <ManageGroups />;
 
       // Add cases for other menu items as needed
       default:

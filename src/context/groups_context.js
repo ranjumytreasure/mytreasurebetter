@@ -38,6 +38,22 @@ const groupsDetailsReducer = (state, action) => {
         case 'FETCH_ERROR':
             return { ...state, isLoading: false, error: action.payload };
 
+        case 'DELETE_GROUP_START':
+            return { ...state, isLoading: true, error: null };
+
+        case 'DELETE_GROUP_SUCCESS':
+            return {
+                ...state,
+                isLoading: false,
+                groups: [], // Clear groups array - will be refetched
+                premium: [],
+                profits: [],
+                selectedGroupDetails: {},
+            };
+
+        case 'DELETE_GROUP_ERROR':
+            return { ...state, isLoading: false, error: action.payload };
+
         default:
             return state;
     }
@@ -95,6 +111,38 @@ export const GroupsDetailsProvider = ({ children }) => {
         }
     };
 
+    // ✅ Delete group and refetch all groups
+    const deleteGroup = async (groupId) => {
+        dispatch({ type: 'DELETE_GROUP_START' });
+        try {
+            const response = await fetch(`${API_BASE_URL}/groups/${groupId}/complete`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${user?.results?.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete group');
+            }
+
+            const data = await response.json();
+            console.log('Group deleted successfully:', data);
+
+            // Dispatch success and then refetch all groups
+            dispatch({ type: 'DELETE_GROUP_SUCCESS', payload: { groupId } });
+
+            // Refetch all groups to get the latest data
+            await fetchAllGroups();
+
+        } catch (error) {
+            dispatch({ type: 'DELETE_GROUP_ERROR', payload: error.message });
+            console.error('Error deleting group:', error);
+            throw error; // Re-throw so component can handle it
+        }
+    };
+
     return (
         <GroupsDetailsContext.Provider
             value={{
@@ -102,6 +150,7 @@ export const GroupsDetailsProvider = ({ children }) => {
                 dispatch,
                 fetchAllGroups,
                 fetchGroupById,
+                deleteGroup,
             }}
         >
             {children}
