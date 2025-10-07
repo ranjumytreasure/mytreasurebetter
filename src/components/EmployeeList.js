@@ -3,11 +3,14 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { API_BASE_URL } from '../utils/apiConfig';
 import { useHistory } from 'react-router-dom'; // Import useHistory hook
 import loadingImage from '../images/preloader.gif';
+import CollectorDashboardModal from './CollectorDashboardModal';
 
 const EmployeeList = ({ items, removeItem, editItem, toggleList }) => {
     const [signedUrls, setSignedUrls] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showCollectorModal, setShowCollectorModal] = useState(false);
+    const [selectedCollector, setSelectedCollector] = useState(null);
     const history = useHistory();
 
     useEffect(() => {
@@ -65,9 +68,39 @@ const EmployeeList = ({ items, removeItem, editItem, toggleList }) => {
         return <p>Error: {error}</p>;
     }
 
-    const handleViewEmployee = (employeeId) => {
-        // Redirect to the employee page with the userId as a route parameter
-        history.push(`/employee/${employeeId}`);
+    const handleViewEmployee = (employee) => {
+        console.log('=== EMPLOYEE DEBUG ===');
+        console.log('Full employee object:', employee);
+        console.log('Employee keys:', Object.keys(employee));
+        console.log('Employee role:', employee.role);
+        console.log('Employee name:', employee.name);
+        console.log('Employee firstname:', employee.firstname);
+        console.log('Employee lastname:', employee.lastname);
+        console.log('Role check result:', employee.role && employee.role.toLowerCase().includes('collector'));
+        console.log('====================');
+
+        // Simple collector check
+        const isCollector = employee.role && employee.role.toLowerCase().includes('collector');
+
+        console.log('Simple role check:', {
+            role: employee.role,
+            isCollector: isCollector
+        });
+
+        if (isCollector) {
+            console.log('✅ Opening collector modal for:', employee);
+            setSelectedCollector(employee);
+            setShowCollectorModal(true);
+        } else {
+            console.log('❌ Redirecting to employee page for:', employee);
+            // Redirect to the employee page with the userId as a route parameter
+            history.push(`/employee/${employee.id}`);
+        }
+    };
+
+    const handleCloseCollectorModal = () => {
+        setShowCollectorModal(false);
+        setSelectedCollector(null);
     };
 
     if (loading) {
@@ -107,7 +140,7 @@ const EmployeeList = ({ items, removeItem, editItem, toggleList }) => {
                                 <button
                                     type='button'
                                     className='view-btn' // Add a class for styling
-                                    onClick={() => handleViewEmployee(id)} // Call handleViewEmployee with the userId
+                                    onClick={() => handleViewEmployee(item)} // Call handleViewEmployee with the full item
                                     style={{ width: "60px", marginRight: "12px" }} >
                                     View
                                 </button>
@@ -132,6 +165,16 @@ const EmployeeList = ({ items, removeItem, editItem, toggleList }) => {
                     );
                 })}
             </div>
+
+            {/* Collector Dashboard Modal */}
+            {console.log('Modal render check:', { showCollectorModal, selectedCollector })}
+            {showCollectorModal && selectedCollector && (
+                <CollectorDashboardModal
+                    isOpen={showCollectorModal}
+                    onClose={handleCloseCollectorModal}
+                    collector={selectedCollector}
+                />
+            )}
         </>
     );
 };

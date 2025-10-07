@@ -17,6 +17,7 @@ import { AobProvider } from './context/aob_context';
 import { EmployeeProvider } from './context/employee_context';
 import { ProductProvider } from './context/product_context';
 import { BillingProvider } from './context/billing_context';
+import { CollectorAreaProvider } from './context/collectorArea_context';
 
 import PrivateRoute from './pages/PrivateRoute';
 import { DashboardProvider } from './context/dashboard_context';
@@ -28,134 +29,136 @@ function App() {
             <SubscriberProvider>
                 <EmployeeProvider>
                     <AobProvider>
-                        <DashboardProvider>
-                            <GroupsDetailsProvider>
-                                <GroupDetailsProvider>
-                                    <CompanySubscriberProvider>
-                                        <LedgerAccountProvider>
-                                            <LedgerEntryProvider>
-                                                <ReceivablesProvider>
-                                                    <PayablesProvider>
-                                                        <ProductProvider>
-                                                            <BillingProvider>
-                                                                <Router>
-                                                                    <ScrollToTop />
+                        <CollectorAreaProvider>
+                            <DashboardProvider>
+                                <GroupsDetailsProvider>
+                                    <GroupDetailsProvider>
+                                        <CompanySubscriberProvider>
+                                            <LedgerAccountProvider>
+                                                <LedgerEntryProvider>
+                                                    <ReceivablesProvider>
+                                                        <PayablesProvider>
+                                                            <ProductProvider>
+                                                                <BillingProvider>
+                                                                    <Router>
+                                                                        <ScrollToTop />
 
-                                                                    <Switch>
-                                                                        {/* Subscriber App Routes - Must come first */}
-                                                                        <Route path="/customer" component={SubscriberLayout} />
+                                                                        <Switch>
+                                                                            {/* Subscriber App Routes - Must come first */}
+                                                                            <Route path="/customer" component={SubscriberLayout} />
 
-                                                                        {/* Existing User App Routes */}
-                                                                        <Route path="/">
-                                                                            <Navbar />
-                                                                            <Sidebar />
-                                                                            <Switch>
-                                                                                {/* Other routes */}
-                                                                                <Route path="/" exact component={LandingPage} />
-                                                                                <PrivateRoute path="/home" component={HomePage} />
-                                                                                <Route path="/signup">
-                                                                                    <div>
-                                                                                        <SignUp />
-                                                                                    </div>
-                                                                                </Route>
-                                                                                <Route path="/verify-otp">
-                                                                                    <VerifyOTP />
-                                                                                </Route>
-                                                                                <Route path="/login" component={Login} />
-                                                                                <Route path="/forgotpassword" component={ForgetPassword} />
-                                                                                <PrivateRoute path="/company" component={Company} />
+                                                                            {/* Existing User App Routes */}
+                                                                            <Route path="/">
+                                                                                <Navbar />
+                                                                                <Sidebar />
+                                                                                <Switch>
+                                                                                    {/* Other routes */}
+                                                                                    <Route path="/" exact component={LandingPage} />
+                                                                                    <PrivateRoute path="/home" component={HomePage} />
+                                                                                    <Route path="/signup">
+                                                                                        <div>
+                                                                                            <SignUp />
+                                                                                        </div>
+                                                                                    </Route>
+                                                                                    <Route path="/verify-otp">
+                                                                                        <VerifyOTP />
+                                                                                    </Route>
+                                                                                    <Route path="/login" component={Login} />
+                                                                                    <Route path="/forgotpassword" component={ForgetPassword} />
+                                                                                    <PrivateRoute path="/company" component={Company} />
 
-                                                                                <PrivateRoute path="/groups/:groupId/auctions/winner/:reserve" component={Winner} />
+                                                                                    <PrivateRoute path="/groups/:groupId/auctions/winner/:reserve" component={Winner} />
 
-                                                                                <Route exact path="/startagroup" component={GroupStepForm} />
+                                                                                    <Route exact path="/startagroup" component={GroupStepForm} />
 
-                                                                                <Route exact path="/Faq" component={Faq} />
+                                                                                    <Route exact path="/Faq" component={Faq} />
 
-                                                                                <Route exact path="/help" component={Help} />
+                                                                                    <Route exact path="/help" component={Help} />
 
-                                                                                {/* <PrivateRoute exact path="/addgroupsubscriber/:groupId" component={AddGroupSubscriber} /> */}
-
-
-                                                                                {/* ned to come back if AddSb doesnt work  */}
+                                                                                    {/* <PrivateRoute exact path="/addgroupsubscriber/:groupId" component={AddGroupSubscriber} /> */}
 
 
-                                                                                <PrivateRoute exact path="/addgroupsubscriber/:groupId/addnew" component={AddSubcriber} />
-
-                                                                                <PrivateRoute exact path="/addgroupsubscriber/:groupId/addcompanysubcriber" component={Subscribers} />
-
-                                                                                <PrivateRoute exact path="/addgroupsubscriber/:groupId" component={AddSub} />
-
-                                                                                <PrivateRoute exact path="/addcompanysubscriber/:membershipId" component={AddCompanySubcriber} />
-
-                                                                                <PrivateRoute exact path="/addcompanymultisubscriber/:membershipId" component={SubscriberStepForm} />
-
-                                                                                <PrivateRoute exact path="/groups/:groupId" component={GroupsPage} />
-
-                                                                                <PrivateRoute exact path="/groups/:group_id/accounts/:grpAccountId" component={GroupAccountDetails} />
+                                                                                    {/* ned to come back if AddSb doesnt work  */}
 
 
-                                                                                <PrivateRoute path="/groups/:groupId/auctions/date/:nextAuctionDate"
-                                                                                    component={AuctionsPage} />
+                                                                                    <PrivateRoute exact path="/addgroupsubscriber/:groupId/addnew" component={AddSubcriber} />
+
+                                                                                    <PrivateRoute exact path="/addgroupsubscriber/:groupId/addcompanysubcriber" component={Subscribers} />
+
+                                                                                    <PrivateRoute exact path="/addgroupsubscriber/:groupId" component={AddSub} />
+
+                                                                                    <PrivateRoute exact path="/addcompanysubscriber/:membershipId" component={AddCompanySubcriber} />
+
+                                                                                    <PrivateRoute exact path="/addcompanymultisubscriber/:membershipId" component={SubscriberStepForm} />
+
+                                                                                    <PrivateRoute exact path="/groups/:groupId" component={GroupsPage} />
+
+                                                                                    <PrivateRoute exact path="/groups/:group_id/accounts/:grpAccountId" component={GroupAccountDetails} />
 
 
-                                                                                <PrivateRoute path="/subscribers"
-                                                                                    component={Subscribers} />
-
-                                                                                <PrivateRoute path="/groups/:groupId/your-due" component={UserDue} />
-                                                                                <PrivateRoute path="/groups/:groupId/customer-due" component={CustomerDue} />
-
-                                                                                <PrivateRoute path="/personal-settings" component={PersonalSettings} />
-                                                                                <PrivateRoute exact path="/subscribers" component={Subscribers} />
-
-                                                                                <PrivateRoute path="/dashboard" component={DashboardPage} />
-
-                                                                                <PrivateRoute path="/admin-settings" component={AdminSettings} />
-
-                                                                                <PrivateRoute path="/ledger" component={Ledger} />
-
-                                                                                <PrivateRoute exact path="/receivables" component={Receivables} />
-
-                                                                                <PrivateRoute exact path="/payables" component={Payables} />
-
-                                                                                <PrivateRoute exact path="/products" component={ProductsPage} />
-
-                                                                                <PrivateRoute path="/my-billing" component={MyBillingPage} />
-
-                                                                                <Route path="/Privacy&Policy" component={PrivacyPolicy} />
-                                                                                <Route path="/Terms&Conditions" component={TermsandConditions} />
-
-                                                                                <PrivateRoute path="/subscriber/:id/update-password" component={SubscriberPasswordUpdate} />
-                                                                                <PrivateRoute path="/subscriber/:id" component={SubscriberProfile} />
-                                                                                {/* <PrivateRoute path="/subscriber/:id" component={SingleSubscriberPage} /> */}
-
-                                                                                <PrivateRoute path="/employee/:id" component={SingleEmployeePage} />
-                                                                                <PrivateRoute path="/collector/:id" component={SingleEmployeePage} />
-
-                                                                                {/* Private route for the area subscribers page */}
+                                                                                    <PrivateRoute path="/groups/:groupId/auctions/date/:nextAuctionDate"
+                                                                                        component={AuctionsPage} />
 
 
-                                                                                <PrivateRoute path="/emp/:employeeId/areasubscribers" component={AreaSubscribersPage} />
+                                                                                    <PrivateRoute path="/subscribers"
+                                                                                        component={Subscribers} />
 
-                                                                                <PrivateRoute path="/samplesubcriber" component={SubscriberProfile} />
+                                                                                    <PrivateRoute path="/groups/:groupId/your-due" component={UserDue} />
+                                                                                    <PrivateRoute path="/groups/:groupId/customer-due" component={CustomerDue} />
 
-                                                                            </Switch>
+                                                                                    <PrivateRoute path="/personal-settings" component={PersonalSettings} />
+                                                                                    <PrivateRoute exact path="/subscribers" component={Subscribers} />
 
-                                                                            <Footer />
-                                                                        </Route>
-                                                                    </Switch>
+                                                                                    <PrivateRoute path="/dashboard" component={DashboardPage} />
 
-                                                                </Router>
-                                                            </BillingProvider>
-                                                        </ProductProvider>
-                                                    </PayablesProvider>
-                                                </ReceivablesProvider>
-                                            </LedgerEntryProvider>
-                                        </LedgerAccountProvider>
-                                    </CompanySubscriberProvider>
-                                </GroupDetailsProvider>
-                            </GroupsDetailsProvider>
+                                                                                    <PrivateRoute path="/admin-settings" component={AdminSettings} />
 
-                        </DashboardProvider>
+                                                                                    <PrivateRoute path="/ledger" component={Ledger} />
+
+                                                                                    <PrivateRoute exact path="/receivables" component={Receivables} />
+
+                                                                                    <PrivateRoute exact path="/payables" component={Payables} />
+
+                                                                                    <PrivateRoute exact path="/products" component={ProductsPage} />
+
+                                                                                    <PrivateRoute path="/my-billing" component={MyBillingPage} />
+
+                                                                                    <Route path="/Privacy&Policy" component={PrivacyPolicy} />
+                                                                                    <Route path="/Terms&Conditions" component={TermsandConditions} />
+
+                                                                                    <PrivateRoute path="/subscriber/:id/update-password" component={SubscriberPasswordUpdate} />
+                                                                                    <PrivateRoute path="/subscriber/:id" component={SubscriberProfile} />
+                                                                                    {/* <PrivateRoute path="/subscriber/:id" component={SingleSubscriberPage} /> */}
+
+                                                                                    <PrivateRoute path="/employee/:id" component={SingleEmployeePage} />
+                                                                                    <PrivateRoute path="/collector/:id" component={SingleEmployeePage} />
+
+                                                                                    {/* Private route for the area subscribers page */}
+
+
+                                                                                    <PrivateRoute path="/emp/:employeeId/areasubscribers" component={AreaSubscribersPage} />
+
+                                                                                    <PrivateRoute path="/samplesubcriber" component={SubscriberProfile} />
+
+                                                                                </Switch>
+
+                                                                                <Footer />
+                                                                            </Route>
+                                                                        </Switch>
+
+                                                                    </Router>
+                                                                </BillingProvider>
+                                                            </ProductProvider>
+                                                        </PayablesProvider>
+                                                    </ReceivablesProvider>
+                                                </LedgerEntryProvider>
+                                            </LedgerAccountProvider>
+                                        </CompanySubscriberProvider>
+                                    </GroupDetailsProvider>
+                                </GroupsDetailsProvider>
+
+                            </DashboardProvider>
+                        </CollectorAreaProvider>
                     </AobProvider>
                 </EmployeeProvider>
             </SubscriberProvider>

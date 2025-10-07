@@ -3,7 +3,8 @@ import { useEmployeeContext } from '../context/employee_context';
 import { useUserContext } from '../context/user_context';
 import AvatarUploader from '../components/AvatarUploader';
 import { uploadImage } from "../utils/uploadImage";
-import Alert from '../components/Alert';
+import AlertComponent from '../components/Alert';
+import CollectorDashboardModal from './CollectorDashboardModal';
 import loadingImage from '../images/preloader.gif';
 import "../style/AddEmployee.css";
 import { API_BASE_URL } from "../utils/apiConfig";
@@ -39,12 +40,56 @@ const AddEmployee = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
+    const [showCollectorModal, setShowCollectorModal] = useState(false);
+    const [selectedCollector, setSelectedCollector] = useState(null);
+    const [signedUrls, setSignedUrls] = useState({});
 
     useEffect(() => {
         if (image?.previewUrl) {
             setPreviewUrl(image.previewUrl);
         }
     }, [image]);
+
+    // Fetch signed URLs for employee images
+    useEffect(() => {
+        const fetchSignedUrls = async () => {
+            if (Array.isArray(list)) {
+                const urls = {};
+                try {
+                    const promises = list.map(async (item) => {
+                        const { user_image } = item;
+                        if (user_image) {
+                            try {
+                                const response = await fetch(`${API_BASE_URL}/get-signed-url?key=${encodeURIComponent(user_image)}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: `Bearer ${user?.results?.token}`,
+                                    },
+                                });
+
+                                if (response.ok) {
+                                    const responseBody = await response.json();
+                                    const signedUrl = responseBody.results;
+                                    urls[user_image] = signedUrl;
+                                }
+                            } catch (error) {
+                                console.error(`Failed to fetch signed URL for user_image: ${user_image}`, error);
+                            }
+                        }
+                    });
+
+                    await Promise.all(promises);
+                    setSignedUrls(urls);
+                } catch (error) {
+                    console.error('Error fetching signed URLs:', error);
+                }
+            }
+        };
+
+        if (list && list.length > 0) {
+            fetchSignedUrls();
+        }
+    }, [list, user?.results?.token]);
 
     const handleSetImage = (file) => {
         if (file) {
@@ -56,6 +101,28 @@ const AddEmployee = () => {
 
     const showAlert = (show = false, type = '', msg = '') => {
         setAlert({ show, type, msg });
+    };
+
+    const handleViewEmployee = (employee) => {
+        console.log('AddEmployee - Employee clicked:', employee);
+        console.log('AddEmployee - Employee role:', employee.role);
+
+        // Check if the employee is a collector
+        const isCollector = employee.role && employee.role.toLowerCase().includes('collector');
+
+        if (isCollector) {
+            console.log('AddEmployee - Opening collector modal for:', employee);
+            setSelectedCollector(employee);
+            setShowCollectorModal(true);
+        } else {
+            console.log('AddEmployee - Not a collector, showing alert');
+            window.alert(`View employee: ${employee.name || employee.firstname || 'Unknown'}`);
+        }
+    };
+
+    const handleCloseCollectorModal = () => {
+        setShowCollectorModal(false);
+        setSelectedCollector(null);
     };
 
     const handleChange = (e) => {
@@ -133,7 +200,7 @@ const AddEmployee = () => {
                 </button>
             </div>
 
-            {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
+            {alert.show && <AlertComponent {...alert} removeAlert={showAlert} list={list} />}
             {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
             {isLoading ? (
@@ -156,7 +223,7 @@ const AddEmployee = () => {
                             <tr key={`${emp.id}-${emp.roleid}`}>
                                 <td data-label="Image">
                                     <img
-                                
+
                                         src={emp?.user_image_from_s3 || "/default-avatar.png"}
                                         alt={`${emp.firstName} ${emp.lastName}`}
                                         className="employee-thumbnail"
@@ -170,7 +237,7 @@ const AddEmployee = () => {
                                 <td className="employee-actions" data-label="Actions">
                                     <button
                                         className="employee-button view"
-                                        onClick={() => alert(`View employee: ${emp.firstName} ${emp.lastName}`)}
+                                        onClick={() => handleViewEmployee(emp)}
                                         title="View Employee"
                                     >
                                         View
@@ -276,6 +343,16 @@ const AddEmployee = () => {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {/* Collector Dashboard Modal */}
+            {showCollectorModal && selectedCollector && (
+                <CollectorDashboardModal
+                    isOpen={showCollectorModal}
+                    onClose={handleCloseCollectorModal}
+                    collector={selectedCollector}
+                    signedUrls={signedUrls}
+                />
             )}
 
         </div>
