@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useLedgerAccountContext } from "../context/ledgerAccount_context";
-import { useLedgerEntryContext } from "../context/ledgerEntry_context";
-import { useUserContext } from "../context/user_context";
 import { toast, ToastContainer } from "react-toastify";
-import { API_BASE_URL } from "../utils/apiConfig";
-import ReceivableReceitPdf from "./PDF/ReceivableReceitPdf";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FiDownload, FiUser, FiPhone, FiCalendar, FiDollarSign, FiCreditCard, FiX, FiCheck, FiAlertCircle, FiPrinter } from 'react-icons/fi';
-import { FaRupeeSign, FaCheckCircle, FaMoneyBillWave, FaBalanceScale, FaExclamationCircle } from 'react-icons/fa';
+import { API_BASE_URL } from "../../utils/apiConfig";
+import { FiUser, FiPhone, FiCalendar, FiDollarSign, FiCreditCard, FiX, FiCheck, FiAlertCircle, FiPrinter } from 'react-icons/fi';
+import { useCollector } from '../../context/CollectorProvider';
+import { useCollectorLedger } from '../../context/CollectorLedgerContext';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables }) => {
+/**
+ * Collector Payment Modal - Reuses ALL functionality from user app's ReceivablePayementModal
+ * Uses parent_membership_id for all operations
+ * Separate component for collector app - doesn't modify user/customer app code
+ */
+const CollectorPaymentModal = ({ isOpen, onClose, receivable, fetchReceivables }) => {
     const [groupAdvanceInput, setGroupAdvanceInput] = useState("");
     const [paymentType, setPaymentType] = useState("full");
     const [useGroupAdvance, setUseGroupAdvance] = useState(false);
@@ -19,14 +20,17 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     const [isConfirming, setIsConfirming] = useState(false);
     const [receiptData, setReceiptData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
-    const { ledgerAccounts, fetchLedgerAccounts } = useLedgerAccountContext();
-    const { fetchLedgerEntries } = useLedgerEntryContext();
-    const { user } = useUserContext();
-    const userCompany = user?.results?.userCompany;
-    const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
+
+    const { user } = useCollector();
+    const { ledgerAccounts = [] } = useCollectorLedger();
+
+    const userCompany = user?.userCompany || user?.results?.userCompany;
+    const membershipId = user?.userAccounts?.[0]?.parent_membership_id ||
+        user?.results?.userAccounts?.[0]?.parent_membership_id;
+
     const [receivableDate, setReceivableDate] = useState(
-        new Date().toISOString().split("T")[0]);
+        new Date().toISOString().split("T")[0]
+    );
 
     const totalDue = receivable?.rbdue ?? 0;
     const advanceBalance = receivable?.total_advance_balance ?? 0;  // ✅ Changed to total_advance_balance
@@ -36,6 +40,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     const [remainingDue, setRemainingDue] = useState(totalDue);
     const [parsedPartialAmount, setParsedPartialAmount] = useState(totalDue);
 
+    // Calculate advance amounts and remaining due (same logic as user app)
     useEffect(() => {
         const advanceInput = useGroupAdvance ? parseFloat(groupAdvanceInput || "0") : 0;
         const partialInput = paymentType === "partial" ? parseFloat(partialAmount || "0") : 0;
@@ -116,14 +121,18 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
             membershipId,
             useGroupAdvanceflag: useGroupAdvance,
             groupAdvanceUsed: advanceApplied,
-            deductionPaymentMethodId: selectedAccount?.id || null
+            deductionPaymentMethodId: selectedAccount?.id || null,
+            collectorId: user?.userId || user?.id,
+            collectorName: `${user?.firstname} ${user?.lastname}`,
         };
+
+        console.log('🔄 Collector payment payload:', payload);
 
         try {
             const response = await fetch(`${API_BASE_URL}/receipts`, {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${user?.results?.token}`,
+                    Authorization: `Bearer ${user?.token || user?.results?.token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
@@ -131,16 +140,21 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('✅ Payment response:', data);
                 setReceiptData({ ...payload, subscriberName: name });
-                setTimeout(() => fetchReceivables(), 2000);
-                fetchLedgerAccounts();
-                fetchLedgerEntries();
+
+                // Refresh receivables immediately to show updated status
+                if (fetchReceivables) {
+                    fetchReceivables();
+                }
+
                 toast.success("Payment processed successfully!");
             } else {
                 const err = await response.json();
                 toast.error(err.message || "Payment failed.");
             }
         } catch (error) {
+            console.error('❌ Payment error:', error);
             toast.error("❌ Network error. Please try again later.");
         } finally {
             setLoading(false);
@@ -160,15 +174,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     };
 
     const handlePrint = () => {
-        const printContents = document.querySelector('.receipt-container')?.innerHTML;
-        const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<html><head><title>Receipt</title>');
-        printWindow.document.write('<style>body { font-family: Arial; padding: 20px; } .receipt-row { display: flex; justify-content: space-between; padding: 4px 0; }</style>');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(printContents);
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.print();
+        window.print();
     };
 
     return (
@@ -176,7 +182,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
             <ToastContainer position="top-center" />
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
                 {/* Modal Header */}
-                <div className="bg-gradient-to-r from-custom-red to-red-600 px-6 py-4 text-white">
+                <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 text-white">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="relative">
@@ -286,7 +292,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                 <button
                                     onClick={handleConfirmPayment}
                                     disabled={loading}
-                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {loading ? (
                                         <>
@@ -343,8 +349,8 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                     <span className="font-semibold">{receiptData.paymentType}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Transaction Ref:</span>
-                                    <span className="font-semibold">{receiptData.paymentTransactionRef}</span>
+                                    <span className="text-gray-600">Collected By:</span>
+                                    <span className="font-semibold">{receiptData.collectorName}</span>
                                 </div>
                             </div>
 
@@ -356,22 +362,18 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                     <FiPrinter className="w-5 h-5" />
                                     Print
                                 </button>
-                                <PDFDownloadLink
-                                    document={<ReceivableReceitPdf receivableData={receiptData} companyData={userCompany} />}
-                                    fileName={`Receipt-${receiptData.subscriberName}-${Date.now()}.pdf`}
-                                    className="flex-1"
+                                <button
                                     onClick={() => {
-                                        setIsDownloading(true);
-                                        setTimeout(() => setIsDownloading(false), 3000);
+                                        // Refresh data one more time before closing
+                                        if (fetchReceivables) {
+                                            fetchReceivables();
+                                        }
+                                        onClose();
                                     }}
+                                    className="flex-1 py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200"
                                 >
-                                    {({ loading: pdfLoading }) => (
-                                        <button className="w-full py-3 px-4 bg-custom-red text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center justify-center gap-2">
-                                            <FiDownload className="w-5 h-5" />
-                                            {pdfLoading || isDownloading ? "Downloading..." : "Download PDF"}
-                                        </button>
-                                    )}
-                                </PDFDownloadLink>
+                                    Close
+                                </button>
                             </div>
                         </div>
                     ) : (
@@ -447,7 +449,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                         type="date"
                                         value={receivableDate}
                                         onChange={(e) => setReceivableDate(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     />
                                 </div>
 
@@ -456,7 +458,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                     <select
                                         value={paymentMethod}
                                         onChange={(e) => setPaymentMethod(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     >
                                         <option value="">-- Select Payment Method --</option>
                                         {ledgerAccounts.map((acc) => (
@@ -468,7 +470,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-3">Payment Type</label>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-600 cursor-pointer transition-all duration-200">
                                             <input
                                                 type="radio"
                                                 value="full"
@@ -479,11 +481,11 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                                     setGroupAdvanceInput("0");
                                                     setPartialAmount("0");
                                                 }}
-                                                className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                                             />
                                             <span className="ml-3 text-sm font-medium text-gray-700">Full Payment</span>
                                         </label>
-                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-custom-red cursor-pointer transition-all duration-200">
+                                        <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-600 cursor-pointer transition-all duration-200">
                                             <input
                                                 type="radio"
                                                 value="partial"
@@ -494,7 +496,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                                     setGroupAdvanceInput("0");
                                                     setPartialAmount(totalDue.toString());
                                                 }}
-                                                className="w-4 h-4 text-custom-red border-gray-300 focus:ring-custom-red"
+                                                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                                             />
                                             <span className="ml-3 text-sm font-medium text-gray-700">Partial Payment</span>
                                         </label>
@@ -520,7 +522,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                                 setPartialAmount(userPayable.toString());
                                             }
                                         }}
-                                        className="w-4 h-4 text-custom-red border-gray-300 rounded focus:ring-custom-red"
+                                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                                     />
                                     <span className="ml-3 text-sm font-medium text-gray-700">Use Advance</span>
                                 </div>
@@ -540,7 +542,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                                     }}
                                                     min="0"
                                                     max={advanceBalance}  // ✅ Changed to advanceBalance
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                                 />
                                             </div>
                                         )}
@@ -557,7 +559,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                                 min="0"
                                                 max={totalDue}
                                                 placeholder="₹0.00"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-red focus:border-transparent"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                             />
                                         </div>
                                     </>
@@ -566,7 +568,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                 {useGroupAdvance && (
                                     <div className="p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200">
                                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                            <FiDollarSign className="w-5 h-5 text-custom-red" />
+                                            <FiDollarSign className="w-5 h-5 text-red-600" />
                                             Payment Summary
                                         </h4>
                                         <div className="space-y-2 text-sm">
@@ -608,7 +610,7 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
                                 <button
                                     onClick={handleSubmit}
                                     disabled={!paymentMethod || (paymentType === "partial" && !partialAmount)}
-                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-custom-red to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <FiDollarSign className="w-5 h-5" />
                                     Process Payment
@@ -622,4 +624,4 @@ const ReceivablePayementModal = ({ isOpen, onClose, receivable, fetchReceivables
     );
 };
 
-export default ReceivablePayementModal;
+export default CollectorPaymentModal;

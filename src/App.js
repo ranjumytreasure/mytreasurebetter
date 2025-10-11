@@ -5,6 +5,7 @@ import { LandingPage, SubscriberStepForm, GroupStepForm, AddGroupSubscriber, Hom
 import { UserProvider } from './context/user_context';
 import { SubscriberProvider } from './context/subscriber/SubscriberContext';
 import SubscriberLayout from './components/subscriber/layout/SubscriberLayout';
+import CollectorLayout from './components/collector/CollectorLayout';
 
 import { GroupDetailsProvider } from './context/group_context';
 import { GroupsDetailsProvider } from './context/groups_context';
@@ -46,6 +47,9 @@ function App() {
                                                                         <Switch>
                                                                             {/* Subscriber App Routes - Must come first */}
                                                                             <Route path="/customer" component={SubscriberLayout} />
+
+                                                                            {/* Collector App Routes - Completely separate */}
+                                                                            <Route path="/collector" component={CollectorLayout} />
 
                                                                             {/* Existing User App Routes */}
                                                                             <Route path="/">

@@ -347,6 +347,10 @@ const GroupsSubscriber = () => {
   const [showScenario2Modal, setShowScenario2Modal] = useState(false);
   const [showScenario3Modal, setShowScenario3Modal] = useState(false);
   const [showScenario4Modal, setShowScenario4Modal] = useState(false);
+
+  // Advance 360° view state
+  const [showAdvanceModal, setShowAdvanceModal] = useState(false);
+  const [selectedAdvanceSubscriber, setSelectedAdvanceSubscriber] = useState(null);
   const [scenarioData, setScenarioData] = useState(null);
   const [selectedSubscriber, setSelectedSubscriber] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -481,6 +485,47 @@ const GroupsSubscriber = () => {
     }
   };
 
+  // Advance 360° view handlers
+  const handleOpenAdvanceModal = (subscriber) => {
+    setSelectedAdvanceSubscriber(subscriber);
+    setShowAdvanceModal(true);
+  };
+
+  const handleCloseAdvanceModal = () => {
+    setShowAdvanceModal(false);
+    setSelectedAdvanceSubscriber(null);
+  };
+
+  // Calculate advance breakdown
+  const calculateAdvanceBreakdown = (subscriber) => {
+    const transactions = subscriber?.advance_transactions || [];
+    let runningBalance = 0;
+    let totalCredit = 0;
+    let totalDebit = 0;
+
+    const transactionsWithBalance = transactions.map(tx => {
+      const amount = parseFloat(tx.amount) || 0;
+      if (tx.type === 'CREDIT') {
+        runningBalance += amount;
+        totalCredit += amount;
+      } else if (tx.type === 'DEBIT') {
+        runningBalance -= amount;
+        totalDebit += amount;
+      }
+      return {
+        ...tx,
+        runningBalance: runningBalance
+      };
+    });
+
+    return {
+      transactions: transactionsWithBalance,
+      totalCredit,
+      totalDebit,
+      currentBalance: runningBalance
+    };
+  };
+
   if (!data) return <p>Data is not available.</p>;
 
   return (
@@ -556,15 +601,21 @@ const GroupsSubscriber = () => {
                   </div>
 
                   {/* Advance Amount */}
-                  <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-4 border border-red-200">
+                  <div
+                    className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-4 border border-red-200 cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-200"
+                    onClick={() => handleOpenAdvanceModal(subscriber)}
+                  >
                     <div className="text-center">
-                      <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Advance Amount</p>
+                      <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide flex items-center justify-center gap-1">
+                        Advance Amount
+                        <span className="text-blue-500 text-xs">ℹ️</span>
+                      </p>
                       <p className="text-lg font-bold text-red-600">
                         {(() => {
                           // Try to get the advance balance from different possible field names
-                          let advanceBalance = subscriber?.total_advance_balance;
+                          let advanceBalance = subscriber?.total_balance || subscriber?.total_advance_balance;
 
-                          // If total_advance_balance is not available, try to calculate it
+                          // If total_balance is not available, try to calculate it
                           if ((advanceBalance === undefined || advanceBalance === null) &&
                             (subscriber?.total_advance_credit !== undefined || subscriber?.total_advance_debit !== undefined)) {
                             const credit = subscriber?.total_advance_credit || 0;
@@ -578,6 +629,7 @@ const GroupsSubscriber = () => {
                             : "N/A";
                         })()}
                       </p>
+                      <p className="text-xs text-gray-500 mt-1">Click for details</p>
                     </div>
                   </div>
 
@@ -641,6 +693,136 @@ const GroupsSubscriber = () => {
         groupId={selectedSubscriber?.group_id || data?.results?.group_id}
         scenarioData={scenarioData}
       />
+
+      {/* Advance 360° Modal */}
+      {showAdvanceModal && selectedAdvanceSubscriber && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-fadeIn">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl md:text-4xl">💰</span>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold">Advance 360° View</h3>
+                    <p className="text-xs md:text-sm text-blue-100 mt-1">{selectedAdvanceSubscriber.name}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCloseAdvanceModal}
+                  className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {(() => {
+                const breakdown = calculateAdvanceBreakdown(selectedAdvanceSubscriber);
+                const { transactions, totalCredit, totalDebit, currentBalance } = breakdown;
+
+                return (
+                  <>
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
+                      <div className="bg-green-50 rounded-lg p-3 md:p-4 text-center border border-green-200">
+                        <p className="text-xs md:text-sm text-green-600 font-medium mb-1">Collected</p>
+                        <p className="text-base md:text-xl font-bold text-green-700">₹{totalCredit.toLocaleString()}</p>
+                      </div>
+                      <div className="bg-red-50 rounded-lg p-3 md:p-4 text-center border border-red-200">
+                        <p className="text-xs md:text-sm text-red-600 font-medium mb-1">Utilized</p>
+                        <p className="text-base md:text-xl font-bold text-red-700">₹{totalDebit.toLocaleString()}</p>
+                      </div>
+                      <div className="bg-blue-50 rounded-lg p-3 md:p-4 text-center border border-blue-200">
+                        <p className="text-xs md:text-sm text-blue-600 font-medium mb-1">Balance</p>
+                        <p className="text-base md:text-xl font-bold text-blue-700">₹{currentBalance.toLocaleString()}</p>
+                      </div>
+                    </div>
+
+                    {/* Transaction List */}
+                    <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+                      <h4 className="text-sm md:text-base font-semibold text-gray-800 mb-3 md:mb-4 flex items-center justify-between">
+                        <span>Transaction History</span>
+                        <span className="text-xs md:text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                          {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
+                        </span>
+                      </h4>
+
+                      {transactions.length > 0 ? (
+                        <div className="space-y-2 md:space-y-3">
+                          {transactions.map((tx, idx) => (
+                            <div
+                              key={idx}
+                              className={`flex items-start gap-2 md:gap-3 p-3 md:p-4 rounded-lg ${tx.type === 'CREDIT'
+                                  ? 'bg-green-50 border-l-4 border-green-500'
+                                  : 'bg-red-50 border-l-4 border-red-500'
+                                }`}
+                            >
+                              <div className="flex-shrink-0 mt-1">
+                                {tx.type === 'CREDIT' ? (
+                                  <span className="text-green-600 text-lg md:text-xl">✅</span>
+                                ) : (
+                                  <span className="text-red-600 text-lg md:text-xl">⚡</span>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-0 mb-2">
+                                  <span className="font-semibold text-gray-700 text-sm md:text-base">
+                                    {new Date(tx.date).toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric'
+                                    })}
+                                  </span>
+                                  <span className={`font-bold text-base md:text-lg ${tx.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {tx.type === 'CREDIT' ? '+' : '-'}₹{parseFloat(tx.amount).toLocaleString()}
+                                  </span>
+                                </div>
+                                <p className="text-gray-600 text-xs md:text-sm mb-1 break-words">{tx.description}</p>
+                                {tx.sub_category && (
+                                  <span className="inline-block text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full mb-2">
+                                    {tx.sub_category}
+                                  </span>
+                                )}
+                                <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+                                  <span className="text-xs md:text-sm text-gray-500">Running Balance:</span>
+                                  <span className="text-sm md:text-base font-semibold text-blue-600">₹{tx.runningBalance.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 md:py-12">
+                          <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span className="text-3xl md:text-4xl">📊</span>
+                          </div>
+                          <p className="text-gray-500 text-sm md:text-base">No transactions yet</p>
+                          <p className="text-gray-400 text-xs md:text-sm mt-1">Transactions will appear here once recorded</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-gray-200 p-4 bg-gray-50 flex justify-end">
+              <button
+                onClick={handleCloseAdvanceModal}
+                className="px-4 md:px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm md:text-base"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

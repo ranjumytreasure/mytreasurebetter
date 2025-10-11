@@ -39,8 +39,8 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
   }, []); // Empty dependency array means this runs only when component mounts
 
   // Debug logging to see subscriber data structure
-  console.log("Group Subscribers:", groupSubscribers);
-  console.log("Selected Group Details:", selectedGroupDetails);
+  // console.log("Group Subscribers:", groupSubscribers);
+  // console.log("Selected Group Details:", selectedGroupDetails);
 
 
 
@@ -109,19 +109,20 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
       // For Groups, we'll create multiple entries - only for subscribers with amounts
       const selectedGroup = groups.find((g) => String(g.id) === String(selectedGroupId));
       const entries = selectedSubscriberIds
-        .filter(subscriberId => {
-          const amount = subscriberAmounts[subscriberId] || 0;
+        .filter(groupSubscriberId => {
+          const amount = subscriberAmounts[groupSubscriberId] || 0;
           return parseFloat(amount) > 0; // Only include entries with amount > 0
         })
-        .map(subscriberId => {
-          const subscriber = groupSubscribers.find(sub => String(sub.subscriber_id) === String(subscriberId));
-          const amount = subscriberAmounts[subscriberId] || 0;
+        .map(groupSubscriberId => {
+          const subscriber = groupSubscribers.find(sub => String(sub.group_subscriber_id) === String(groupSubscriberId));  // ✅ Use group_subscriber_id
+          const amount = subscriberAmounts[groupSubscriberId] || 0;
 
           return {
             ...formData,
             membershipId: user?.results?.userAccounts?.[0]?.parent_membership_id || "",
             groupId: selectedGroupId,
-            subscriberId: subscriberId,
+            subscriberId: subscriber?.subscriber_id || null,  // ✅ Keep subscriber_id for person identification
+            groupSubscriberId: groupSubscriberId,  // ✅ Added: unique group subscriber ID for chit identification
             subscriberName: subscriber?.name || "",
             subCategory: formData.subCategory,
             amount: parseFloat(amount),
@@ -232,7 +233,7 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
     // Check if all entries have required fields
     return tempData.some(entry => {
       if (!entry.amount || entry.amount <= 0 || !entry.description) return true;
-      if (entry.category === "Groups" && (!entry.groupId || !entry.subscriberId)) return true;
+      if (entry.category === "Groups" && (!entry.groupId || !entry.groupSubscriberId)) return true;  // ✅ Changed to groupSubscriberId
       return false;
     });
   };
@@ -276,7 +277,7 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
       setSubscriberAmounts({});
     } else {
       // Select all filtered subscribers
-      const allIds = filteredSubscribers.map(cust => cust.subscriber_id);
+      const allIds = filteredSubscribers.map(cust => cust.group_subscriber_id);  // ✅ Use group_subscriber_id
       setSelectedSubscriberIds(allIds);
     }
   };
@@ -380,12 +381,17 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
                         <h4 className="font-medium text-gray-800 mb-3">Subscriber Entries ({tempData.length})</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {tempData.map((entry, index) => {
-                            const subscriber = groupSubscribers.find(sub => String(sub.subscriber_id) === String(entry.subscriberId));
+                            const subscriber = groupSubscribers.find(sub => String(sub.group_subscriber_id) === String(entry.groupSubscriberId));  // ✅ Use group_subscriber_id
                             return (
                               <div key={index} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <div className="flex-1 min-w-0">
                                   <div className="font-medium text-gray-700 truncate">{entry.subscriberName}</div>
                                   <div className="text-sm text-gray-500 truncate">{subscriber?.phone || 'N/A'}</div>
+                                  {subscriber?.accountshare_amount && (
+                                    <div className="text-xs text-blue-600 font-semibold mt-1">
+                                      Chit: ₹{parseFloat(subscriber.accountshare_amount).toLocaleString()}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="text-right ml-3">
                                   <span className="font-bold text-green-600 text-lg">₹ {parseFloat(entry.amount).toFixed(2)}</span>
@@ -657,28 +663,35 @@ const AddEntryModal = ({ onClose, customersByGroup = {}, accounts = [] }) => {
                               cust.name.toLowerCase().includes((formData.subscriberSearch || "").toLowerCase())
                             )
                             .map((cust) => {
-                              const isSelected = selectedSubscriberIds.includes(cust.subscriber_id);
+                              const isSelected = selectedSubscriberIds.includes(cust.group_subscriber_id);  // ✅ Use group_subscriber_id
                               return (
-                                <div key={cust.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
+                                <div key={cust.group_subscriber_id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
                                   <input
                                     type="checkbox"
-                                    id={`subscriber-${cust.subscriber_id}`}
+                                    id={`subscriber-${cust.group_subscriber_id}`}  // ✅ Use group_subscriber_id
                                     checked={isSelected}
-                                    onChange={() => handleSubscriberSelect(cust.subscriber_id)}
+                                    onChange={() => handleSubscriberSelect(cust.group_subscriber_id)}  // ✅ Use group_subscriber_id
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                   />
                                   <label
-                                    htmlFor={`subscriber-${cust.subscriber_id}`}
+                                    htmlFor={`subscriber-${cust.group_subscriber_id}`}  // ✅ Use group_subscriber_id
                                     className="flex-1 text-sm font-medium text-gray-700 cursor-pointer"
                                   >
-                                    {cust.name} - {cust.phone}
+                                    <div className="flex flex-col">
+                                      <span>{cust.name} - {cust.phone}</span>
+                                      {cust.accountshare_amount && (
+                                        <span className="text-xs text-blue-600 font-semibold">
+                                          Chit: ₹{parseFloat(cust.accountshare_amount).toLocaleString()} ({cust.accountshare_percentage}%)
+                                        </span>
+                                      )}
+                                    </div>
                                   </label>
                                   {isSelected && (
                                     <input
                                       type="number"
                                       placeholder="Amount"
-                                      value={subscriberAmounts[cust.subscriber_id] || ""}
-                                      onChange={(e) => handleAmountChange(cust.subscriber_id, e.target.value)}
+                                      value={subscriberAmounts[cust.group_subscriber_id] || ""}  // ✅ Use group_subscriber_id
+                                      onChange={(e) => handleAmountChange(cust.group_subscriber_id, e.target.value)}  // ✅ Use group_subscriber_id
                                       className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                                       min="0"
                                       step="0.01"
