@@ -145,7 +145,7 @@ const CollectorReceivables = () => {
     };
 
     const formatCurrency = (amount) => {
-        return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
+        return `₹${Number(amount ?? 0).toLocaleString("en-IN")}`;
     };
 
     const formatDate = (dateStr) => {
@@ -372,7 +372,7 @@ const CollectorReceivables = () => {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-2xl font-bold text-yellow-900">
-                                                            {formatCurrency(receivable?.total_advance_balance || 0)}
+                                                            {formatCurrency(receivable?.total_advance_balance ?? 0)}
                                                         </p>
                                                     </div>
                                                 </div>

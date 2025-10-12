@@ -61,7 +61,7 @@ const CollectorAdvanceHistory = () => {
     };
 
     const formatCurrency = (amount) => {
-        return `₹${parseFloat(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${parseFloat(amount ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     const formatDate = (dateString) => {

@@ -436,7 +436,7 @@ const CollectorPaymentModal = ({ isOpen, onClose, receivable, fetchReceivables }
                                         <span className="text-yellow-800 font-semibold">Advance Balance</span>
                                     </div>
                                     <span className="text-2xl font-bold text-yellow-900">
-                                        {formatCurrency(receivable?.total_advance_balance || 0)}
+                                        {formatCurrency(receivable?.total_advance_balance ?? 0)}
                                     </span>
                                 </div>
                             </div>

@@ -232,9 +232,9 @@ const SubscriberProfile = () => {
         ifsc: res.bank_ifsc || '',
       },
       financials: {
-        totalPaid: res.total_paid || 0,
-        totalDue: res.total_due || 0,
-        totalAdvance: res.total_advance || 0,
+        totalPaid: res.total_paid ?? 0,
+        totalDue: res.total_due ?? 0,
+        totalAdvance: res.total_advance ?? 0,
       },
       financeDetails: {
         occupation: res.occupation || '',

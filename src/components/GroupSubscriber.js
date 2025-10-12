@@ -613,13 +613,13 @@ const GroupsSubscriber = () => {
                       <p className="text-lg font-bold text-red-600">
                         {(() => {
                           // Try to get the advance balance from different possible field names
-                          let advanceBalance = subscriber?.total_balance || subscriber?.total_advance_balance;
+                          let advanceBalance = subscriber?.total_balance ?? subscriber?.total_advance_balance;
 
                           // If total_balance is not available, try to calculate it
                           if ((advanceBalance === undefined || advanceBalance === null) &&
                             (subscriber?.total_advance_credit !== undefined || subscriber?.total_advance_debit !== undefined)) {
-                            const credit = subscriber?.total_advance_credit || 0;
-                            const debit = subscriber?.total_advance_debit || 0;
+                            const credit = subscriber?.total_advance_credit ?? 0;
+                            const debit = subscriber?.total_advance_debit ?? 0;
                             advanceBalance = credit - debit;
                           }
 
@@ -758,8 +758,8 @@ const GroupsSubscriber = () => {
                             <div
                               key={idx}
                               className={`flex items-start gap-2 md:gap-3 p-3 md:p-4 rounded-lg ${tx.type === 'CREDIT'
-                                  ? 'bg-green-50 border-l-4 border-green-500'
-                                  : 'bg-red-50 border-l-4 border-red-500'
+                                ? 'bg-green-50 border-l-4 border-green-500'
+                                : 'bg-red-50 border-l-4 border-red-500'
                                 }`}
                             >
                               <div className="flex-shrink-0 mt-1">
@@ -908,8 +908,8 @@ const DeleteSubscriberModal = ({ show, subscriber, onClose, onConfirm, isLoading
                   // If total_advance_balance is not available, try to calculate it
                   if ((advanceBalance === undefined || advanceBalance === null) &&
                     (subscriber?.total_advance_credit !== undefined || subscriber?.total_advance_debit !== undefined)) {
-                    const credit = subscriber?.total_advance_credit || 0;
-                    const debit = subscriber?.total_advance_debit || 0;
+                    const credit = subscriber?.total_advance_credit ?? 0;
+                    const debit = subscriber?.total_advance_debit ?? 0;
                     advanceBalance = credit - debit;
                   }
 
