@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, groupAccountId }) => {
@@ -12,6 +12,82 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
 
     const history = useHistory();
     const { groupId, grpSubId } = useParams();
+
+    // State for sorting
+    const [sortConfig, setSortConfig] = useState({ key: 'sno', direction: 'asc' });
+
+    // Function to handle column header click for sorting
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    // Sort icon component
+    const SortIcon = ({ columnKey }) => {
+        if (sortConfig.key !== columnKey) {
+            return <span className="ml-1 text-gray-400">⇅</span>;
+        }
+        return sortConfig.direction === 'asc' ?
+            <span className="ml-1 text-red-600">▲</span> :
+            <span className="ml-1 text-red-600">▼</span>;
+    };
+
+    // Memoized sorted group transactions
+    const sortedGroupTransactions = useMemo(() => {
+        if (!groupTransactionInfo || groupTransactionInfo.length === 0) {
+            return [];
+        }
+
+        const sorted = [...groupTransactionInfo].sort((a, b) => {
+            let aValue, bValue;
+
+            switch (sortConfig.key) {
+                case 'sno':
+                    aValue = a.sno || 0;
+                    bValue = b.sno || 0;
+                    break;
+                case 'date':
+                    aValue = new Date(a.date).getTime();
+                    bValue = new Date(b.date).getTime();
+                    break;
+                case 'auctionAmount':
+                    aValue = a.auctionAmount || 0;
+                    bValue = b.auctionAmount || 0;
+                    break;
+                case 'commision':
+                    aValue = a.commision || 0;
+                    bValue = b.commision || 0;
+                    break;
+                case 'reserve':
+                    aValue = a.reserve || 0;
+                    bValue = b.reserve || 0;
+                    break;
+                case 'customerDue':
+                    aValue = a.customerDue || 0;
+                    bValue = b.customerDue || 0;
+                    break;
+                case 'auctionStatus':
+                    aValue = a.auctionStatus || '';
+                    bValue = b.auctionStatus || '';
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+
+        return sorted;
+    }, [groupTransactionInfo, sortConfig]);
 
 
 
@@ -32,7 +108,7 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
     };
 
     const renderGroupAccounts = () => {
-        if (!groupTransactionInfo || groupTransactionInfo.length === 0) {
+        if (!sortedGroupTransactions || sortedGroupTransactions.length === 0) {
             return (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Group Accounts</h3>
@@ -47,7 +123,7 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
         return (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-3 sm:p-4">
-                    <h3 className="text-base sm:text-lg font-semibold">Group Accounts</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">Group Accounts (Click column headers to sort)</h3>
                 </div>
 
                 {/* Desktop Table View */}
@@ -55,19 +131,75 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S.No</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auction Amount</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('sno')}
+                                >
+                                    <div className="flex items-center">
+                                        S.No
+                                        <SortIcon columnKey="sno" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('date')}
+                                >
+                                    <div className="flex items-center">
+                                        Date
+                                        <SortIcon columnKey="date" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('auctionAmount')}
+                                >
+                                    <div className="flex items-center">
+                                        Auction Amount
+                                        <SortIcon columnKey="auctionAmount" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('commision')}
+                                >
+                                    <div className="flex items-center">
+                                        Commission
+                                        <SortIcon columnKey="commision" />
+                                    </div>
+                                </th>
                                 {groupDetails?.type === 'ACCUMULATIVE' && (
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reserve</th>
+                                    <th
+                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                        onClick={() => handleSort('reserve')}
+                                    >
+                                        <div className="flex items-center">
+                                            Reserve
+                                            <SortIcon columnKey="reserve" />
+                                        </div>
+                                    </th>
                                 )}
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('customerDue')}
+                                >
+                                    <div className="flex items-center">
+                                        Due
+                                        <SortIcon columnKey="customerDue" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('auctionStatus')}
+                                >
+                                    <div className="flex items-center">
+                                        Status
+                                        <SortIcon columnKey="auctionStatus" />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {groupTransactionInfo.map((transaction, index) => (
+                            {sortedGroupTransactions.map((transaction, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
@@ -107,7 +239,7 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
 
                 {/* Mobile Card View - Compact */}
                 <div className="md:hidden p-4 space-y-4">
-                    {groupTransactionInfo.map((transaction, index) => (
+                    {sortedGroupTransactions.map((transaction, index) => (
                         <div key={index} className="bg-white rounded-lg p-4 border border-gray-200 shadow-md">
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex items-center gap-2">
@@ -269,10 +401,10 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                     </div>
 
                     {/* Auction History */}
-                    {groupTransactionInfo && groupTransactionInfo.length > 0 && (
+                    {sortedGroupTransactions && sortedGroupTransactions.length > 0 && (
                         <div className="space-y-4">
                             <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-6 text-center">Auction History</h4>
-                            {groupTransactionInfo.map((transaction, index) => (
+                            {sortedGroupTransactions.map((transaction, index) => (
                                 <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 sm:p-6 border-l-4 border-green-500 shadow-md">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                                         <div>
