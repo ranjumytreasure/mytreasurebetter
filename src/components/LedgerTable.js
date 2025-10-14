@@ -35,7 +35,7 @@ const LedgerTable = () => {
         </thead>
         <tbody>
           {ledgerEntries.results.map((entry, index) => {
-            const date = new Date(entry.created_at);
+            const date = new Date(entry.transacted_date);
             const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 
             return (
