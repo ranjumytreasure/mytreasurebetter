@@ -163,7 +163,7 @@ const SubscriberLiveAuction = () => {
                 // Return to group details page after a short delay (like mobile app)
                 setTimeout(() => {
                     console.log('=== RETURNING TO GROUP DETAILS ===');
-                    history.push(`/customer/groups/${groupId}/${grpSubId}`);
+                    history.push(`/chit-fund/subscriber/groups/${groupId}/${grpSubId}`);
                 }, 2000); // 2 second delay to show the close message
             });
 
@@ -323,7 +323,7 @@ const SubscriberLiveAuction = () => {
             socket.emit('leaveAuction', groupAccountId);
             socket.disconnect();
         }
-        history.push(`/customer/groups/${groupId}/${grpSubId}`);
+        history.push(`/chit-fund/subscriber/groups/${groupId}/${grpSubId}`);
     };
 
     const formatCurrency = (amount) => {

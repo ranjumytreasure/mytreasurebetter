@@ -154,6 +154,16 @@ const Nav = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:block">
             <div className="ml-10 flex items-baseline space-x-8">
+              {/* Back to Hub Button */}
+              <Link
+                to="/app-selection"
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${scrolled
+                  ? 'text-white hover:text-red-100 hover:bg-white/10'
+                  : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                  }`}
+              >
+                🏠 Back to Hub
+              </Link>
               {isLoggedIn && hasPermission(userRole, 'viewHome') && (
                 <Link
                   to="/home"

@@ -17,7 +17,7 @@ const Finish = () => {
     const history = useHistory();
 
     const handleBackButtonClick = () => {
-        history.push('/home'); // Redirect to the home page
+        history.push('/chit-fund/user/home'); // Redirect to the home page
     };
 
     const handleMultiStepSubscriber = () => {

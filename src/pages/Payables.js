@@ -48,7 +48,7 @@ const Payables = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24">
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">

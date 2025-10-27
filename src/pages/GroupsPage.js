@@ -132,7 +132,7 @@ const GroupsPage = () => {
         if (groupId) {
             fetchGroups(groupId);
         }
-    }, [groupId]);
+    }, [groupId]); // Remove fetchGroups from dependencies to prevent infinite loop
 
     if (isLoading) {
         return (
@@ -146,7 +146,13 @@ const GroupsPage = () => {
     const hasData = data && Object.keys(data).length > 0;
 
     return (
-        <>
+        <div className="groups-page" style={{
+            padding: '20px',
+            paddingTop: '80px',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            minHeight: 'calc(100vh - 80px)'
+        }}>
             {hasData ? (
                 <>
                     <UserInfo data={data} />
@@ -158,7 +164,7 @@ const GroupsPage = () => {
                     No data available.
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

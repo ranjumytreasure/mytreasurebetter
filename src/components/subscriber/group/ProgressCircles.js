@@ -85,7 +85,7 @@ const ProgressCircles = ({ groupDetails, selectedCircle, onCircleClick, auctionS
     const handleCircleClick = (circleId) => {
         // If auction circle is clicked and auction is open, go directly to auction page
         if (circleId === 'auction' && auctionStatus === 'OPEN' && groupAccountId) {
-            history.push(`/customer/groups/${groupId}/${grpSubId}/auction`);
+            history.push(`/chit-fund/subscriber/groups/${groupId}/${grpSubId}/auction`);
             return;
         }
 

@@ -25,19 +25,22 @@ const styles = StyleSheet.create({
 
 
 
-const Mypdf = ({ tableData, tableHeaders, heading,  companyData = {} }) => {
-   
+const Mypdf = ({ tableData, tableHeaders, heading, companyData = {} }) => {
+    // Add safety checks for required props
+    const safeTableData = Array.isArray(tableData) ? tableData : [];
+    const safeTableHeaders = Array.isArray(tableHeaders) ? tableHeaders : [];
+    const safeHeading = heading || "Report";
+    const safeCompanyData = companyData || {};
 
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <PDFHeader  companyData={companyData}  />
+                <PDFHeader companyData={safeCompanyData} />
                 <View>
-
                     <PDFTable
-                        tableHeaders={tableHeaders}
-                        data={tableData}
-                        heading={heading}
+                        tableHeaders={safeTableHeaders}
+                        data={safeTableData}
+                        heading={safeHeading}
                     />
                 </View>
             </Page>

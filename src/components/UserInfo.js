@@ -25,69 +25,58 @@ const UserInfo = ({ data }) => {
   }, [data]);
 
 
-  const items = [
-    {
-      id: 1, icon: <GoRepo className='icon' />, label: 'Group Amount', value: `${groupName}:${amount}`, color: 'pink',
-    },
-
-    {
-      id: 2, icon: <FiUsers className='icon' />, label: 'Group Type', value: type, color: 'green',
-    },
-    //value: data.type
-    {
-      id: 3, icon: <FiUserPlus className='icon' />, label: 'Commision Type', value: commisionType, color: 'purple',
-    },
-    //value: data.commisionType
-    {
-      id: 4, icon: <GoArrowBoth className='icon' />, label: 'Comm Amount', value: commissionAmount, color: 'yellow',
-    },
-    //value: data.commissionAmount
-
-  ]
 
 
   return (
-    <section className="py-8 px-4 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-          {items.map((item) => {
-            return <Item key={item.id} {...item}></Item>
-          })}
+    <div className="bg-white border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        {/* Compact Group Header */}
+        <div className="mb-4">
+          <h1 className="text-xl font-bold text-gray-900">{groupName}</h1>
+        </div>
+
+        {/* Compact Metrics Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Group Amount */}
+          <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg p-3 border border-pink-200">
+            <div className="flex items-center gap-2 mb-1">
+              <GoRepo className="text-pink-600 text-sm" />
+              <span className="text-xs font-medium text-gray-600">Amount</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900">₹{amount?.toLocaleString()}</div>
+          </div>
+
+          {/* Group Type */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+            <div className="flex items-center gap-2 mb-1">
+              <FiUsers className="text-green-600 text-sm" />
+              <span className="text-xs font-medium text-gray-600">Type</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900 capitalize">{type}</div>
+          </div>
+
+          {/* Commission Type */}
+          <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-3 border border-purple-200">
+            <div className="flex items-center gap-2 mb-1">
+              <FiUserPlus className="text-purple-600 text-sm" />
+              <span className="text-xs font-medium text-gray-600">Commission</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900 capitalize">{commisionType}</div>
+          </div>
+
+          {/* Commission Amount */}
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-3 border border-amber-200">
+            <div className="flex items-center gap-2 mb-1">
+              <GoArrowBoth className="text-amber-600 text-sm" />
+              <span className="text-xs font-medium text-gray-600">Comm. Amount</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900">₹{commissionAmount?.toLocaleString()}</div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
-const Item = ({ icon, label, value, color }) => {
-  const getColorClasses = (color) => {
-    switch (color) {
-      case 'pink':
-        return 'bg-pink-100 text-pink-600';
-      case 'green':
-        return 'bg-green-100 text-green-600';
-      case 'purple':
-        return 'bg-purple-100 text-purple-600';
-      case 'yellow':
-        return 'bg-yellow-100 text-yellow-600';
-      default:
-        return 'bg-gray-100 text-gray-600';
-    }
-  };
-
-  return (
-    <article className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-      <div className="flex items-center gap-4">
-        <span className={`w-12 h-12 rounded-full flex items-center justify-center ${getColorClasses(color)}`}>
-          <span className="text-xl">{icon}</span>
-        </span>
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">{value}</h3>
-          <p className="text-sm text-gray-600 capitalize">{label}</p>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 export default UserInfo;

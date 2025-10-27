@@ -62,7 +62,7 @@ const GroupStepForm = () => {
 
     // Handle back to home navigation
     const handleBackToHome = () => {
-        history.push('/home');
+        history.push('/chit-fund/user/home');
     };
 
     const groupDetails = {
@@ -104,7 +104,7 @@ const GroupStepForm = () => {
 
     return (
         <AppContext.Provider value={{ groupDetails }}>
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-4">
                 <div className="flex flex-col items-center p-4 max-w-6xl mx-auto">
                     {/* Back to Home Button */}
                     <div className="w-full max-w-4xl mb-4">

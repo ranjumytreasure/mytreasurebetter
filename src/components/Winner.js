@@ -56,20 +56,20 @@ const Winner = ({ location }) => {
     }, [imageUrl]);
 
     const handleContinueClick = () => {
-        history.push('/home');
+        history.push('/chit-fund/user/home');
     };
 
     const handleBackToGroup = () => {
         if (groupId && groupId !== 'undefined') {
-            history.push(`/groups/${groupId}`);
+            history.push(`/chit-fund/user/groups/${groupId}`);
         } else {
-            history.push('/home');
+            history.push('/chit-fund/user/home');
         }
     };
 
     const handlePayNow = () => {
         // Redirect to payables page
-        history.push('/payables');
+        history.push('/chit-fund/user/payables');
     };
 
     const fetchCompanyLogoUrl = async (logoKey) => {

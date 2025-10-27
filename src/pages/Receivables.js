@@ -104,7 +104,16 @@ const Receivable = () => {
     let totalCredit = 0;
     let totalDebit = 0;
 
-    const transactionsWithBalance = transactions.map(tx => {
+    // Debug: Log original transaction order
+    console.log('🔍 Receivables - Original transactions from backend (chronological order):', transactions);
+
+    // Backend sends data in chronological order (oldest first), so we can use it directly
+    const chronologicalTransactions = [...transactions];
+
+    console.log('🔍 Receivables - Using chronological order for calculation:', chronologicalTransactions);
+
+    // Calculate running balance in chronological order and store with each transaction
+    const transactionsWithBalance = chronologicalTransactions.map((tx, index) => {
       const amount = parseFloat(tx.amount) || 0;
       if (tx.type === 'CREDIT') {
         runningBalance += amount;
@@ -113,14 +122,23 @@ const Receivable = () => {
         runningBalance -= amount;
         totalDebit += amount;
       }
+
+      console.log(`🔍 Receivables - Transaction ${index + 1}: ${tx.type} ₹${amount} → Running Balance: ₹${runningBalance}`);
+
       return {
         ...tx,
-        runningBalance: runningBalance
+        runningBalance: runningBalance,
+        chronologicalIndex: index
       };
     });
 
+    // Reverse for display (newest first) while preserving running balance
+    const displayTransactions = transactionsWithBalance.reverse();
+
+    console.log('🔍 Receivables - Final display transactions (newest first):', displayTransactions);
+
     return {
-      transactions: transactionsWithBalance,
+      transactions: displayTransactions,
       totalCredit,
       totalDebit,
       currentBalance: runningBalance
@@ -128,7 +146,7 @@ const Receivable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 pt-24">
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">

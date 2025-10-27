@@ -255,7 +255,7 @@ const NewGroups = ({ groups, selectedTab, refreshGroups }) => {
     : [];
 
   const handleStartAuction = (groupId) => {
-    history.push(`/addgroupsubscriber/${groupId}`);
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}`);
   };
 
   const handleDeleteGroup = async (id) => {
@@ -346,20 +346,20 @@ const NewGroups = ({ groups, selectedTab, refreshGroups }) => {
                 </div>
 
                 {/* Action buttons */}
-               <div className="group-actions">
-  <button
-    className="group-button"
-    onClick={() => handleStartAuction(group.id)}
-  >
-    Add Subscribers
-  </button>
-  <button
-    className="delete-button"
-    onClick={() => handleDeleteGroup(group.id)}
-  >
-    🗑
-  </button>
-</div>
+                <div className="group-actions">
+                  <button
+                    className="group-button"
+                    onClick={() => handleStartAuction(group.id)}
+                  >
+                    Add Subscribers
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDeleteGroup(group.id)}
+                  >
+                    🗑
+                  </button>
+                </div>
 
               </div>
             ))

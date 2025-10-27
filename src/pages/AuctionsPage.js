@@ -166,7 +166,9 @@ const AuctionsPage = () => {
         socket.on("closeGroup", (winningSub) => {
             console.log(winningSub);
             socket.emit("leaveGroup", winningSub.winnerObject.groupRoomIdentifier);
-            history.push(`/groups/${winningSub.winnerObject.groupId}/auctions/winner/${winningSub.winnerObject.winnerAmount}/winner`, {
+            // Use the groupId from URL params instead of winningSub.winnerObject.groupId
+            const currentGroupId = groupId || winningSub.winnerObject.groupId;
+            history.push(`/chit-fund/user/groups/${currentGroupId}/auctions/winner/${winningSub.winnerObject.winnerAmount}/winner`, {
                 winningSub: winningSub
             });
         });
@@ -300,7 +302,7 @@ const AuctionsPage = () => {
 
     const handleBackButtonClick = () => {
         socket.emit("leaveGroup", groupId);
-        history.push(`/groups/${groupId}`);
+        history.push(`/chit-fund/user/groups/${groupId}`);
     };
 
     const closeSubscriberList = () => {

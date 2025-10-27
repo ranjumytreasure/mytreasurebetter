@@ -28,6 +28,7 @@ import Ledger from './Ledger'
 import ProductsPage from './ProductsPage'
 import MyBillingPage from './MyBillingPage'
 import SubscriberPasswordUpdate from './SubscriberPasswordUpdate'
+import AppSelectionPage from './AppSelectionPage'
 
 
 export {
@@ -57,6 +58,7 @@ export {
     Ledger,
     ProductsPage,
     MyBillingPage,
-    SubscriberPasswordUpdate
+    SubscriberPasswordUpdate,
+    AppSelectionPage
 
 }

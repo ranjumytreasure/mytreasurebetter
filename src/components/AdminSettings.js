@@ -23,8 +23,6 @@ function AdminSettings() {
   const { isLoggedIn, user, login } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);
 
-
-
   const [selectedMenu, setSelectedMenu] = useState('settings');
 
   const handleMenuClick = (menu) => {

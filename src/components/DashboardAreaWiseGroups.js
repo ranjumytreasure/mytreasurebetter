@@ -36,33 +36,64 @@ const DashboardAreaWiseGroups = () => {
   const [showSubscriberWise, setShowSubscriberWise] = useState(false);
 
   return (
-    <SectionWrapper className="section">
-      <div className="accordion-wrapper">
-        <div className="accordion-section">
-          <div className="accordion-header" onClick={() => setShowAreaWise(!showAreaWise)}>
-            <h3>📍 Area Wise Receivables</h3>
-            <span>{showAreaWise ? '−' : '+'}</span>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+        <h2 className="text-xl font-semibold text-white">Detailed Analytics</h2>
+        <p className="text-blue-100 text-sm">Area-wise and subscriber-wise receivables breakdown</p>
+      </div>
+      
+      <div className="p-6">
+        <div className="space-y-4">
+          {/* Area Wise Receivables */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <button 
+              className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between text-left"
+              onClick={() => setShowAreaWise(!showAreaWise)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600 text-lg">📍</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Area Wise Receivables</h3>
+                  <p className="text-sm text-gray-600">Breakdown by geographical areas</p>
+                </div>
+              </div>
+              <span className="text-gray-400 text-xl">{showAreaWise ? '−' : '+'}</span>
+            </button>
+            {showAreaWise && (
+              <div className="border-t border-gray-200 p-6 bg-white">
+                <DashboardAreaWiseAccounts />
+              </div>
+            )}
           </div>
-          {showAreaWise && (
-            <div className="accordion-body">
-              <DashboardAreaWiseAccounts />
-            </div>
-          )}
-        </div>
 
-        <div className="accordion-section">
-          <div className="accordion-header" onClick={() => setShowSubscriberWise(!showSubscriberWise)}>
-            <h3>👤 Subscriber Groupwise Receivables</h3>
-            <span>{showSubscriberWise ? '−' : '+'}</span>
+          {/* Subscriber Group Wise Receivables */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <button 
+              className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between text-left"
+              onClick={() => setShowSubscriberWise(!showSubscriberWise)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <span className="text-green-600 text-lg">👥</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Subscriber Group Wise Receivables</h3>
+                  <p className="text-sm text-gray-600">Breakdown by subscriber groups</p>
+                </div>
+              </div>
+              <span className="text-gray-400 text-xl">{showSubscriberWise ? '−' : '+'}</span>
+            </button>
+            {showSubscriberWise && (
+              <div className="border-t border-gray-200 p-6 bg-white">
+                <DashboardSubscriberGroupWiseAccounts />
+              </div>
+            )}
           </div>
-          {showSubscriberWise && (
-            <div className="accordion-body">
-              <DashboardSubscriberGroupWiseAccounts />
-            </div>
-          )}
         </div>
       </div>
-    </SectionWrapper>
+    </div>
   );
 };
 

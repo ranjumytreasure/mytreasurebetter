@@ -275,7 +275,7 @@ const AddCompanySubcriber = () => {
         setShowList(!showList);
     };
     const handleBackButtonClick = () => {
-        history.push('/home'); // Replace '/' with the actual URL of your home page
+        history.push('/chit-fund/user/home'); // Replace '/' with the actual URL of your home page
     };
     const imgStyles = {
 

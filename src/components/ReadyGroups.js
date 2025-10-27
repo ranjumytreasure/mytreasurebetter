@@ -200,7 +200,7 @@ const ReadyGroups = ({ groups, selectedTab }) => {
     };
 
     const handleStartAuction = (groupId) => {
-        history.push(`/groups/${groupId}`);
+        history.push(`/chit-fund/user/groups/${groupId}`);
     };
 
     return (

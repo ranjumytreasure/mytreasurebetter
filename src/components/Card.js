@@ -36,7 +36,7 @@
 
 //   const { avatar_url, name, company, location, city, state, email, bio } = userd;
 
-//   const handleStartCompany = () => history.push('/company');
+//   const handleStartCompany = () => history.push('/chit-fund/user/companies');
 
 //   return (
 //     <Wrapper>
@@ -273,7 +273,7 @@ const Card = () => {
 
   const { avatar_url, name, company, location, city, state, email, bio } = userd;
 
-  const handleStartCompany = () => history.push('/company');
+  const handleStartCompany = () => history.push('/chit-fund/user/companies');
 
   const handleImageError = () => {
     console.log('Company logo failed to load, using default logo');

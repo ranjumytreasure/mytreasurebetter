@@ -305,7 +305,7 @@ function AddSubcriber() {
     setShowList(!showList);
   };
   const handleBackButtonClick = () => {
-    history.push(`/addgroupsubscriber/${groupId}`); // Use backticks (`) for template literals
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}`); // Use backticks (`) for template literals
   };
   const handleImageUpdate = async () => {
     if (!selectedImage) {
@@ -463,10 +463,10 @@ function AddSubcriber() {
               {alert.show && (
                 <div className="pt-2">
                   <div className={`p-4 rounded-lg border ${alert.type === 'success'
-                      ? 'bg-green-50 border-green-200 text-green-800'
-                      : alert.type === 'danger'
-                        ? 'bg-red-50 border-red-200 text-red-800'
-                        : 'bg-blue-50 border-blue-200 text-blue-800'
+                    ? 'bg-green-50 border-green-200 text-green-800'
+                    : alert.type === 'danger'
+                      ? 'bg-red-50 border-red-200 text-red-800'
+                      : 'bg-blue-50 border-blue-200 text-blue-800'
                     }`}>
                     <div className="flex items-center gap-2">
                       {alert.type === 'success' && (

@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaUsers, FaUserPlus, FaDollarSign, FaArrowRight } from "react-icons/fa";
+import { FaUsers, FaUserPlus, FaDollarSign, FaArrowRight, FaMotorcycle, FaCoins, FaChartLine } from "react-icons/fa";
 
 const FeaturedProducts = () => {
-    const steps = [
+    const financeApps = [
         {
             id: 1,
-            title: "Start a Group",
-            description: "Transform Your Financial Landscape: Launch Your Group Now!",
+            title: "Chit Fund Management",
+            description: "Complete chit fund management with group creation, subscriber management, auction handling, and automated payments.",
             icon: (
                 <div className="relative">
                     <svg className="w-32 h-32 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 134 132" fill="none">
@@ -28,8 +28,8 @@ const FeaturedProducts = () => {
         },
         {
             id: 2,
-            title: "Add Subscribers",
-            description: "Time to welcome subscribers! Invite friends, family, and peers to join your financial circle. The more subscribers, the greater the potential rewards.",
+            title: "Daily Collection",
+            description: "Streamline your daily collection processes with automated tracking, payment reminders, and comprehensive reporting.",
             icon: (
                 <div className="relative">
                     <svg className="w-32 h-32 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 134 119" fill="none">
@@ -37,11 +37,11 @@ const FeaturedProducts = () => {
                             fillRule="evenodd"
                             clipRule="evenodd"
                             d="M29.0752 14.4541C34.1047 9.42459 45.4206 4.2086 47.8569 3.72102C48.9163 3.50922 51.159 3.05092 53.4319 2.58646C55.73 2.11683 58.059 1.6409 59.2266 1.40714C66.3696 -0.0212925 74.9534 -0.607963 82.1306 0.827486C84.0076 1.20295 85.8636 1.50794 87.6972 1.80925C94.1614 2.87151 100.347 3.88804 106.194 7.78552C113.566 12.7007 116.47 18.9336 119.788 26.0558C120.533 27.6537 121.298 29.2964 122.139 30.979C133.554 53.8081 141.529 92.1065 117.5 110.128C110.668 115.251 103.064 115.373 95.3929 115.496C91.7346 115.555 88.0614 115.614 84.45 116.216C71.882 118.31 55.5826 119.13 42.701 117.376C32.2854 115.957 18.1931 105.685 7.91088 93.8922C4.33969 89.7959 2.37758 81.9228 1.09271 76.7672C1.04518 76.5765 0.998573 76.3895 0.952846 76.2065C-4.4691 54.5195 14.3712 29.1573 29.0752 14.4541Z"
-                            fill="#DE1738"
+                            fill="#2563EB"
                         />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <FaUserPlus className="w-8 h-8 text-white" />
+                        <FaCoins className="w-8 h-8 text-white" />
                     </div>
                 </div>
             ),
@@ -50,8 +50,8 @@ const FeaturedProducts = () => {
         },
         {
             id: 3,
-            title: "Earn Money",
-            description: "Monetize Your Chit Group turn Collaboration into Earnings",
+            title: "Two Wheeler Loan",
+            description: "Comprehensive two-wheeler loan management with EMI tracking, payment schedules, and customer management.",
             icon: (
                 <div className="relative">
                     <svg className="w-32 h-32 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133 116" fill="none">
@@ -59,11 +59,11 @@ const FeaturedProducts = () => {
                             fillRule="evenodd"
                             clipRule="evenodd"
                             d="M7.50597 1.58869C5.90452 2.17401 3.03696 13.8994 2.48267 19.1791C1.50429 28.51 1.66798 33.8043 1.14392 41.1444C-0.0642702 58.0695 1.39497 75.4446 1.87831 92.469C1.95912 95.3154 1.32721 107.186 3.31309 109.062C7.3712 112.896 31.9019 100.38 37.5 101.018C55.5476 103.075 59.7315 116.138 77.9871 115.62C89.0199 115.306 100.321 116.464 111.24 115.158C115.57 114.64 120.825 113.945 123.89 110.701C125.388 109.115 125.159 103.017 125.302 101.018C126.049 90.5521 126.916 80.019 128.508 69.5894C130.539 56.2808 130.599 42.611 131.702 29.2418C132.172 23.5302 133.651 13.9471 130.88 8.77523C129.881 6.91187 126.505 7.01367 124.796 6.77813C116.52 5.63894 72.9055 19.5406 64.5 19.1791C39.5635 18.1084 49.5749 2.49796 24.8183 0.456199C20.18 0.074057 11.7503 0.0389955 7.50597 1.58869Z"
-                            fill="#DE1738"
+                            fill="#059669"
                         />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <FaDollarSign className="w-8 h-8 text-white" />
+                        <FaMotorcycle className="w-8 h-8 text-white" />
                     </div>
                 </div>
             ),
@@ -78,40 +78,43 @@ const FeaturedProducts = () => {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        How it works - just 3 steps away
+                        Our Finance Management Solutions
                     </h2>
+                    <p className="text-lg text-gray-600 mb-4">
+                        Comprehensive tools for all your financial business needs
+                    </p>
                     <div className="w-24 h-1 bg-red-600 mx-auto rounded-full"></div>
                 </div>
 
-                {/* Steps Grid */}
+                {/* Finance Apps Grid */}
                 <div className="grid md:grid-cols-3 gap-8 mb-16">
-                    {steps.map((step, index) => (
-                        <div key={step.id} className="relative">
-                            {/* Step Card */}
-                            <div className={`${step.bgColor} ${step.borderColor} border-2 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2`}>
-                                {/* Step Number */}
+                    {financeApps.map((app, index) => (
+                        <div key={app.id} className="relative">
+                            {/* App Card */}
+                            <div className={`${app.bgColor} ${app.borderColor} border-2 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2`}>
+                                {/* App Number */}
                                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                                     <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                        {step.id}
+                                        {app.id}
                                     </div>
                                 </div>
 
                                 {/* Icon */}
                                 <div className="mb-6">
-                                    {step.icon}
+                                    {app.icon}
                                 </div>
 
                                 {/* Content */}
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                    {step.title}
+                                    {app.title}
                                 </h3>
                                 <p className="text-gray-600 leading-relaxed">
-                                    {step.description}
+                                    {app.description}
                                 </p>
                             </div>
 
-                            {/* Arrow (except for last step) */}
-                            {index < steps.length - 1 && (
+                            {/* Arrow (except for last app) */}
+                            {index < financeApps.length - 1 && (
                                 <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
                                     <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center">
                                         <FaArrowRight className="w-4 h-4" />

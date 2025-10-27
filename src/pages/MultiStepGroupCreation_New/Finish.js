@@ -13,7 +13,7 @@ export default function Finish() {
   const groupId = updateContext.groupId;
 
   const handleBackButtonClick = () => {
-    history.push("/home");
+    history.push("/chit-fund/user/home");
   };
 
   return (

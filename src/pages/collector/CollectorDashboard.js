@@ -150,7 +150,7 @@ const CollectorDashboard = () => {
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Link
-                            to="/collector/receivables"
+                            to="/chit-fund/collector/receivables"
                             className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 flex items-center"
                         >
                             <div className="p-3 rounded-full bg-red-100">
@@ -253,7 +253,7 @@ const CollectorDashboard = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <Link
-                                                        to="/collector/receivables"
+                                                        to="/chit-fund/collector/receivables"
                                                         className="text-red-600 hover:text-red-900"
                                                     >
                                                         View Details

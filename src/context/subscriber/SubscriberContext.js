@@ -143,7 +143,13 @@ export const SubscriberProvider = ({ children }) => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/subscribers/groups/${groupId}/${grpSubId}`, {
+            const apiUrl = `${API_BASE_URL}/subscribers/groups/${groupId}/${grpSubId}`;
+            console.log('🔍 ===== API CALL DEBUGGING =====');
+            console.log('🔍 API URL:', apiUrl);
+            console.log('🔍 Group ID:', groupId);
+            console.log('🔍 Group Subscriber ID:', grpSubId);
+
+            const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -152,7 +158,17 @@ export const SubscriberProvider = ({ children }) => {
             });
 
             const data = await response.json();
+            console.log('🔍 API Response:', data);
+            console.log('🔍 API Response Results:', data.results);
 
+            if (data.results && data.results.outstandingAdvanceTransactionInfo) {
+                console.log('🔍 Outstanding Advance Transaction Info:', data.results.outstandingAdvanceTransactionInfo);
+                console.log('🔍 Outstanding Advance Transaction Info Length:', data.results.outstandingAdvanceTransactionInfo.length);
+                if (data.results.outstandingAdvanceTransactionInfo.length > 0) {
+                    console.log('🔍 First Transaction Sample:', data.results.outstandingAdvanceTransactionInfo[0]);
+                    console.log('🔍 First Transaction Keys:', Object.keys(data.results.outstandingAdvanceTransactionInfo[0] || {}));
+                }
+            }
 
             if (data.error === false) {
                 setGroupDetails(data.results);

@@ -5,7 +5,7 @@ const RecentTransactions = ({ transactions, loading }) => {
     const history = useHistory();
 
     const handleViewAll = () => {
-        history.push('/customer/transactions');
+        history.push('/chit-fund/subscriber/transactions');
     };
 
     const formatAmount = (amount) => {
@@ -90,8 +90,14 @@ const RecentTransactions = ({ transactions, loading }) => {
                 {transactions.slice(0, 5).map((transaction, index) => (
                     <div key={transaction.id || index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex-shrink-0">
-                            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-sm">
-                                {getPaymentMethodIcon(transaction.payment_method)}
+                            {/* Up Arrow (Green) for Money Came In, Down Arrow (Red) for Money Gone Out */}
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${transaction.arrow === 'UP'
+                                ? 'bg-green-500'
+                                : 'bg-red-500'
+                                }`}>
+                                <span className={`text-sm font-bold text-white`}>
+                                    {transaction.arrow === 'UP' ? '↑' : '↓'}
+                                </span>
                             </div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -113,18 +119,19 @@ const RecentTransactions = ({ transactions, loading }) => {
                                     <span className="mr-1">🏷️</span>
                                     {transaction.payment_type}
                                 </span>
+                                {transaction.group_name && (
+                                    <span className="flex items-center">
+                                        <span className="mr-1">👥</span>
+                                        {transaction.group_name}
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
                             <div className="text-right">
-                                <p className={`text-sm font-bold ${transaction.payment_method === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {transaction.payment_method === 'credit' ? '+' : '-'}{formatAmount(transaction.payment_amount)}
+                                <p className={`text-sm font-bold ${transaction.arrow === 'UP' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {transaction.arrow === 'UP' ? '+' : '-'}{formatAmount(transaction.payment_amount)}
                                 </p>
-                            </div>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${transaction.payment_method === 'credit' ? 'bg-green-100' : 'bg-red-100'}`}>
-                                <span className={`text-xs ${transaction.payment_method === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {transaction.payment_method === 'credit' ? '↗️' : '↘️'}
-                                </span>
                             </div>
                         </div>
                     </div>

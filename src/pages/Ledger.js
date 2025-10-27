@@ -40,7 +40,11 @@ const LedgerPage = () => {
 
   // On mount, inject mock entries
   useEffect(() => {
-    setEntries(ledgerEntries);
+
+    // Ensure we always set an array
+    const safeEntries = Array.isArray(ledgerEntries) ? ledgerEntries :
+      (ledgerEntries?.results && Array.isArray(ledgerEntries.results)) ? ledgerEntries.results : [];
+    setEntries(safeEntries);
   }, [ledgerEntries]);
 
   useEffect(() => {
@@ -88,8 +92,6 @@ const LedgerPage = () => {
     a.download = "ledger.csv";
     a.click();
   };
-
-
 
   return (
     <div className={`ledger-page ${showModal || showAccountModal ? "blurred" : ""}`}>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLedgerEntryContext } from "../context/ledgerEntry_context";
 
-const LedgerTable = () => {
+const LedgerTable = ({ entries: propEntries }) => {
   const {
     ledgerEntries,
     isLoading,
@@ -12,13 +12,29 @@ const LedgerTable = () => {
     setLimit,
   } = useLedgerEntryContext();
 
-  const totalCredit = ledgerEntries.results
-    .filter((entry) => entry.entry_type === "CREDIT")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+  // Use prop entries if provided, otherwise use context entries
+  const contextEntries = Array.isArray(ledgerEntries) ? ledgerEntries : (ledgerEntries?.results || []);
+  const rawEntries = propEntries || contextEntries;
 
-  const totalDebit = ledgerEntries.results
+  // Ensure entries is always an array
+  const entries = Array.isArray(rawEntries) ? rawEntries : [];
+
+
+  const totalCredit = entries
+    .filter((entry) => entry.entry_type === "CREDIT")
+    .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+
+  const totalDebit = entries
     .filter((entry) => entry.entry_type === "DEBIT")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+
+  if (isLoading) {
+    return <div>Loading ledger entries...</div>;
+  }
+
+  if (!entries || entries.length === 0) {
+    return <div>No ledger entries found.</div>;
+  }
 
   return (
     <div>
@@ -34,7 +50,7 @@ const LedgerTable = () => {
           </tr>
         </thead>
         <tbody>
-          {ledgerEntries.results.map((entry, index) => {
+          {entries.map((entry, index) => {
             const date = new Date(entry.transacted_date);
             const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 

@@ -6,13 +6,13 @@ const Popup = ({ text, closePopup, groupId, noofCompanySubscriber, noofSubscribe
   // export const Popup = ({ text, closePopup }) => {
   const handleAddNewClick = () => {
     // Navigate to the specific URL when "Add New" is clicked
-    history.push(`/addgroupsubscriber/${groupId}/addnew`);
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}/addnew`);
     // Close the popup
     closePopup();
   };
   const handleCompanySubscriberClick = () => {
     // Navigate to the Company Subscribers page when the button is clicked
-    history.push(`/addgroupsubscriber/${groupId}/addcompanysubcriber`);
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}/addcompanysubcriber`);
     // history.push(`/subscribers`); // Replace with the actual URL
     closePopup();
   };

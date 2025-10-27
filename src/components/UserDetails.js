@@ -37,7 +37,7 @@ const Container = styled.div`
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   max-width: 1200px;
-  margin: 1rem auto;
+  margin: 3rem auto 1rem auto;
   position: relative;
   padding-top: .5rem; /* space for button */
 `;
@@ -75,18 +75,29 @@ const Content = styled.div`
 
 const InnerContent = styled.div`
   padding: 1.5rem; /* padding inside the white card */
-  display: grid;
-  gap: 2rem; /* space between card & followers */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* space between card & highlights */
   
   @media (min-width: 992px) {
-    grid-template-columns: 0.3fr 0.7fr;
+    flex-direction: row;
+    align-items: flex-start;
   }
 `;
 
 const CardWrapper = styled.div`
   margin-bottom: 1rem;
+  
+  @media (min-width: 992px) {
+    flex: 0 0 300px; /* Fixed width for card */
+    margin-bottom: 0;
+  }
 `;
 
-const HighlightsWrapper = styled.div``;
+const HighlightsWrapper = styled.div`
+  @media (min-width: 992px) {
+    flex: 1; /* Take remaining space */
+  }
+`;
 
 

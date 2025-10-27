@@ -816,15 +816,60 @@ const SubscriberProfile = () => {
         {/* Sidebar Menu */}
         <h2 className="sidebar-title">Sections</h2>
         <ul className="sidebar-nav">
-          <li onClick={() => setVisibleSection('metrics')}>Dashboard</li>
-          <li onClick={() => setVisibleSection('personal')}>Profile</li>
-          <li onClick={() => setVisibleSection('address')}>Address</li>
-          <li onClick={() => setVisibleSection('region')}>Region</li>
-          <li onClick={() => setVisibleSection('bank')}>Bank Info</li>
-          <li onClick={() => setVisibleSection('finance')}>Finance</li>
-          <li onClick={() => setVisibleSection('nominee')}>Nominee</li>
-          <li onClick={() => setVisibleSection('business')}>Business</li>
-          <li onClick={() => setVisibleSection('dependents')}>Dependents</li>
+          <li
+            className={visibleSection === 'metrics' ? 'active' : ''}
+            onClick={() => setVisibleSection('metrics')}
+          >
+            Dashboard
+          </li>
+          <li
+            className={visibleSection === 'personal' ? 'active' : ''}
+            onClick={() => setVisibleSection('personal')}
+          >
+            Profile
+          </li>
+          <li
+            className={visibleSection === 'address' ? 'active' : ''}
+            onClick={() => setVisibleSection('address')}
+          >
+            Address
+          </li>
+          <li
+            className={visibleSection === 'region' ? 'active' : ''}
+            onClick={() => setVisibleSection('region')}
+          >
+            Region
+          </li>
+          <li
+            className={visibleSection === 'bank' ? 'active' : ''}
+            onClick={() => setVisibleSection('bank')}
+          >
+            Bank Info
+          </li>
+          <li
+            className={visibleSection === 'finance' ? 'active' : ''}
+            onClick={() => setVisibleSection('finance')}
+          >
+            Finance
+          </li>
+          <li
+            className={visibleSection === 'nominee' ? 'active' : ''}
+            onClick={() => setVisibleSection('nominee')}
+          >
+            Nominee
+          </li>
+          <li
+            className={visibleSection === 'business' ? 'active' : ''}
+            onClick={() => setVisibleSection('business')}
+          >
+            Business
+          </li>
+          <li
+            className={visibleSection === 'dependents' ? 'active' : ''}
+            onClick={() => setVisibleSection('dependents')}
+          >
+            Dependents
+          </li>
           <li onClick={() => history.push(`/subscriber/${subscriberId}/update-password`)} className="change-password-link">Change Password</li>
         </ul>
       </div>

@@ -191,7 +191,7 @@ const CartButtons = ({ scrolled }) => {
                                             {hasPermission(userRole, 'viewPersonalSettings') && (
                                                 <li>
                                                     <Link
-                                                        to="/personal-settings"
+                                                        to="/chit-fund/user/personalsettings"
                                                         onClick={closeSidebar}
                                                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
                                                     >
@@ -251,7 +251,7 @@ const CartButtons = ({ scrolled }) => {
                                             {hasPermission(userRole, 'viewAdminSettings') && (
                                                 <li>
                                                     <Link
-                                                        to="/admin-settings"
+                                                        to="/chit-fund/user/adminsettings"
                                                         onClick={closeSidebar}
                                                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
                                                     >

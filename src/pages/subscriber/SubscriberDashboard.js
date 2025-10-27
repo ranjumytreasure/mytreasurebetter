@@ -81,7 +81,7 @@ const SubscriberDashboard = () => {
                                     </p>
                                 </div>
                                 <button
-                                    onClick={() => window.location.href = '/customer/groups'}
+                                    onClick={() => window.location.href = '/chit-fund/subscriber/groups'}
                                     className="text-red-600 hover:text-red-800 font-semibold flex items-center space-x-2 transition-colors duration-200"
                                 >
                                     <span>View All</span>

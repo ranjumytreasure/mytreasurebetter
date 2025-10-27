@@ -16,7 +16,7 @@ const CollectorLogin = () => {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            history.push('/collector/receivables');
+            history.push('/chit-fund/collector/receivables');
         }
     }, [isAuthenticated, history]);
 
@@ -62,7 +62,7 @@ const CollectorLogin = () => {
 
         const result = await login(formData);
         if (result.success) {
-            history.push('/collector/receivables');
+            history.push('/chit-fund/collector/receivables');
         }
     };
 

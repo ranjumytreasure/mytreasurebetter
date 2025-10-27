@@ -48,6 +48,97 @@
 /* Home Page Container */
 .home-page {
   padding: 1rem;
+}
+
+/* Hub Navigation */
+.hub-navigation {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+}
+
+.hub-navigation .flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hub-navigation .mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.hub-navigation .text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.hub-navigation .font-bold {
+  font-weight: 700;
+}
+
+.hub-navigation .text-gray-900 {
+  color: #111827;
+}
+
+.hub-navigation .text-gray-600 {
+  color: #4b5563;
+}
+
+.hub-navigation .px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.hub-navigation .py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.hub-navigation .bg-blue-600 {
+  background-color: #2563eb;
+}
+
+.hub-navigation .text-white {
+  color: white;
+}
+
+.hub-navigation .rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.hub-navigation .font-medium {
+  font-weight: 500;
+}
+
+.hub-navigation .hover\:bg-blue-700:hover {
+  background-color: #1d4ed8;
+}
+
+.hub-navigation .transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.hub-navigation .duration-200 {
+  transition-duration: 200ms;
+}
+
+.hub-navigation .flex {
+  display: flex;
+}
+
+.hub-navigation .items-center {
+  align-items: center;
+}
+
+.hub-navigation .gap-2 {
+  gap: 0.5rem;
+}
+
+/* Home page base styling */
+.home-page {
   background-color: #f8f9fa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

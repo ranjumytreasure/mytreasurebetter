@@ -80,7 +80,7 @@ export const GroupDetailsProvider = ({ children }) => {
     initialState
   );
 
-  const fetchGroups = async (groupId) => {
+  const fetchGroups = React.useCallback(async (groupId) => {
     if (!user?.results?.token || !groupId) return;
 
     dispatch({ type: "FETCH_START" });
@@ -91,13 +91,19 @@ export const GroupDetailsProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-      if (!res.ok) throw new Error("Failed to fetch groups");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to fetch groups: ${res.status} ${errorText}`);
+      }
+
       const data = await res.json();
       dispatch({ type: "FETCH_SUCCESS", payload: data });
     } catch (error) {
+      console.error("Error fetching groups:", error);
       dispatch({ type: "FETCH_ERROR", payload: error.message });
     }
-  };
+  }, [user?.results?.token]);
 
   const fetchSubscribers = async (groupId) => {
     if (!user?.results?.token || !groupId) return;
@@ -363,19 +369,19 @@ export const GroupDetailsProvider = ({ children }) => {
   };
 
 
+  const contextValue = React.useMemo(() => ({
+    ...state,
+    fetchGroups,
+    fetchSubscribers,
+    deleteGroupSubscriberbyCompositekey,
+    deleteGroupSubscriber,
+    checkDeletionScenario,
+    deleteGroupSubscriberWithScenario,
+    replaceGroupSubscriber
+  }), [state, fetchGroups, fetchSubscribers, deleteGroupSubscriberbyCompositekey, deleteGroupSubscriber, checkDeletionScenario, deleteGroupSubscriberWithScenario, replaceGroupSubscriber]);
+
   return (
-    <GroupDetailsContext.Provider
-      value={{
-        ...state,
-        fetchGroups,
-        fetchSubscribers,
-        deleteGroupSubscriberbyCompositekey,
-        deleteGroupSubscriber,
-        checkDeletionScenario,
-        deleteGroupSubscriberWithScenario,
-        replaceGroupSubscriber
-      }}
-    >
+    <GroupDetailsContext.Provider value={contextValue}>
       {children}
     </GroupDetailsContext.Provider>
   );

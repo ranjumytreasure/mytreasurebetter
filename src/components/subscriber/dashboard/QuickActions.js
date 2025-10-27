@@ -9,21 +9,21 @@ const QuickActions = () => {
             id: 'groups',
             label: 'View All Groups',
             icon: '👥',
-            action: () => history.push('/customer/groups'),
+            action: () => history.push('/chit-fund/subscriber/groups'),
             color: '#4CAF50'
         },
         {
             id: 'transactions',
             label: 'Transaction History',
             icon: '💳',
-            action: () => history.push('/customer/transactions'),
+            action: () => history.push('/chit-fund/subscriber/transactions'),
             color: '#2196F3'
         },
         {
             id: 'profile',
             label: 'Update Profile',
             icon: '👤',
-            action: () => history.push('/customer/profile'),
+            action: () => history.push('/chit-fund/subscriber/profile'),
             color: '#FF9800'
         },
         {

@@ -15,25 +15,25 @@ const SubscriberHeader = () => {
         {
             id: 'groups',
             label: t('my_groups'),
-            path: '/customer/groups',
+            path: '/chit-fund/subscriber/groups',
             icon: '👥'
         },
         {
             id: 'transactions',
             label: t('transactions'),
-            path: '/customer/transactions',
+            path: '/chit-fund/subscriber/transactions',
             icon: '💳'
         },
         {
             id: 'dashboard',
             label: t('dashboard'),
-            path: '/customer/dashboard',
+            path: '/chit-fund/subscriber/dashboard',
             icon: '📊'
         },
         {
             id: 'profile',
             label: t('profile'),
-            path: '/customer/profile',
+            path: '/chit-fund/subscriber/profile',
             icon: '👤'
         }
     ];
@@ -45,7 +45,7 @@ const SubscriberHeader = () => {
 
     const handleLogout = () => {
         signOut();
-        history.push('/customer/login');
+        history.push('/chit-fund/subscriber/login');
         setIsMobileMenuOpen(false);
     };
 

@@ -115,7 +115,7 @@
 //   // }, [user]);
 
 //   const handleStartGroup = () => {
-//     history.push('/startagroup');
+//     history.push('/chit-fund/user/startagroup');
 
 //   };
 
@@ -402,7 +402,7 @@ const HomePage = () => {
   }, [user]);
 
   const handleStartGroup = () => {
-    history.push('/startagroup');
+    history.push('/chit-fund/user/startagroup');
   };
 
   if (isLoading) {

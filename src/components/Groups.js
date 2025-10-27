@@ -26,8 +26,6 @@ const Groups = ({ data }) => {
 
   useEffect(() => {
     if (data && data.results) {
-      console.log('Data and results are available:', data);
-
       // Set groupTransactionInfo when data is available
       const { groupsTabResult, yourDueResult, custDueResult, groupAccountResult, commisionType, is_commision_taken, commissionAmount, emi, groupProgress, type } = data.results;
       setGroupTransactionInfo(groupAccountResult);
@@ -42,11 +40,6 @@ const Groups = ({ data }) => {
       setGroupType(type);
     }
   }, [data]); // Run this effect when data prop changes
-  console.log(groups);
-  console.log(yourdue);
-  console.log(customerdue);
-  console.log(commisionType);
-  console.log(is_commision_taken);
   if (!data || !data.results) {
     // Handle the case where data or data.results is null or undefined
     return <p>No data available.</p>;
@@ -56,10 +49,8 @@ const Groups = ({ data }) => {
 
   const { nextAuctionDate, startTime, endTime, type, groupSubcriberResult } = data.results;
 
-  return (<section className='section'>
-
-
-    <Wrapper className='section-center' >
+  return (
+    <Wrapper>
       <div>
         <div className="flex justify-end gap-4 mb-6">
           <PDFDownloadLink
@@ -100,8 +91,6 @@ const Groups = ({ data }) => {
         groupSubcriberResult={groupSubcriberResult}
       />
     </Wrapper>
-  </section>
-
   );
 };
 const Wrapper = styled.div`

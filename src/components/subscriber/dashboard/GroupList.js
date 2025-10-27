@@ -5,7 +5,7 @@ const GroupList = ({ groups, loading }) => {
     const history = useHistory();
 
     const handleGroupClick = (groupId, grpSubId) => {
-        history.push(`/customer/groups/${groupId}/${grpSubId}`);
+        history.push(`/chit-fund/subscriber/groups/${groupId}/${grpSubId}`);
     };
 
     if (loading) {

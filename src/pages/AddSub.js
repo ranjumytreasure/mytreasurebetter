@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useGroupDetailsContext } from "../context/group_context";
 import { useCompanySubscriberContext } from "../context/companysubscriber_context";
 import { useParams, useHistory } from "react-router-dom";
-import styled, { keyframes, css } from "styled-components";
 import { FiTrash2 } from "react-icons/fi";
 import { FaMagic } from "react-icons/fa";
 import loadingImage from "../images/preloader.gif";
@@ -18,6 +17,18 @@ const AddSub = () => {
     deleteGroupSubscriber,
     noofCompanySubscriber,
   } = useGroupDetailsContext();
+
+  // Helper function to get initials from name
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
 
   const { companySubscribers } = useCompanySubscriberContext();
 
@@ -43,11 +54,11 @@ const AddSub = () => {
   // --- Handlers ---
   const handleOpenPopup = () => setOpen(true);
   const handleAddNewClick = () => {
-    history.push(`/addgroupsubscriber/${groupId}/addnew`);
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}/addnew`);
     setOpen(false);
   };
   const handleCompanySubscriberClick = () => {
-    history.push(`/addgroupsubscriber/${groupId}/addcompanysubcriber`);
+    history.push(`/chit-fund/user/addgroupsubscriber/${groupId}/addcompanysubcriber`);
     setOpen(false);
   };
   const toggleViewMode = () => {
@@ -69,360 +80,180 @@ const AddSub = () => {
   }
 
   return (
-    <Wrapper>
+    <div className="min-h-screen bg-gray-50 p-6">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
-      <Header>Add Subscribers</Header>
 
-      <SummaryBar>
-        <SummaryCard>
-          <strong>Total:</strong> {totalSubscribers}
-        </SummaryCard>
-        <SummaryCard>
-          <strong>Added:</strong> {addedSubscribers}
-        </SummaryCard>
+      {/* Header with Navigation */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => history.goBack()}
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+          >
+            ← Back
+          </button>
 
-        {/* Outstanding with Genie Effect */}
-        <OutstandingCard highlight={outstandingSubscribers > 0}>
+          <button
+            onClick={handleOpenPopup}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
+          >
+            + Add {outstandingSubscribers ?? 0} Subscriber
+          </button>
+        </div>
+
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add Subscribers</h1>
+          <p className="text-gray-600">Manage group subscribers and add new members</p>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+          <div className="text-2xl font-bold text-blue-600 mb-1">{totalSubscribers}</div>
+          <div className="text-sm font-medium text-gray-600">Total Subscribers</div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+          <div className="text-2xl font-bold text-green-600 mb-1">{addedSubscribers}</div>
+          <div className="text-sm font-medium text-gray-600">Added</div>
+        </div>
+
+        <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center relative ${outstandingSubscribers > 0 ? 'ring-2 ring-red-200 animate-pulse' : ''}`}>
           {outstandingSubscribers > 0 && (
-            <GenieBubble>
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 text-xs px-3 py-2 rounded-lg shadow-lg border animate-bounce">
               🧞 Genie says: Add {outstandingSubscribers} subscriber to complete the group!
-            </GenieBubble>
+            </div>
           )}
-          <strong>Outstanding:</strong> {outstandingSubscribers}
-          {outstandingSubscribers > 0 && <FaMagic style={{ marginLeft: "6px" }} />}
-        </OutstandingCard>
-      </SummaryBar>
+          <div className="text-2xl font-bold text-red-600 mb-1 flex items-center justify-center gap-2">
+            {outstandingSubscribers}
+            {outstandingSubscribers > 0 && <FaMagic className="text-red-500" />}
+          </div>
+          <div className="text-sm font-medium text-gray-600">Outstanding</div>
+        </div>
+      </div>
 
-      <TopBar>
-        <BackButton onClick={() => history.goBack()}>Back</BackButton>
-        <AddButton onClick={handleOpenPopup}>
-          + Add {outstandingSubscribers ?? 0} Subscriber
-        </AddButton>
-        <ToggleViewBtn onClick={toggleViewMode}>
-          {viewMode === "grid" ? "List View" : "Grid View"}
-        </ToggleViewBtn>
-      </TopBar>
+      {/* View Toggle */}
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={toggleViewMode}
+          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+        >
+          {viewMode === "grid" ? "📋 List View" : "🔲 Grid View"}
+        </button>
+      </div>
 
-      <AddSubSubscriberList viewMode={viewMode}>
+      {/* Subscribers List */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">Current Subscribers</h2>
+
         {data?.results?.groupSubcriberResult?.length > 0 ? (
-          data?.results?.groupSubcriberResult?.map((sub) => (
-            <AddSubSubscriberCard key={sub.group_subscriber_id} viewMode={viewMode}>
-              <img src={sub?.user_image_from_s3 || "default-image.jpg"} alt={sub.name} />
-              <div className="info">
-                <p className="name">{sub.name}</p>
-                <p className="phone">{sub.phone || "No phone"}</p>
-              </div>
-
-              <DeleteBtn
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  console.log("Deleting:", sub.group_subscriber_id, groupId);
-
-                  const result = await deleteGroupSubscriber(sub.group_subscriber_id, groupId);
-
-                  if (result.success) {
-                    toast.success(result.message);
-                    await fetchGroups(groupId);
-                  } else {
-                    toast.error(result.message);
-                  }
-                }}
+          <div className={`${viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" : "space-y-3"}`}>
+            {data?.results?.groupSubcriberResult?.map((sub) => (
+              <div
+                key={sub.group_subscriber_id}
+                className={`bg-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow duration-200 ${viewMode === "grid" ? "text-center" : "flex items-center gap-4"
+                  }`}
               >
-                <FiTrash2 />
-              </DeleteBtn>
-            </AddSubSubscriberCard>
-          ))
-        ) : (
-          <p>No subscribers found.</p>
-        )}
-      </AddSubSubscriberList>
+                <div className={`${viewMode === "grid" ? "flex justify-center mb-3" : "flex-shrink-0"}`}>
+                  {sub?.user_image_from_s3 ? (
+                    <img
+                      src={sub.user_image_from_s3}
+                      alt={sub.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-12 h-12 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white font-semibold text-sm ${sub?.user_image_from_s3 ? 'hidden' : 'flex'
+                      }`}
+                    style={{
+                      backgroundColor: `hsl(${sub.name?.charCodeAt(0) * 137.5 % 360}, 70%, 50%)`
+                    }}
+                  >
+                    {getInitials(sub.name)}
+                  </div>
+                </div>
 
+                <div className={`${viewMode === "grid" ? "text-center" : "flex-1"}`}>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{sub.name}</h3>
+                  <p className="text-xs text-gray-500">{sub.phone || "No phone"}</p>
+                </div>
+
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    console.log("Deleting:", sub.group_subscriber_id, groupId);
+
+                    const result = await deleteGroupSubscriber(sub.group_subscriber_id, groupId);
+
+                    if (result.success) {
+                      toast.success(result.message);
+                      await fetchGroups(groupId);
+                    } else {
+                      toast.error(result.message);
+                    }
+                  }}
+                  className={`text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors duration-200 ${viewMode === "grid" ? "mt-3 mx-auto" : "flex-shrink-0"
+                    }`}
+                  title="Remove subscriber"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">👥</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No subscribers found</h3>
+            <p className="text-gray-500">Start by adding subscribers to this group</p>
+          </div>
+        )}
+      </div>
+
+      {/* Popup Modal */}
       {open && (
-        <PopupOverlay>
-          <PopupCard>
-            <CloseBtn onClick={() => setOpen(false)}>&times;</CloseBtn>
-            <PopupTitle>
-              Add Subscribers <span>({outstandingSubscribers ?? 0})</span>
-            </PopupTitle>
-            <PopupActions>
-              <PopupBtnPrimary onClick={handleAddNewClick}>➕ Add New</PopupBtnPrimary>
-              <PopupBtnCompany onClick={handleCompanySubscriberClick}>
-                🏢 Company Subscribers ({actualCompanySubscriberCount})
-              </PopupBtnCompany>
-            </PopupActions>
-          </PopupCard>
-        </PopupOverlay>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
+            <div className="p-6">
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-light"
+              >
+                ×
+              </button>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Add Subscribers
+                <span className="text-gray-500 font-normal"> ({outstandingSubscribers ?? 0})</span>
+              </h3>
+
+              <div className="space-y-3 mt-6">
+                <button
+                  onClick={handleAddNewClick}
+                  className="w-full px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  ➕ Add New Subscriber
+                </button>
+
+                <button
+                  onClick={handleCompanySubscriberClick}
+                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  🏢 Company Subscribers ({actualCompanySubscriberCount})
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
-    </Wrapper>
+    </div>
   );
 };
 
-/* ---------------- STYLED COMPONENTS ---------------- */
-
-const Wrapper = styled.section`
-  padding: 2rem;
-`;
-
-const Header = styled.h2`
-  margin-bottom: 1rem;
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #a4161a;
-`;
-
-const SummaryBar = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const SummaryCard = styled.div`
-  flex: 1;
-  min-width: 120px;
-  background: #fff0f0;
-  color: #cd3240;
-  font-weight: bold;
-  text-align: center;
-  padding: 1rem 0;
-  border-radius: 8px;
-  box-shadow: var(--light-shadow);
-  font-size: 1rem;
-
-  @media (max-width: 600px) {
-    flex: 1 1 100%;
-  }
-`;
-
-/* Pulse animation */
-const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(205, 50, 64, 0.7); }
-  70% { box-shadow: 0 0 0 12px rgba(205, 50, 64, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(205, 50, 64, 0); }
-`;
-
-/* Genie speech bubble */
-const GenieBubble = styled.div`
-  position: absolute;
-  top: -45px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  color: #333;
-  font-size: 0.8rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  white-space: nowrap;
-  animation: fadeInOut 3s ease-in-out infinite;
-
-  @keyframes fadeInOut {
-    0%,100% { opacity: 0; transform: translate(-50%, -10px); }
-    20%,80% { opacity: 1; transform: translate(-50%, 0); }
-  }
-`;
-
-const OutstandingCard = styled(SummaryCard)`
-  position: relative;
-
-  ${({ highlight }) =>
-    highlight &&
-    css`
-      animation: ${pulse} 2s infinite;
-    `}
-`;
-
-const TopBar = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-`;
-
-const BackButton = styled.button`
-  background-color: #cd3240;
-  color: white;
-  padding: 0.5rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-`;
-
-const AddButton = styled.button`
-  background-color: #cd3240;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-`;
-
-const ToggleViewBtn = styled.button`
-  background-color: #555;
-  color: white;
-  padding: 0.5rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-`;
-
-const AddSubSubscriberList = styled.div`
-  display: ${({ viewMode }) => (viewMode === "grid" ? "grid" : "flex")};
-  flex-direction: ${({ viewMode }) => (viewMode === "grid" ? "initial" : "column")};
-  grid-template-columns: ${({ viewMode }) =>
-    viewMode === "grid" ? "repeat(auto-fill, minmax(220px, 1fr))" : "none"};
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: ${({ viewMode }) =>
-    viewMode === "grid" ? "repeat(auto-fill, minmax(180px, 1fr))" : "none"};
-  }
-  @media (max-width: 480px) {
-    grid-template-columns: ${({ viewMode }) =>
-    viewMode === "grid" ? "repeat(auto-fill, minmax(150px, 1fr))" : "none"};
-  }
-`;
-
-const AddSubSubscriberCard = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: var(--light-shadow);
-  display: flex;
-  flex-direction: ${({ viewMode }) => (viewMode === "grid" ? "column" : "row")};
-  align-items: ${({ viewMode }) => (viewMode === "grid" ? "center" : "flex-start")};
-  padding: 0.5rem 0.6rem;
-  gap: 0.5rem;
-  width: ${({ viewMode }) => (viewMode === "grid" ? "auto" : "100%")};
-
-  img {
-    width: ${({ viewMode }) => (viewMode === "grid" ? "40px" : "35px")};
-    height: ${({ viewMode }) => (viewMode === "grid" ? "40px" : "35px")};
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: ${({ viewMode }) => (viewMode === "grid" ? "0" : "0.5rem")};
-    .name {
-      font-weight: bold;
-      margin: 0;
-      font-size: 0.9rem;
-    }
-    .phone {
-      font-size: 0.75rem;
-      color: gray;
-    }
-  }
-`;
-
-const DeleteBtn = styled.button`
-  background: transparent;
-  border: none;
-  color: #cd3240;
-  font-size: 1.2rem;
-  cursor: pointer;
-`;
-
-/* Popup styles */
-const PopupOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1050;
-`;
-
-const PopupCard = styled.div`
-  position: relative;
-  background: #fff;
-  padding: 1.8rem;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: scaleIn 0.25s ease;
-  @keyframes scaleIn {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-`;
-
-const CloseBtn = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: transparent;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  color: #888;
-`;
-
-const PopupTitle = styled.h3`
-  font-size: 1.25rem;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
-  color: #cd3240;
-  span {
-    font-weight: normal;
-    color: #444;
-  }
-`;
-
-const PopupActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-`;
-
-const PopupBtnPrimary = styled.button`
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  border: none;
-  background: #cd3240;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  &:hover {
-    background: #a4161a;
-  }
-`;
-
-const PopupBtnCompany = styled.button`
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  border: none;
-  background: #cd3240;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-
-  &:hover {
-    background: #a4161a;
-  }
-`;
 
 export default AddSub;

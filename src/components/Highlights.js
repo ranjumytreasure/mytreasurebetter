@@ -26,16 +26,16 @@ const Highlights = ({ groups, premium }) => {
   }, [user]);
 
   const handleMultiStepSubscriber = (membershipId) => {
-    history.push(`/addcompanymultisubscriber/${membershipId}`);
+    history.push(`/chit-fund/user/addcompanymultisubscriber/${membershipId}`);
   };
 
   const handleStartGroup = () => {
-    history.push('/startagroup');
+    history.push('/chit-fund/user/startagroup');
   };
 
-  const goToLedger = () => history.push('/ledger');
-  const goToReceivables = () => history.push('/receivables');
-  const goToPayables = () => history.push('/payables');
+  const goToLedger = () => history.push('/chit-fund/user/ledger');
+  const goToReceivables = () => history.push('/chit-fund/user/receivables');
+  const goToPayables = () => history.push('/chit-fund/user/payables');
 
   const totalCurrentBalance = Array.isArray(ledgerAccounts)
     ? ledgerAccounts.reduce((sum, acc) => sum + (parseFloat(acc.current_balance) || 0), 0)
@@ -184,7 +184,7 @@ const Highlights = ({ groups, premium }) => {
           </button>
           <button
             className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md flex items-center justify-center gap-2"
-            onClick={() => history.push('/dashboard')}
+            onClick={() => history.push('/chit-fund/user/dashboard')}
           >
             <Calendar size={16} />
             Dashboard

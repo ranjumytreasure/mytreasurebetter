@@ -98,14 +98,14 @@ function Login() {
     console.log(userObjectFromAPI?.results?.userId);
 
     if (selectedRole.includes('User') || selectedRole.includes('Manager')) {
-      history.push('/home');
+      history.push('/app-selection');
     } else if (selectedRole.includes('Subscriber')) {
-      history.push('/subscriber');
+      history.push('/chit-fund/subscriber');
     } else if (selectedRole.includes('Accountant')) {
       history.push('/accountant-page');
     } else if (selectedRole.includes('Collector')) {
 
-      history.push(`/collector/${userObjectFromAPI?.results?.userId}`);
+      history.push(`/chit-fund/collector/dashboard`);
     } else {
       // Handle unknown account names
       history.push('/unknown-account-page');
@@ -183,8 +183,8 @@ function Login() {
                 type="submit"
                 disabled={isButtonDisabled}
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${isButtonDisabled
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-custom-red to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-custom-red to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                   }`}
               >
                 {isLoading ? (

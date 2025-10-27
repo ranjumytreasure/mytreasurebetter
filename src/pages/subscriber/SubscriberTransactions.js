@@ -184,54 +184,72 @@ const SubscriberTransactions = () => {
                         </div>
                     ) : transactionDashboard?.transactions?.length > 0 ? (
                         <div className="divide-y divide-gray-100">
-                            {transactionDashboard.transactions.map((transaction, index) => (
-                                <div key={transaction.id || index} className="p-6 hover:bg-gray-50 transition-colors">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="flex-shrink-0">
-                                                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-xl">
-                                                    {getPaymentMethodIcon(transaction.payment_method)}
+                            {transactionDashboard.transactions.map((transaction, index) => {
+                                // Log transaction details for debugging
+                                console.log('🔍 Transaction Details:', {
+                                    index,
+                                    payment_method: transaction.payment_method,
+                                    payment_type: transaction.payment_type,
+                                    arrow: transaction.arrow,
+                                    fullTransaction: transaction
+                                });
+
+                                return (
+                                    <div key={transaction.id || index} className="p-6 hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="flex-shrink-0">
+                                                    {/* Up Arrow (Green) for Money Came In, Down Arrow (Red) for Money Gone Out */}
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${transaction.arrow === 'UP'
+                                                        ? 'bg-green-500'
+                                                        : 'bg-red-500'
+                                                        }`}>
+                                                        <span className={`text-2xl font-bold text-white`}>
+                                                            {transaction.arrow === 'UP' ? '↑' : '↓'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center space-x-2">
+                                                        <p className="text-lg font-semibold text-gray-900 truncate">
+                                                            {transaction.name || 'Transaction'}
+                                                        </p>
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(transaction.payment_status)}`}>
+                                                            {transaction.payment_status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
+                                                        <span className="flex items-center">
+                                                            <span className="mr-1">📅</span>
+                                                            {formatDate(transaction.created_at)}
+                                                        </span>
+                                                        <span className="flex items-center">
+                                                            <span className="mr-1">🏷️</span>
+                                                            {transaction.payment_type}
+                                                        </span>
+                                                        {transaction.group_name && (
+                                                            <span className="flex items-center">
+                                                                <span className="mr-1">👥</span>
+                                                                {transaction.group_name}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center space-x-2">
-                                                    <p className="text-lg font-semibold text-gray-900 truncate">
-                                                        {transaction.name || 'Transaction'}
+                                            <div className="flex items-center space-x-4">
+                                                <div className="text-right">
+                                                    <p className={`text-2xl font-bold ${transaction.arrow === 'UP' ? 'text-green-600' : 'text-red-600'}`}>
+                                                        {transaction.arrow === 'UP' ? '+' : '-'}{formatAmount(transaction.payment_amount)}
                                                     </p>
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(transaction.payment_status)}`}>
-                                                        {transaction.payment_status}
-                                                    </span>
+                                                    <p className="text-sm text-gray-500 capitalize">
+                                                        {transaction.arrow === 'UP' ? 'Received' : 'Paid Out'}
+                                                    </p>
                                                 </div>
-                                                <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-                                                    <span className="flex items-center">
-                                                        <span className="mr-1">📅</span>
-                                                        {formatDate(transaction.created_at)}
-                                                    </span>
-                                                    <span className="flex items-center">
-                                                        <span className="mr-1">🏷️</span>
-                                                        {transaction.payment_type}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center space-x-4">
-                                            <div className="text-right">
-                                                <p className={`text-2xl font-bold ${transaction.payment_method === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                                                    {transaction.payment_method === 'credit' ? '+' : '-'}{formatAmount(transaction.payment_amount)}
-                                                </p>
-                                                <p className="text-sm text-gray-500 capitalize">
-                                                    {transaction.payment_method.toLowerCase()}
-                                                </p>
-                                            </div>
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${transaction.payment_method === 'credit' ? 'bg-green-100' : 'bg-red-100'}`}>
-                                                <span className={`text-lg ${transaction.payment_method === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                                                    {transaction.payment_method === 'credit' ? '↗️' : '↘️'}
-                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="p-12 text-center">

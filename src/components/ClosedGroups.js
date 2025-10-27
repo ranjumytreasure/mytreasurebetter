@@ -15,7 +15,7 @@
 //   };
 
 //   const handleViewDetails = (groupId) => {
-//     history.push(`/groups/${groupId}`);
+//     history.push(`/chit-fund/user/groups/${groupId}`);
 //   };
 
 //   return (
@@ -200,7 +200,7 @@ const ClosedGroups = ({ groups }) => {
   };
 
   const handleViewDetails = (groupId) => {
-    history.push(`/groups/${groupId}`);
+    history.push(`/chit-fund/user/groups/${groupId}`);
   };
 
   return (

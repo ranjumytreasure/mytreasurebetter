@@ -21,7 +21,7 @@ const GroupDataInNavbar = () => {
         if (storedGroupData) {
             // Use history.push to navigate to '/startagroup' with state data
             console.log('Stored Group Data:', storedGroupData);
-            history.push('/startagroup', { storedGroupData });
+            history.push('/chit-fund/user/startagroup', { storedGroupData });
         }
 
     };

@@ -503,7 +503,17 @@ const GroupsSubscriber = () => {
     let totalCredit = 0;
     let totalDebit = 0;
 
-    const transactionsWithBalance = transactions.map(tx => {
+    // Debug: Log original transaction order
+    console.log('🔍 Original transactions from backend (reverse order):', transactions);
+
+    // Since backend sends data in reverse chronological order (newest first),
+    // we need to reverse it to get chronological order (oldest first) for running balance calculation
+    const chronologicalTransactions = [...transactions].reverse();
+
+    console.log('🔍 Reversed to chronological order:', chronologicalTransactions);
+
+    // Calculate running balance in chronological order and store with each transaction
+    const transactionsWithBalance = chronologicalTransactions.map((tx, index) => {
       const amount = parseFloat(tx.amount) || 0;
       if (tx.type === 'CREDIT') {
         runningBalance += amount;
@@ -512,14 +522,23 @@ const GroupsSubscriber = () => {
         runningBalance -= amount;
         totalDebit += amount;
       }
+
+      console.log(`🔍 Transaction ${index + 1}: ${tx.type} ₹${amount} → Running Balance: ₹${runningBalance}`);
+
       return {
         ...tx,
-        runningBalance: runningBalance
+        runningBalance: runningBalance,
+        chronologicalIndex: index
       };
     });
 
+    // Keep original order (newest first) for display while preserving running balance
+    const displayTransactions = transactionsWithBalance.reverse();
+
+    console.log('🔍 Final display transactions (newest first):', displayTransactions);
+
     return {
-      transactions: transactionsWithBalance,
+      transactions: displayTransactions,
       totalCredit,
       totalDebit,
       currentBalance: runningBalance

@@ -210,7 +210,7 @@ const SubscriberGroupDetails = () => {
 
 
     const handleBackClick = () => {
-        history.push('/customer/groups');
+        history.push('/chit-fund/subscriber/groups');
     };
 
     const handleCircleClick = (circleId) => {

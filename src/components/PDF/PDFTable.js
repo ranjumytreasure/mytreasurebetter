@@ -68,36 +68,46 @@ const PDFTable = ({
         },
     });
 
+    // Add safety checks for data and tableHeaders
+    const safeData = Array.isArray(data) ? data : [];
+    const safeTableHeaders = Array.isArray(tableHeaders) ? tableHeaders : [];
+    const safeHeading = heading || "Report";
+
     return (
         <View wrap={true}>
-            <Text style={styles.innerHeading}>{heading}</Text>
+            <Text style={styles.innerHeading}>{safeHeading}</Text>
             <View style={styles.table}>
                 {/* Table Headers */}
                 <View style={[styles.rowHead, { justifyContent: "space-between" }]}>
                     <Text style={styles.snCell}>S.N</Text>
-                    {tableHeaders?.map((thead, headerIndex) => (
-                        <Text key={thead.title} style={[styles.cell, styles.headerCell]}>
-                            {thead.title}
+                    {safeTableHeaders.map((thead, headerIndex) => (
+                        <Text key={thead?.title || headerIndex} style={[styles.cell, styles.headerCell]}>
+                            {thead?.title || ""}
                         </Text>
                     ))}
                 </View>
 
                 {/* Table content */}
-                {Array.isArray(data) &&
-                    data?.map((item, dataIndex) => (
-                        <View key={dataIndex}>
-                            <View style={styles.row}>
-                                <Text style={styles.snRow}>{dataIndex + 1}.</Text>
-                                {tableHeaders?.map((header, headerIndex) => (
+                {safeData.map((item, dataIndex) => (
+                    <View key={dataIndex}>
+                        <View style={styles.row}>
+                            <Text style={styles.snRow}>{dataIndex + 1}.</Text>
+                            {safeTableHeaders.map((header, headerIndex) => {
+                                // Safe value extraction with fallback
+                                const value = item && header?.value ? item[header.value] : "";
+                                const displayValue = header?.render
+                                    ? header.render(value, item, dataIndex)
+                                    : value ?? "";
+
+                                return (
                                     <Text style={styles.cell} key={headerIndex}>
-                                        {header?.render
-                                            ? header?.render?.(item?.[header.value], item, dataIndex)
-                                            : item[header.value] ?? ""}
+                                        {String(displayValue || "")}
                                     </Text>
-                                ))}
-                            </View>
+                                );
+                            })}
                         </View>
-                    ))}
+                    </View>
+                ))}
             </View>
         </View>
     );

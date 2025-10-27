@@ -13,7 +13,7 @@
 //   };
 
 //   const handleMultiStepSubscriber = () => {
-//     history.push(`/addcompanymultisubscriber/${user.results.userAccounts[0].parent_membership_id}`);
+//     history.push(`/chit-fund/user/addcompanymultisubscriber/${user.results.userAccounts[0].parent_membership_id}`);
 //   };
 
 //   const filteredSubscribers = companySubscribers.filter((subscriber) =>
@@ -176,7 +176,7 @@ const Subscribers = () => {
   };
 
   const handleMultiStepSubscriber = () => {
-    history.push(`/addcompanymultisubscriber/${user.results.userAccounts[0].parent_membership_id}`);
+    history.push(`/chit-fund/user/addcompanymultisubscriber/${user.results.userAccounts[0].parent_membership_id}`);
   };
 
   const searchTerm = (nameFilter || "").toLowerCase();
@@ -195,7 +195,7 @@ const Subscribers = () => {
   }
 
   return (
-    <section className="py-8 px-4 bg-white min-h-screen">
+    <section className="pb-8 px-4 bg-white min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
           <h2 className="text-3xl font-bold text-gray-800">

@@ -304,6 +304,29 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
         // Check multiple possible data sources for due information
         const dueData = transactionInfo || groupDetails?.transactionInfo || groupDetails?.dueInfo || groupDetails?.receivableInfo || [];
 
+        // COMPREHENSIVE DEBUG LOGGING FOR DUE DATA
+        console.log('🔍 ===== COMPREHENSIVE DUE DETAILS DEBUGGING =====');
+        console.log('🔍 FULL groupDetails object:', JSON.stringify(groupDetails, null, 2));
+        console.log('🔍 transactionInfo:', JSON.stringify(transactionInfo, null, 2));
+        console.log('🔍 groupDetails?.transactionInfo:', JSON.stringify(groupDetails?.transactionInfo, null, 2));
+        console.log('🔍 groupDetails?.dueInfo:', JSON.stringify(groupDetails?.dueInfo, null, 2));
+        console.log('🔍 groupDetails?.receivableInfo:', JSON.stringify(groupDetails?.receivableInfo, null, 2));
+        console.log('🔍 Final dueData:', JSON.stringify(dueData, null, 2));
+        console.log('🔍 dueData length:', dueData?.length);
+        console.log('🔍 dueData type:', typeof dueData);
+        console.log('🔍 dueData isArray:', Array.isArray(dueData));
+
+        if (dueData && dueData.length > 0) {
+            console.log('🔍 First due transaction sample (FULL):', JSON.stringify(dueData[0], null, 2));
+            console.log('🔍 All due transactions:', JSON.stringify(dueData, null, 2));
+
+            // Log each field individually
+            const firstTransaction = dueData[0];
+            console.log('🔍 First transaction fields:');
+            Object.keys(firstTransaction).forEach(key => {
+                console.log(`🔍   ${key}:`, firstTransaction[key], `(type: ${typeof firstTransaction[key]})`);
+            });
+        }
 
         if (!dueData || dueData.length === 0) {
             return (
@@ -325,11 +348,17 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                 <div className="p-4 sm:p-6 space-y-4">
                     {dueData.map((transaction, index) => (
                         <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 sm:p-6 border-l-4 border-orange-500 shadow-md">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
                                 <div className="text-center sm:text-left">
-                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Date</div>
+                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Auction Date</div>
                                     <div className="text-sm sm:text-base font-bold text-gray-900">
-                                        {new Date(transaction.date || transaction.createdAt || new Date()).toLocaleDateString()}
+                                        {transaction.auctiondate ? new Date(transaction.auctiondate).toLocaleDateString() : 'N/A'}
+                                    </div>
+                                </div>
+                                <div className="text-center sm:text-left">
+                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Payment Date</div>
+                                    <div className="text-sm sm:text-base font-bold text-gray-900">
+                                        {transaction.date || transaction.createdAt ? new Date(transaction.date || transaction.createdAt).toLocaleString() : 'N/A'}
                                     </div>
                                 </div>
                                 <div className="text-center sm:text-left">
@@ -456,6 +485,15 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
     };
 
     const renderCreditDetails = () => {
+        // Comprehensive logging for debugging
+        console.log('🔍 ===== CREDIT DETAILS DEBUGGING =====');
+        console.log('🔍 Full outstandingAdvanceTransactionInfo array:', outstandingAdvanceTransactionInfo);
+        console.log('🔍 Array length:', outstandingAdvanceTransactionInfo?.length);
+
+        if (outstandingAdvanceTransactionInfo && outstandingAdvanceTransactionInfo.length > 0) {
+            console.log('🔍 First transaction sample:', outstandingAdvanceTransactionInfo[0]);
+        }
+
         // Calculate total credit amount dynamically
         const calculateTotalCredit = () => {
             if (!outstandingAdvanceTransactionInfo || outstandingAdvanceTransactionInfo.length === 0) {
@@ -496,30 +534,49 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                     </div>
                 </div>
                 <div className="p-3 sm:p-4 space-y-3">
-                    {outstandingAdvanceTransactionInfo.map((transaction, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-blue-500">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                                <div>
-                                    <div className="text-xs sm:text-sm text-gray-500">Date</div>
-                                    <div className="text-sm sm:text-base font-semibold text-gray-900">
-                                        {new Date(transaction.date).toLocaleDateString()}
+                    {outstandingAdvanceTransactionInfo.map((transaction, index) => {
+                        console.log('🔍 Transaction:', transaction);
+                        return (
+                            <div key={index} className="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-blue-500">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                                    <div>
+                                        <div className="text-xs sm:text-sm text-gray-500">Auction Date</div>
+                                        <div className="text-sm sm:text-base font-semibold text-gray-900">
+                                            {transaction.auctiondate ? new Date(transaction.auctiondate).toLocaleDateString() : 'N/A'}
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <div className="text-xs sm:text-sm text-gray-500">Amount</div>
-                                    <div className="text-sm sm:text-base font-semibold text-gray-900">
-                                        ₹{transaction.amount?.toLocaleString() || '0'}
+                                    <div>
+                                        <div className="text-xs sm:text-sm text-gray-500">Payment Date</div>
+                                        <div className="text-sm sm:text-base font-semibold text-gray-900">
+                                            {transaction.date ? new Date(transaction.date).toLocaleString() : 'N/A'}
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <div className="text-xs sm:text-sm text-gray-500">Status</div>
-                                    <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Credit
+                                    <div>
+                                        <div className="text-xs sm:text-sm text-gray-500">Amount</div>
+                                        <div className="text-sm sm:text-base font-semibold text-green-600">
+                                            ₹{transaction.amount?.toLocaleString() || '0'}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs sm:text-sm text-gray-500">Status</div>
+                                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${transaction.status === 'Success'
+                                            ? 'bg-green-100 text-green-800'
+                                            : transaction.status === 'Due'
+                                                ? 'bg-red-100 text-red-800'
+                                                : 'bg-gray-100 text-gray-800'
+                                            }`}>
+                                            {transaction.status === 'Success'
+                                                ? 'Received'
+                                                : transaction.status === 'Due'
+                                                    ? 'Due'
+                                                    : transaction.status || 'Unknown'
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         );

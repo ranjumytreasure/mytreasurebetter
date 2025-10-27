@@ -10,7 +10,7 @@ const CollectorHeader = () => {
 
     const handleLogout = () => {
         logout();
-        history.push('/collector/login');
+        history.push('/chit-fund/collector/login');
     };
 
     const toggleMenu = () => {
@@ -31,21 +31,21 @@ const CollectorHeader = () => {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex space-x-8">
                         <Link
-                            to="/collector/receivables"
+                            to="/chit-fund/collector/receivables"
                             className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
                         >
                             <FiDollarSign className="h-4 w-4" />
                             <span>Receivables</span>
                         </Link>
                         <Link
-                            to="/collector/advance-history"
+                            to="/chit-fund/collector/advance-history"
                             className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
                         >
                             <FiList className="h-4 w-4" />
                             <span>Advance History</span>
                         </Link>
                         <Link
-                            to="/collector/dashboard"
+                            to="/chit-fund/collector/dashboard"
                             className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
                         >
                             <FiBarChart2 className="h-4 w-4" />
@@ -89,7 +89,7 @@ const CollectorHeader = () => {
                     <div className="md:hidden">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-red-700 rounded-md mt-2">
                             <Link
-                                to="/collector/receivables"
+                                to="/chit-fund/collector/receivables"
                                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -97,7 +97,7 @@ const CollectorHeader = () => {
                                 <span>Receivables</span>
                             </Link>
                             <Link
-                                to="/collector/advance-history"
+                                to="/chit-fund/collector/advance-history"
                                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -105,7 +105,7 @@ const CollectorHeader = () => {
                                 <span>Advance History</span>
                             </Link>
                             <Link
-                                to="/collector/dashboard"
+                                to="/chit-fund/collector/dashboard"
                                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >

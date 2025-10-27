@@ -47,77 +47,73 @@ const DashboardMasterInfo = () => {
   ]
 
 
-  return <section className='section'>
-    <Wrapper className='section-center'>
-      {items.map((item) => {
-        return <Item key={item.id} {...item}></Item>
-      })}
-    </Wrapper>
-  </section>;
-};
+  const ModernItem = ({ icon, label, value, color }) => {
+    const getColorClasses = (color) => {
+      switch (color) {
+        case 'pink':
+          return {
+            bg: 'bg-gradient-to-br from-pink-500 to-rose-500',
+            text: 'text-pink-600',
+            bgLight: 'bg-pink-50',
+            border: 'border-pink-200'
+          };
+        case 'purple':
+          return {
+            bg: 'bg-gradient-to-br from-purple-500 to-violet-500',
+            text: 'text-purple-600',
+            bgLight: 'bg-purple-50',
+            border: 'border-purple-200'
+          };
+        case 'green':
+          return {
+            bg: 'bg-gradient-to-br from-green-500 to-emerald-500',
+            text: 'text-green-600',
+            bgLight: 'bg-green-50',
+            border: 'border-green-200'
+          };
+        default:
+          return {
+            bg: 'bg-gradient-to-br from-blue-500 to-indigo-500',
+            text: 'text-blue-600',
+            bgLight: 'bg-blue-50',
+            border: 'border-blue-200'
+          };
+      }
+    };
 
-const Item = ({ icon, label, value, color }) => {
-  return <article className="item">
-    <span className={color}>{icon}</span>
-    <div>
-      <h3>{value}</h3>
-      <p>{label}</p>
+    const colors = getColorClasses(color);
+
+    return (
+      <div className={`bg-white rounded-xl shadow-sm border ${colors.border} p-6 hover:shadow-md transition-shadow duration-200`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className={`w-12 h-12 ${colors.bg} rounded-xl flex items-center justify-center`}>
+            <span className="text-white text-xl">{icon}</span>
+          </div>
+          <div className={`w-3 h-3 ${colors.bg} rounded-full`}></div>
+        </div>
+
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-1">{value || 0}</h3>
+          <p className="text-sm font-medium text-gray-600">{label}</p>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="mb-8">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Key Metrics</h2>
+        <p className="text-gray-600">Overview of your chit fund performance</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {items.map((item) => {
+          return <ModernItem key={item.id} {...item}></ModernItem>
+        })}
+      </div>
     </div>
-
-  </article>
-}
-
-const Wrapper = styled.section`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem 2rem;
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-  .item {
-    border-radius: var(--radius);
-    padding: .5rem 1rem;
-    background: var(--clr-white);   
-
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 3rem;
-    align-items: center;
-    span {
-      width: 3rem;
-      height: 3rem;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-    }
-    .icon {
-      font-size: 1.5rem;
-    }
-    h3 {
-      margin-bottom: 0;
-      letter-spacing: 0;
-    }
-    p {
-      margin-bottom: 0;
-      text-transform: capitalize;
-    }
-    .pink {
-      background: #ffe0f0;
-      color: #da4a91;
-    }
-    .green {
-      background: var(--clr-primary-10);
-      color: var(--clr-primary-5);
-    }
-    .purple {
-      background: #e6e6ff;
-      color: #5d55fa;
-    }
-    .yellow {
-      background: #fffbea;
-      color: #f0b429;
-    }
-  }
-`;
+  );
+};
 
 export default DashboardMasterInfo;

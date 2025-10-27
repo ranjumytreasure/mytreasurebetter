@@ -5,12 +5,13 @@
     min-height: 100vh;
     background: #f9f9f9;
     font-family: Arial, sans-serif;
-    max-width: 1200px;
-    /* Limit container width */
+    max-width: 1400px;
+    /* Increased container width */
     margin: 0 auto;
     /* Center the entire container */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
+    width: 100%;
+    /* Ensure full width usage */
 }
 
 /* ---------- Sidebar ---------- */
@@ -91,9 +92,16 @@
     font-size: 0.95rem;
 }
 
-.sidebar-nav li:hover,
+.sidebar-nav li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+    transition: all 0.2s ease;
+}
+
 .sidebar-nav li.active {
-    background-color: #444;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left: 3px solid #fff;
+    font-weight: bold;
 }
 
 /* ---------- Profile Content ---------- */
@@ -101,6 +109,16 @@
     flex: 1;
     padding: 2rem;
     overflow-y: auto;
+    min-width: 0;
+    /* Prevent flex item from shrinking below content size */
+    width: calc(100% - 240px);
+    /* Ensure content takes remaining width */
+    max-width: calc(1400px - 240px);
+    /* Match container width minus sidebar */
+    min-height: calc(100vh - 4rem);
+    /* Ensure minimum height for content area */
+    background-color: #f9f9f9;
+    /* Match container background */
 }
 
 /* ---------- Section ---------- */
@@ -112,6 +130,10 @@
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #ddd;
+    width: 100%;
+    /* Ensure sections take full width */
+    box-sizing: border-box;
+    /* Include padding and border in width calculation */
 }
 
 .section-title {
@@ -153,6 +175,9 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 2rem;
+    width: 100%;
+    /* Ensure metrics container takes full width */
+    box-sizing: border-box;
 }
 
 .card {
@@ -248,24 +273,40 @@
     .subscriber-profile-container {
         flex-direction: column;
         /* Stack sidebar on top */
+        max-width: 100%;
+        margin: 0;
+        box-shadow: none;
     }
 
     .subscriber-profile-sidebar {
-        width: 100vw;
+        width: 100%;
         /* Full screen width */
         padding: 1rem;
         position: relative;
-
+        flex-shrink: 0;
     }
 
-    .subscriber-profile-main {
+    .profile-content {
+        width: 100%;
+        max-width: 100%;
         padding: 1rem;
+        min-width: auto;
     }
 
     .sidebar-title,
     .subscriber-profile-sidebar ul li {
         text-align: center;
         font-size: 1rem;
+    }
+
+    .metrics {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .card {
+        flex: 1 1 auto;
+        min-width: auto;
     }
 }
 

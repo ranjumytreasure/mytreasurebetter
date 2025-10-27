@@ -121,7 +121,7 @@ const GroupDetailsModal = ({ group, onClose }) => {
                                 className="action-btn primary-btn"
                                 onClick={() => {
                                     // Navigate to full group details page
-                                    window.location.href = `/customer/groups/${groupId}/${groupSubscriberId}`;
+                                    window.location.href = `/chit-fund/subscriber/groups/${groupId}/${groupSubscriberId}`;
                                 }}
                             >
                                 View Full Details

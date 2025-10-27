@@ -106,7 +106,7 @@ const GroupDetailsCard = ({ groups, yourdue, customerdue, nextAuctionDate, start
     };
 
     const handleGoToAuctions = () => {
-        history.push(`/groups/${groupId}/auctions/date/nextAuctionDate=${nextAuctionDate}`);
+        history.push(`/chit-fund/user/groups/${groupId}/auctions/date/nextAuctionDate=${nextAuctionDate}`);
     };
 
     const subscriber = {
@@ -130,11 +130,11 @@ const GroupDetailsCard = ({ groups, yourdue, customerdue, nextAuctionDate, start
     };
     const handleYourDueClick = () => {
         // Redirect to the YourDuePage for the specific groupId
-        history.push(`/groups/${groupId}/your-due`);
+        history.push(`/chit-fund/user/groups/${groupId}/your-due`);
     };
     const handleCustomerDueClick = () => {
         // Redirect to the YourDuePage for the specific groupId
-        history.push(`/groups/${groupId}/customer-due`);
+        history.push(`/chit-fund/user/groups/${groupId}/customer-due`);
     };
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg relative mt-6">
