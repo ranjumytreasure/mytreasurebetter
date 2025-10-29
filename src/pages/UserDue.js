@@ -41,7 +41,7 @@
 //                 }
 
 //                 const fetchedData = await response.json();
-             
+
 //                 setData(fetchedData);
 //                 const firstGroup = fetchedData.results.groupWiseResult[0];
 
@@ -67,10 +67,10 @@
 //         fetchGroups();
 //     }, [groupId, setIsLoading]); // Fetch data whenever the groupId changes
 //     useEffect(() => {
-       
+
 
 //         console.log(GroupWiseOverallUserDuedata); // This will log the updated state
-       
+
 //     }, [GroupWiseOverallUserDuedata]);
 
 //     if (isLoading) {
@@ -81,7 +81,7 @@
 //             </>
 //         );
 //     }
- 
+
 //     return (<>
 //         <GroupWiseOverallUserDue GroupWiseOverallUserDuedata={GroupWiseOverallUserDuedata} />
 //         <GroupAccountWiseOverallUserDue data={data} />
@@ -92,15 +92,17 @@
 // export default UserDue
 
 import React, { useState, useEffect } from 'react';
-import {YourDue  } from '../components';
+import { YourDue } from '../components';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/apiConfig';
 import { useUserContext } from '../context/user_context';
+import { useGroupDetailsContext } from '../context/group_context';
 import loadingImage from '../images/preloader.gif';
 
 const UserDue = () => {
   const { groupId } = useParams();
   const { user, isLoading, setIsLoading } = useUserContext();
+  const { data: groupDetailsData, fetchGroups } = useGroupDetailsContext();
   const [data, setData] = useState([]);
   const [GroupWiseOverallUserDuedata, setGroupWiseOverallUserDuedata] = useState({
     group_id: '',
@@ -110,7 +112,7 @@ const UserDue = () => {
   });
 
   useEffect(() => {
-    const fetchGroups = async () => {
+    const fetchYourDueData = async () => {
       try {
         setIsLoading(true);
         const apiUrl = `${API_BASE_URL}/groups/${groupId}/your-due`;
@@ -145,8 +147,14 @@ const UserDue = () => {
       }
     };
 
-    fetchGroups();
-  }, [groupId, setIsLoading]);
+    // Fetch group details for displaying group name, amount, start date
+    if (groupId) {
+      fetchGroups(groupId);
+    }
+
+    // Fetch your due data
+    fetchYourDueData();
+  }, [groupId, setIsLoading, fetchGroups]);
 
   if (isLoading) {
     return (
@@ -159,7 +167,7 @@ const UserDue = () => {
 
   return (
     <>
-      <YourDue data={data} GroupWiseOverallUserDuedata={GroupWiseOverallUserDuedata} />
+      <YourDue data={data} GroupWiseOverallUserDuedata={GroupWiseOverallUserDuedata} groupDetailsData={groupDetailsData} />
     </>
   );
 };

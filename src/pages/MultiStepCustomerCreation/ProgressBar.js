@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import AppContext from './Context';
 import { Check } from 'lucide-react';
 
@@ -12,29 +12,8 @@ const ProgressBar = () => {
     const setStep = stepDetails?.setStep;
     const totalSteps = 9; // Total number of steps in your form
 
-    // Scroll detection logic
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-
-            // Show sticky progress bar when scrolling down past 200px
-            if (currentScrollY > 200 && currentScrollY > lastScrollY) {
-                setShowSticky(true);
-            }
-            // Hide sticky progress bar when scrolling up or at top
-            else if (currentScrollY < lastScrollY || currentScrollY <= 200) {
-                setShowSticky(false);
-            }
-
-            setLastScrollY(currentScrollY);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY]);
-
-    // Step labels
-    const stepLabels = [
+    // Memoize step labels to prevent recreating on every render
+    const stepLabels = useMemo(() => [
         'Photo',
         'Personal',
         'Contact',
@@ -45,7 +24,37 @@ const ProgressBar = () => {
         'Business',
         'Preview',
         'Complete'
-    ];
+    ], []);
+
+    // Scroll detection logic with throttling to prevent excessive re-renders
+    useEffect(() => {
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+
+                    // Show sticky progress bar when scrolling down past 200px
+                    if (currentScrollY > 200 && currentScrollY > lastScrollY) {
+                        setShowSticky(true);
+                    }
+                    // Hide sticky progress bar when scrolling up or at top
+                    else if (currentScrollY < lastScrollY || currentScrollY <= 200) {
+                        setShowSticky(false);
+                    }
+
+                    setLastScrollY(currentScrollY);
+                    ticking = false;
+                });
+
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
 
     // Handle step click
     const handleStepClick = (stepIndex) => {
@@ -56,7 +65,7 @@ const ProgressBar = () => {
 
     // Reusable progress bar component
     const ProgressBarContent = ({ isSticky = false }) => (
-        <div className={`w-full max-w-4xl mx-auto ${isSticky ? 'p-3' : 'mb-6 p-6'} bg-gradient-to-r from-white to-gray-50 ${isSticky ? 'rounded-lg shadow-lg' : 'rounded-2xl shadow-lg'} transition-all duration-300 ${isSticky ? 'border-b border-gray-200' : 'hover:shadow-xl border-2 border-red-200'}`}>
+        <div className={`w-full max-w-4xl mx-auto ${isSticky ? 'p-3' : 'mb-6 p-6'} bg-gradient-to-r from-white to-gray-50 ${isSticky ? 'rounded-lg shadow-lg' : 'rounded-2xl shadow-lg'} ${isSticky ? 'border-b border-gray-200' : 'hover:shadow-xl border-2 border-red-200'}`}>
             {!isSticky && (
                 <div className="relative mb-6">
                     {/* Title integrated into border */}
@@ -157,4 +166,5 @@ const ProgressBar = () => {
     );
 };
 
-export default ProgressBar;
+// Memoize ProgressBar to prevent re-renders when context values other than stepDetails change
+export default React.memo(ProgressBar);

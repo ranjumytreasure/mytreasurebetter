@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import AppContext from './Context';
 import PhotoDetails from './PhotoDetails';
@@ -40,6 +40,9 @@ const SubscriberStepForm = () => {
     const [taluk, setTaluk] = useState("");
     const [district, setDistrict] = useState("");
     const [phone, setPhone] = useState("");
+    // Location Details
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
     // Bank Details
     const [bankName, setBankName] = useState("");
     const [branch, setBranch] = useState("");
@@ -67,94 +70,128 @@ const SubscriberStepForm = () => {
     }, [step]);
 
     // Handle back to home navigation
-    const handleBackToHome = () => {
+    const handleBackToHome = useCallback(() => {
         history.push('/chit-fund/user/home');
-    };
+    }, [history]);
 
-    const contextValues = {
-        stepDetails: {
-            step,
-            setStep: (newStep) => {
-                setStep(newStep);
-                setFocusTrigger(prev => prev + 1); // Trigger focus on step change
-            },
-            focusTrigger
+    // Memoize step-related context (changes only when step changes)
+    const stepDetails = useMemo(() => ({
+        step,
+        setStep: (newStep) => {
+            setStep(newStep);
+            setFocusTrigger(prev => prev + 1);
         },
-        personalDetails: {
-            subscriberName,
-            setSubscriberName,
-            age,
-            setAge,
-            dob,
-            setDob,
-            gender,
-            setGender,
-            maritalStatus,
-            setMaritalStatus,
-            nationality,
-            setNationality,
-            education,
-            setEducation,
-            spouseName,
-            setSpouseName,
-            spouseDob,
-            setSpouseDob,
-            spouseAge,
-            setSpouseAge
+        focusTrigger
+    }), [step, focusTrigger]);
 
-        },
-        photoDetails: {
-            image,
-            setImage
-        },
-        contactDetails: {
-            phone,
-            setPhone
-        },
-        addressDetails: {
-            streetName,
-            setStreetName,
-            villageName,
-            setVillageName,
-            pincode,
-            setPincode,
-            taluk,
-            setTaluk,
-            district,
-            setDistrict
-        },
+    // Memoize personal details context (only recreate when these values change)
+    const personalDetails = useMemo(() => ({
+        subscriberName,
+        setSubscriberName,
+        age,
+        setAge,
+        dob,
+        setDob,
+        gender,
+        setGender,
+        maritalStatus,
+        setMaritalStatus,
+        nationality,
+        setNationality,
+        education,
+        setEducation,
+        spouseName,
+        setSpouseName,
+        spouseDob,
+        setSpouseDob,
+        spouseAge,
+        setSpouseAge
+    }), [subscriberName, age, dob, gender, maritalStatus, nationality, education, spouseName, spouseDob, spouseAge]);
 
-        financeDetails: {
-            occupation,
-            setOccupation,
-            annualIncome,
-            setAnnualIncome,
-            pan,
-            setPan,
-            aadhar,
-            setAadhar,
-        },
+    // Memoize photo details context
+    const photoDetails = useMemo(() => ({
+        image,
+        setImage
+    }), [image]);
 
-        nomineeDetails: { nominee, setNominee, relationship, setRelationship },
-        businessDetails: { businessType, setBusinessType, annualTurnover, setAnnualTurnover },
+    // Memoize contact details context
+    const contactDetails = useMemo(() => ({
+        phone,
+        setPhone
+    }), [phone]);
 
-        // ✅ Add Bank Details
-        bankDetails: {
-            bankName,
-            setBankName,
-            branch,
-            setBranch,
-            bankIFSC,
-            setBankIFSC,
-            accountNumber,
-            setAccountNumber
-        },
+    // Memoize address details context (THIS is what changes when map updates!)
+    const addressDetails = useMemo(() => ({
+        streetName,
+        setStreetName,
+        villageName,
+        setVillageName,
+        pincode,
+        setPincode,
+        taluk,
+        setTaluk,
+        district,
+        setDistrict,
+        latitude,
+        setLatitude,
+        longitude,
+        setLongitude
+    }), [streetName, villageName, pincode, taluk, district, latitude, longitude]);
 
-        // ✅ Include password state
+    // Memoize finance details context
+    const financeDetails = useMemo(() => ({
+        occupation,
+        setOccupation,
+        annualIncome,
+        setAnnualIncome,
+        pan,
+        setPan,
+        aadhar,
+        setAadhar
+    }), [occupation, annualIncome, pan, aadhar]);
+
+    // Memoize nominee details context
+    const nomineeDetails = useMemo(() => ({
+        nominee,
+        setNominee,
+        relationship,
+        setRelationship
+    }), [nominee, relationship]);
+
+    // Memoize business details context
+    const businessDetails = useMemo(() => ({
+        businessType,
+        setBusinessType,
+        annualTurnover,
+        setAnnualTurnover
+    }), [businessType, annualTurnover]);
+
+    // Memoize bank details context
+    const bankDetails = useMemo(() => ({
+        bankName,
+        setBankName,
+        branch,
+        setBranch,
+        bankIFSC,
+        setBankIFSC,
+        accountNumber,
+        setAccountNumber
+    }), [bankName, branch, bankIFSC, accountNumber]);
+
+    // Memoize the entire context value
+    const contextValues = useMemo(() => ({
+        stepDetails,
+        personalDetails,
+        photoDetails,
+        contactDetails,
+        addressDetails,
+        financeDetails,
+        nomineeDetails,
+        businessDetails,
+        bankDetails,
         password,
         setPassword
-
-    };
+    }), [stepDetails, personalDetails, photoDetails, contactDetails, addressDetails, financeDetails, nomineeDetails, businessDetails, bankDetails, password]);
 
     return (
         <AppContext.Provider value={contextValues}>

@@ -3,6 +3,7 @@ import { useDailyCollectionContext } from '../../context/dailyCollection/DailyCo
 import { useUserContext } from '../../context/user_context';
 import { API_BASE_URL } from '../../utils/apiConfig';
 import { FiFilter, FiMapPin, FiDollarSign, FiCalendar, FiUser, FiSearch, FiRefreshCw, FiCheckCircle, FiClock, FiAlertCircle } from 'react-icons/fi';
+import RouteMapModal from '../../components/RouteMapModal';
 
 const CollectionsPage = () => {
     const { user } = useUserContext();
@@ -12,6 +13,8 @@ const CollectionsPage = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedReceivable, setSelectedReceivable] = useState(null);
     const [ledgerAccounts, setLedgerAccounts] = useState([]);
+    const [showRouteModal, setShowRouteModal] = useState(false);
+    const [selectedSubscriberForRoute, setSelectedSubscriberForRoute] = useState(null);
 
     // Filters - Default to show today's due and overdue
     const [filters, setFilters] = useState({
@@ -160,6 +163,40 @@ const CollectionsPage = () => {
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount)) return '₹0';
         return `₹${numAmount.toLocaleString("en-IN")}`;
+    };
+
+    // Handle navigation to subscriber location
+    const handleNavigate = (receivable) => {
+        console.log('🗺️ handleNavigate called:', receivable);
+        const subscriber = receivable.subscriber;
+        console.log('👤 Subscriber data:', subscriber);
+
+        // Check if subscriber has location data
+        if (!subscriber) {
+            alert('❌ Subscriber information not available');
+            return;
+        }
+
+        const latitude = parseFloat(subscriber.latitude);
+        const longitude = parseFloat(subscriber.longitude);
+        console.log('📍 Coordinates:', { latitude, longitude });
+
+        if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+            alert('❌ Location not available for this subscriber.\n\nPlease update the subscriber\'s address with location coordinates.');
+            return;
+        }
+
+        // Open route modal with subscriber data
+        const subscriberData = {
+            name: subscriber.name || subscriber.firstname || 'Subscriber',
+            phone: subscriber.phone || '',
+            latitude: latitude,
+            longitude: longitude
+        };
+        console.log('✅ Opening modal with data:', subscriberData);
+        setSelectedSubscriberForRoute(subscriberData);
+        setShowRouteModal(true);
+        console.log('✅ Modal state set to true');
     };
 
     // Handle payment
@@ -409,8 +446,13 @@ const CollectionsPage = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                                <button
+                                                    onClick={() => handleNavigate(receivable)}
+                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center mx-auto gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                                    title="Get directions to subscriber location"
+                                                >
                                                     <FiMapPin className="w-4 h-4" />
+                                                    <span className="text-xs">Route</span>
                                                 </button>
                                             </td>
                                             <td className="px-6 py-4 text-center">
@@ -517,6 +559,18 @@ const CollectionsPage = () => {
                             </div>
                         </div>
                     </div>
+                )}
+
+                {/* Route Map Modal */}
+                {showRouteModal && selectedSubscriberForRoute && (
+                    <RouteMapModal
+                        isOpen={showRouteModal}
+                        onClose={() => {
+                            setShowRouteModal(false);
+                            setSelectedSubscriberForRoute(null);
+                        }}
+                        subscriberData={selectedSubscriberForRoute}
+                    />
                 )}
             </div>
         </div>

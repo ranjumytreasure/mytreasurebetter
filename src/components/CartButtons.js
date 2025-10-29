@@ -179,8 +179,8 @@ const CartButtons = ({ scrolled }) => {
                             {isTooltipVisible && (
                                 <>
                                     {/* Invisible bridge to prevent hover gap - mobile: above, desktop: below */}
-                                    <div className={`absolute w-56 h-2 z-40 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
-                                    <div className={`absolute w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+                                    <div className={`absolute w-56 h-2 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} style={{ zIndex: 9998 }} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}></div>
+                                    <div className={`absolute w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 ${isMobile ? 'bottom-10' : 'top-10'} ${popupPosition}`} style={{ zIndex: 9999 }} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
                                         <div className="px-4 py-2 border-b border-gray-100">
                                             <p className="text-sm font-semibold text-gray-800">
                                                 {user.results.firstname || user.results.name || "User"}

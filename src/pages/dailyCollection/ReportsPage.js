@@ -37,14 +37,16 @@ const ReportsPage = () => {
     const { user } = useUserContext();
     const { companies, products, loans } = useDailyCollectionContext();
 
-    // Custom formatCurrency for PDF (without ¹ character)
+    // Custom formatCurrency for PDF (without Unicode rupee symbol)
     const formatCurrencyForPDF = (amount) => {
-        if (!amount) return '₹0';
-        // Manual formatting to avoid ¹ character
+        if (!amount && amount !== 0) return 'Rs. 0';
+        // Use Rs. instead of ₹ for PDF compatibility
         const num = Number(amount);
-        const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        const result = `₹${formatted}`;
-        console.log('formatCurrencyForPDF:', amount, '->', result);
+        const formatted = num.toLocaleString('en-IN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        const result = `Rs. ${formatted}`;
         return result;
     };
 
@@ -664,14 +666,16 @@ const ReportItem = ({ report, onView, onExport, companies, user }) => {
     const reportData = report.data || report;
     const reportType = report.reportType || report.id || 'loan-summary';
 
-    // Custom formatCurrency for PDF (without ¹ character)
+    // Custom formatCurrency for PDF (without Unicode rupee symbol)
     const formatCurrencyForPDF = (amount) => {
-        if (!amount) return '₹0';
-        // Manual formatting to avoid ¹ character
+        if (!amount && amount !== 0) return 'Rs. 0';
+        // Use Rs. instead of ₹ for PDF compatibility
         const num = Number(amount);
-        const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        const result = `₹${formatted}`;
-        console.log('formatCurrencyForPDF:', amount, '->', result);
+        const formatted = num.toLocaleString('en-IN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        const result = `Rs. ${formatted}`;
         return result;
     };
 
@@ -951,14 +955,16 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
     const reportData = report.data || report;
     const reportType = report.reportType || report.id || 'loan-summary';
 
-    // Custom formatCurrency for PDF (without ¹ character)
+    // Custom formatCurrency for PDF (without Unicode rupee symbol)
     const formatCurrencyForPDF = (amount) => {
-        if (!amount) return '₹0';
-        // Manual formatting to avoid ¹ character
+        if (!amount && amount !== 0) return 'Rs. 0';
+        // Use Rs. instead of ₹ for PDF compatibility
         const num = Number(amount);
-        const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        const result = `₹${formatted}`;
-        console.log('formatCurrencyForPDF:', amount, '->', result);
+        const formatted = num.toLocaleString('en-IN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        const result = `Rs. ${formatted}`;
         return result;
     };
 

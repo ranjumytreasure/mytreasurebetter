@@ -17,12 +17,19 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-const YourDue = ({ data, GroupWiseOverallUserDuedata }) => {
+const YourDue = ({ data, GroupWiseOverallUserDuedata, groupDetailsData }) => {
     const { user } = useUserContext();
     const { state } = useGroupDetailsContext();
     const history = useHistory();
     const userCompany = user?.results?.userCompany;
-    const groupData = state?.data;
+    const groupData = groupDetailsData || state?.data;
+
+    // Debug: Log group data to see the structure
+    console.log('Group Data for PDF:', groupData);
+    console.log('Group Data Results:', groupData?.results);
+    console.log('Group Name:', groupData?.results?.groupName);
+    console.log('Group Amount:', groupData?.results?.amount);
+    console.log('Group Start Date:', groupData?.results?.startDate);
 
     const [accountWiseData, setAccountWiseData] = useState([]);
     const [totalDue, setTotalDue] = useState('0');
@@ -137,6 +144,48 @@ const YourDue = ({ data, GroupWiseOverallUserDuedata }) => {
                     </div>
                 </div>
 
+                {/* Group Details Section */}
+                {groupData?.results && (
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-8">
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 px-8 py-4">
+                            <h2 className="text-2xl font-bold text-white text-center">Group Details</h2>
+                        </div>
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <span className="text-sm font-medium text-blue-600">Group Name</span>
+                                    </div>
+                                    <div className="text-xl font-bold text-blue-800">{groupData?.results?.groupName || groupData?.groupName || 'N/A'}</div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                        </svg>
+                                        <span className="text-sm font-medium text-green-600">Group Amount</span>
+                                    </div>
+                                    <div className="text-xl font-bold text-green-800">₹{(groupData?.results?.amount || groupData?.amount)?.toLocaleString() || 'N/A'}</div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span className="text-sm font-medium text-purple-600">Start Date</span>
+                                    </div>
+                                    <div className="text-xl font-bold text-purple-800">{formatDate(groupData?.results?.startDate) || formatDate(groupData?.results?.start_date) || formatDate(groupData?.startDate) || formatDate(groupData?.start_date) || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Data Table */}
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                     {/* Table Header - Desktop Only */}
@@ -241,18 +290,22 @@ const YourDue = ({ data, GroupWiseOverallUserDuedata }) => {
                                             <PDFDownloadLink
                                                 document={
                                                     <AuctionWinnerReceiptPdf
-                                                        winnerData={{
-                                                            winnerImage: user_image_base64format,
-                                                            winnerName: name,
-                                                            auctionDate: formattedAuctionDate,
-                                                            amountTaken: total_supposed_to_pay ?? 0,
-                                                            prizeMoney: total_supposed_to_pay ?? 0,
-                                                            balance: total_outstanding_balance ?? 0,
-                                                            paymentMode: payment_mode ?? 'Online',
-                                                            groupName: groupData?.results?.groupName ?? '',
-                                                            amount: groupData?.results?.amount ?? '',
-                                                            startDate: formatDate(groupData?.results?.startDate) ?? '',
-                                                        }}
+                                                        winnerData={(() => {
+                                                            const pdfData = {
+                                                                winnerImage: user_image_base64format,
+                                                                winnerName: name,
+                                                                auctionDate: formattedAuctionDate,
+                                                                amountTaken: total_supposed_to_pay ?? 0,
+                                                                prizeMoney: total_supposed_to_pay ?? 0,
+                                                                balance: total_outstanding_balance ?? 0,
+                                                                paymentMode: payment_mode ?? 'Online',
+                                                                groupName: groupData?.results?.groupName || groupData?.groupName || 'N/A',
+                                                                amount: groupData?.results?.amount || groupData?.amount || 'N/A',
+                                                                startDate: formatDate(groupData?.results?.startDate) || formatDate(groupData?.results?.start_date) || formatDate(groupData?.startDate) || formatDate(groupData?.start_date) || 'N/A',
+                                                            };
+                                                            console.log('PDF Data being sent:', pdfData);
+                                                            return pdfData;
+                                                        })()}
                                                         companyData={userCompany}
                                                     />
                                                 }
@@ -316,18 +369,22 @@ const YourDue = ({ data, GroupWiseOverallUserDuedata }) => {
                                             <PDFDownloadLink
                                                 document={
                                                     <AuctionWinnerReceiptPdf
-                                                        winnerData={{
-                                                            winnerImage: user_image_base64format,
-                                                            winnerName: name,
-                                                            auctionDate: formattedAuctionDate,
-                                                            amountTaken: total_supposed_to_pay ?? 0,
-                                                            prizeMoney: total_supposed_to_pay ?? 0,
-                                                            balance: total_outstanding_balance ?? 0,
-                                                            paymentMode: payment_mode ?? 'Online',
-                                                            groupName: groupData?.results?.groupName ?? '',
-                                                            amount: groupData?.results?.amount ?? '',
-                                                            startDate: formatDate(groupData?.results?.startDate) ?? '',
-                                                        }}
+                                                        winnerData={(() => {
+                                                            const pdfData = {
+                                                                winnerImage: user_image_base64format,
+                                                                winnerName: name,
+                                                                auctionDate: formattedAuctionDate,
+                                                                amountTaken: total_supposed_to_pay ?? 0,
+                                                                prizeMoney: total_supposed_to_pay ?? 0,
+                                                                balance: total_outstanding_balance ?? 0,
+                                                                paymentMode: payment_mode ?? 'Online',
+                                                                groupName: groupData?.results?.groupName || groupData?.groupName || 'N/A',
+                                                                amount: groupData?.results?.amount || groupData?.amount || 'N/A',
+                                                                startDate: formatDate(groupData?.results?.startDate) || formatDate(groupData?.results?.start_date) || formatDate(groupData?.startDate) || formatDate(groupData?.start_date) || 'N/A',
+                                                            };
+                                                            console.log('PDF Data being sent (Mobile):', pdfData);
+                                                            return pdfData;
+                                                        })()}
                                                         companyData={userCompany}
                                                     />
                                                 }

@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useDailyCollectionContext } from '../../context/dailyCollection/DailyCollectionContext';
 import { useUserContext } from '../../context/user_context';
 import { API_BASE_URL } from '../../utils/apiConfig';
 import { FiX, FiSearch, FiUser, FiDollarSign, FiCalendar, FiChevronRight, FiChevronLeft, FiCheck, FiDownload, FiPrinter, FiPhone, FiMail, FiTrendingUp, FiClock, FiPercent, FiShare2 } from 'react-icons/fi';
+import LoanAgreementPDF from './PDF/LoanAgreementPDF';
 
 const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
     const { disburseLoan } = useDailyCollectionContext();
@@ -27,9 +29,10 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
     const [generatedReceivables, setGeneratedReceivables] = useState([]);
     const [disbursedLoan, setDisbursedLoan] = useState(null);
     const [ledgerAccounts, setLedgerAccounts] = useState([]);
+    const [companies, setCompanies] = useState([]);
     const printRef = useRef();
 
-    // Fetch ledger accounts on component mount
+    // Fetch ledger accounts and companies on component mount
     useEffect(() => {
         const fetchLedgerAccounts = async () => {
             if (!user?.results?.token) return;
@@ -56,7 +59,33 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
             }
         };
 
+        const fetchCompanies = async () => {
+            if (!user?.results?.token) return;
+
+            const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
+            if (!membershipId) return;
+
+            try {
+                const url = `${API_BASE_URL}/dc/companies?parent_membership_id=${membershipId}`;
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${user.results.token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setCompanies(data.results || []);
+                }
+            } catch (error) {
+                console.error('Error fetching companies:', error);
+            }
+        };
+
         fetchLedgerAccounts();
+        fetchCompanies();
     }, [user]);
 
     // Get selected data
@@ -272,7 +301,7 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
                 subscriberId: formData.subscriber_id,
                 productId: formData.product_id,
                 principalAmount: parseFloat(formData.loan_amount),
-                cashInHand: parseFloat(formData.cash_in_hand || formData.loan_amount),
+                cashInHand: parseFloat(cashInHand), // Use the computed cashInHand (loan amount - interest)
                 loanMode: formData.loan_mode || selectedProduct?.frequency,
                 paymentMethod: formData.payment_method,
                 membershipId: user?.results?.userAccounts?.[0]?.parent_membership_id,
@@ -284,12 +313,9 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
             };
 
             console.log('Loan payload to send to backend:', loanPayload);
-            console.log('Form data:', formData);
 
             // Check API URL
             const apiUrl = `${API_BASE_URL}/dc/loans/disburse`;
-            console.log('API URL:', apiUrl);
-            console.log('Token available:', !!user?.results?.token);
 
             // Call existing backend API: POST /dc/loans/disburse
             const response = await fetch(apiUrl, {
@@ -316,7 +342,6 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
             // Check for success using the actual backend response structure
             if (result.error === false && result.code === 200) {
                 console.log('✅ Loan and receivables created successfully in database:', result);
-                console.log('Response data structure:', JSON.stringify(result.results, null, 2));
 
                 // Backend response structure:
                 // {
@@ -351,93 +376,7 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
     };
 
 
-    // Generate PDF
-    const generatePDF = () => {
-        try {
-            const { jsPDF } = require('jspdf');
-            const doc = new jsPDF();
-
-            // Set font
-            doc.setFont('helvetica');
-
-            // Title
-            doc.setFontSize(20);
-            doc.text('LOAN AGREEMENT', 105, 20, { align: 'center' });
-
-            // Company Info
-            doc.setFontSize(12);
-            doc.text('MyTreasure Finance Hub', 20, 35);
-            doc.text('Daily Collection Division', 20, 42);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 49);
-
-            // Loan Details
-            doc.setFontSize(14);
-            doc.text('LOAN DETAILS', 20, 65);
-
-            doc.setFontSize(10);
-            doc.text(`Loan ID: ${disbursedLoan?.loan?.id || 'N/A'}`, 20, 75);
-            doc.text(`Subscriber: ${selectedSubscriber?.name || selectedSubscriber?.firstname}`, 20, 82);
-            doc.text(`Phone: ${selectedSubscriber?.phone}`, 20, 89);
-            doc.text(`Product: ${selectedProduct?.product_name}`, 20, 96);
-            doc.text(`Loan Amount: ₹${parseFloat(formData.loan_amount).toFixed(2)}`, 20, 103);
-            doc.text(`Cash in Hand: ₹${cashInHand}`, 20, 110);
-            doc.text(`Interest Rate: ${selectedProduct?.interest_rate || 0}%`, 20, 117);
-            doc.text(`Disbursement Date: ${formData.disbursement_date}`, 20, 124);
-            doc.text(`First Due Date: ${formData.first_due_date}`, 20, 131);
-            doc.text(`Total Installments: ${generatedReceivables.length}`, 20, 138);
-            doc.text(`Per Cycle Due: ₹${perCycleDue}`, 20, 145);
-
-            // Payment Schedule
-            doc.setFontSize(12);
-            doc.text('PAYMENT SCHEDULE', 20, 160);
-
-            // Table headers
-            doc.setFontSize(8);
-            doc.text('Cycle', 20, 170);
-            doc.text('Due Date', 40, 170);
-            doc.text('Amount', 80, 170);
-            doc.text('Balance', 120, 170);
-
-            // Table data (first 20 rows)
-            let yPos = 175;
-            generatedReceivables.slice(0, 20).forEach((rec, idx) => {
-                if (yPos > 280) return; // Page break
-                doc.text(`#${rec.cycle}`, 20, yPos);
-                doc.text(rec.due_date, 40, yPos);
-                doc.text(`₹${rec.due_amount}`, 80, yPos);
-                doc.text(`₹${rec.closing_balance}`, 120, yPos);
-                yPos += 5;
-            });
-
-            if (generatedReceivables.length > 20) {
-                doc.text(`... and ${generatedReceivables.length - 20} more cycles`, 20, yPos + 5);
-            }
-
-            // Terms and Conditions
-            doc.setFontSize(10);
-            doc.text('TERMS AND CONDITIONS:', 20, 200);
-            doc.setFontSize(8);
-            doc.text('1. Borrower agrees to pay the loan amount as per the schedule above.', 20, 210);
-            doc.text('2. Late payment charges may apply for overdue amounts.', 20, 217);
-            doc.text('3. This agreement is subject to the terms and conditions of MyTreasure Finance Hub.', 20, 224);
-
-            // Signature section
-            doc.setFontSize(10);
-            doc.text('BORROWER SIGNATURE:', 20, 240);
-            doc.text('_________________________', 20, 250);
-            doc.text('Date: _______________', 20, 260);
-
-            doc.text('AUTHORIZED SIGNATURE:', 120, 240);
-            doc.text('_________________________', 120, 250);
-            doc.text('Date: _______________', 120, 260);
-
-            // Save the PDF
-            doc.save(`loan-agreement-${disbursedLoan?.loan?.id || 'temp'}.pdf`);
-        } catch (error) {
-            console.error('PDF generation failed:', error);
-            alert('PDF generation failed. Please use the Print option instead.');
-        }
-    };
+    // PDF generation is now handled by PDFDownloadLink component with @react-pdf/renderer
 
     // Print function
     const handlePrint = () => {
@@ -1296,14 +1235,41 @@ MyTreasure Finance Hub Team
                             {/* Action Buttons - Only show after database creation */}
                             {disbursedLoan && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 no-print">
-                                    <button
-                                        onClick={generatePDF}
+                                    <PDFDownloadLink
+                                        document={
+                                            <LoanAgreementPDF
+                                                loanData={{
+                                                    loan: disbursedLoan.loan,
+                                                    subscriber: selectedSubscriber,
+                                                    product: selectedProduct,
+                                                    receivables: generatedReceivables,
+                                                    cashInHand: cashInHand,
+                                                    perCycleDue: perCycleDue
+                                                }}
+                                                companyData={{
+                                                    companyName: companies?.[0]?.company_name || 'MyTreasure Finance Hub',
+                                                    phone: companies?.[0]?.phone || '',
+                                                    email: companies?.[0]?.email || '',
+                                                    address: companies?.[0]?.address || '',
+                                                    district: companies?.[0]?.district || ''
+                                                }}
+                                            />
+                                        }
+                                        fileName={`loan-agreement-${disbursedLoan?.loan?.id || 'temp'}.pdf`}
                                         className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                                     >
-                                        <FiDownload className="w-5 h-5" />
-                                        <span className="hidden sm:inline">Download PDF</span>
-                                        <span className="sm:hidden">PDF</span>
-                                    </button>
+                                        {({ loading }) => (
+                                            <>
+                                                <FiDownload className="w-5 h-5" />
+                                                <span className="hidden sm:inline">
+                                                    {loading ? 'Preparing PDF...' : 'Download PDF'}
+                                                </span>
+                                                <span className="sm:hidden">
+                                                    {loading ? '...' : 'PDF'}
+                                                </span>
+                                            </>
+                                        )}
+                                    </PDFDownloadLink>
                                     <button
                                         onClick={handlePrint}
                                         className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"

@@ -62,6 +62,8 @@ const PreviewAndSubmit = () => {
             pincode: addressDetails.pincode,
             taluk: addressDetails.taluk,
             district: addressDetails.district,
+            latitude: addressDetails.latitude,
+            longitude: addressDetails.longitude,
         },
         bank: {
             bankName: bankDetails.bankName,
@@ -207,6 +209,11 @@ const PreviewAndSubmit = () => {
                 </li>
                 <li>
                     <span>Address:</span> {`${customerData.address.streetName}, ${customerData.address.villageName}, ${customerData.address.taluk}, ${customerData.address.district}, ${customerData.address.pincode}`}
+                    {(customerData.address.latitude && customerData.address.longitude) && (
+                        <div className="text-sm text-gray-600 mt-1">
+                            📍 Coordinates: {customerData.address.latitude}, {customerData.address.longitude}
+                        </div>
+                    )}
                 </li>
                 <li><span>Nominee:</span> {customerData.nominee.name} ({customerData.nominee.relationship})</li>
                 <li><span>Business Type:</span> {customerData.businessDetails.type}</li>

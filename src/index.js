@@ -4,12 +4,13 @@ import React, { useEffect } from 'react'; // Import React and useEffect
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import './style/custom.css';
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS for map functionality
 import App from './App';
 //import gitRev from 'git-rev-sync';  // Correct way to import git-rev-sync
 
 
 import { UserProvider } from './context/user_context';
-import { Auth0Provider } from '@auth0/auth0-react' ;
+import { Auth0Provider } from '@auth0/auth0-react';
 
 
 // // Get the current commit hash

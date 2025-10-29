@@ -12,6 +12,8 @@ import AvatarUploader from '../components/AvatarUploader';
 import Alert from '../components/Alert';
 import EditableField from '../components/EditableField'
 import Select from 'react-select';
+import FixedMapPicker from '../components/FixedMapPicker';
+import SimpleLocationPicker from '../components/SimpleLocationPicker';
 import "../style/SubscriberProfile.css";
 
 const SubscriberProfile = () => {
@@ -54,6 +56,11 @@ const SubscriberProfile = () => {
   // image upload
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
+
+  // Map picker state
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [useSimplePicker, setUseSimplePicker] = useState(false);
+  const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
 
   const handleSetImage = (file) => {
     setSelectedImage(file);
@@ -224,6 +231,8 @@ const SubscriberProfile = () => {
         pincode: res.pincode || '',
         taluk: res.taluk || '',
         district: res.district || '',
+        latitude: res.latitude || '',
+        longitude: res.longitude || '',
       },
       bankDetails: {
         accountNumber: res.bank_account_number || '',
@@ -421,6 +430,85 @@ const SubscriberProfile = () => {
         [field]: value,
       },
     }));
+  };
+
+  // Map picker handlers
+  const openMapPicker = () => {
+    setIsMapOpen(true);
+    setUseSimplePicker(false);
+  };
+
+  const openSimplePicker = () => {
+    setIsMapOpen(true);
+    setUseSimplePicker(true);
+  };
+
+  const closeMapPicker = () => {
+    setIsMapOpen(false);
+    setUseSimplePicker(false);
+  };
+
+  const handleLocationSelect = (lat, lng) => {
+    setSubscriberData((prev) => ({
+      ...prev,
+      addressDetails: {
+        ...prev.addressDetails,
+        latitude: lat.toString(),
+        longitude: lng.toString(),
+      },
+    }));
+  };
+
+  // Geocoding: Convert address to coordinates
+  const geocodeAddress = async () => {
+    const { street, village, taluk, district, pincode } = subscriberData.addressDetails;
+    const addressParts = [street, village, taluk, district, pincode].filter(Boolean);
+
+    if (addressParts.length === 0) {
+      alert('Please enter at least some address details to locate on map');
+      return;
+    }
+
+    const fullAddress = addressParts.join(', ');
+    setIsGeocodingLoading(true);
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'TreasureApp/1.0'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Geocoding service unavailable');
+      }
+
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        setSubscriberData((prev) => ({
+          ...prev,
+          addressDetails: {
+            ...prev.addressDetails,
+            latitude: lat,
+            longitude: lon,
+          },
+        }));
+        alert(`✅ Location found!\n\nAddress: ${fullAddress}\nCoordinates: ${parseFloat(lat).toFixed(6)}, ${parseFloat(lon).toFixed(6)}`);
+      } else {
+        alert('❌ Location not found. Please try:\n- Adding more address details\n- Checking spelling\n- Using the map picker to select manually');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      alert('❌ Unable to locate address. Please use the map picker to select location manually.');
+    } finally {
+      setIsGeocodingLoading(false);
+    }
   };
   if (loading) {
     return (
@@ -1038,6 +1126,118 @@ const SubscriberProfile = () => {
                   onChange={(e) => handleChange('addressDetails', 'district', e.target.value)}
                   placeholder="District"
                 />
+
+                {/* Location Coordinates Section */}
+                <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#f0f7ff', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+                  <h4 style={{ margin: '0 0 15px 0', color: '#2563eb', fontSize: '16px' }}>📍 Location Coordinates</h4>
+
+                  {/* Auto-Locate Button */}
+                  <button
+                    type="button"
+                    onClick={geocodeAddress}
+                    disabled={isGeocodingLoading}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      marginBottom: '10px',
+                      backgroundColor: isGeocodingLoading ? '#9ca3af' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: isGeocodingLoading ? 'not-allowed' : 'pointer',
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    {isGeocodingLoading ? (
+                      <>
+                        <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid white', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <span>🔍</span>
+                        Find Location from Address
+                      </>
+                    )}
+                  </button>
+
+                  {/* Map Picker Buttons */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                    <button
+                      type="button"
+                      onClick={openMapPicker}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>🗺️</span>
+                      Select on Map
+                    </button>
+                    <button
+                      type="button"
+                      onClick={openSimplePicker}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: '#8b5cf6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>📍</span>
+                      Enter Manually
+                    </button>
+                  </div>
+
+                  {/* Coordinate Input Fields */}
+                  <input
+                    type="number"
+                    step="any"
+                    value={subscriberData.addressDetails.latitude}
+                    onChange={(e) => handleChange('addressDetails', 'latitude', e.target.value)}
+                    placeholder="Latitude (e.g., 12.9716)"
+                    style={{ marginBottom: '8px', width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                  />
+                  <input
+                    type="number"
+                    step="any"
+                    value={subscriberData.addressDetails.longitude}
+                    onChange={(e) => handleChange('addressDetails', 'longitude', e.target.value)}
+                    placeholder="Longitude (e.g., 77.5946)"
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                  />
+
+                  {/* Current Coordinates Display */}
+                  {(subscriberData.addressDetails.latitude && subscriberData.addressDetails.longitude) && (
+                    <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'white', borderRadius: '6px', fontSize: '13px' }}>
+                      <strong>Current Location:</strong><br />
+                      📍 {subscriberData.addressDetails.latitude}, {subscriberData.addressDetails.longitude}
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <p>
@@ -1046,6 +1246,23 @@ const SubscriberProfile = () => {
                 Pincode: {subscriberData.addressDetails.pincode} <br />
                 Taluk: {subscriberData.addressDetails.taluk} <br />
                 District: {subscriberData.addressDetails.district}
+                {(subscriberData.addressDetails.latitude && subscriberData.addressDetails.longitude) && (
+                  <>
+                    <br /><br />
+                    <strong>📍 Location:</strong><br />
+                    Latitude: {subscriberData.addressDetails.latitude} <br />
+                    Longitude: {subscriberData.addressDetails.longitude}
+                    <br />
+                    <a
+                      href={`https://www.google.com/maps?q=${subscriberData.addressDetails.latitude},${subscriberData.addressDetails.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#2563eb', textDecoration: 'underline', marginTop: '5px', display: 'inline-block' }}
+                    >
+                      🗺️ View on Google Maps
+                    </a>
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -1230,6 +1447,29 @@ const SubscriberProfile = () => {
           </div>
         )}
       </div>
+
+      {/* Map Picker Modals */}
+      {isMapOpen && (
+        <div>
+          {useSimplePicker ? (
+            <SimpleLocationPicker
+              latitude={subscriberData.addressDetails.latitude}
+              longitude={subscriberData.addressDetails.longitude}
+              onLocationSelect={handleLocationSelect}
+              isOpen={isMapOpen}
+              onClose={closeMapPicker}
+            />
+          ) : (
+            <FixedMapPicker
+              latitude={subscriberData.addressDetails.latitude}
+              longitude={subscriberData.addressDetails.longitude}
+              onLocationSelect={handleLocationSelect}
+              isOpen={isMapOpen}
+              onClose={closeMapPicker}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 

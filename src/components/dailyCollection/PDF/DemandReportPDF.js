@@ -67,11 +67,13 @@ const DemandReportPDF = ({
     summaryData = {}
 }) => {
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
+        // Use Rs. instead of ₹ for PDF compatibility (avoids ¹ symbol)
+        const num = Number(amount || 0);
+        const formatted = num.toLocaleString('en-IN', {
+            minimumFractionDigits: 0,
             maximumFractionDigits: 0
-        }).format(amount || 0);
+        });
+        return `Rs. ${formatted}`;
     };
 
     return (
