@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDailyCollectionContext } from '../../context/dailyCollection/DailyCollectionContext';
 import { useUserContext } from '../../context/user_context';
 import { API_BASE_URL } from '../../utils/apiConfig';
-import { FiFilter, FiMapPin, FiDollarSign, FiCalendar, FiUser, FiSearch, FiRefreshCw, FiCheckCircle, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { FiFilter, FiMapPin, FiDollarSign, FiCalendar, FiUser, FiSearch, FiRefreshCw, FiCheckCircle, FiClock, FiAlertCircle, FiDownload } from 'react-icons/fi';
 import RouteMapModal from '../../components/RouteMapModal';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import CollectionsReportPDF from '../../components/dailyCollection/PDF/CollectionsReportPDF';
 
 const CollectionsPage = () => {
     const { user } = useUserContext();
@@ -15,6 +17,7 @@ const CollectionsPage = () => {
     const [ledgerAccounts, setLedgerAccounts] = useState([]);
     const [showRouteModal, setShowRouteModal] = useState(false);
     const [selectedSubscriberForRoute, setSelectedSubscriberForRoute] = useState(null);
+    const [companies, setCompanies] = useState([]);
 
     // Filters - Default to show today's due and overdue
     const [filters, setFilters] = useState({
@@ -22,7 +25,7 @@ const CollectionsPage = () => {
         endDate: '',
         subscriberName: '',
         amount: '',
-        status: 'all', // all, today, pending, overdue
+        status: 'all', // all, today, overdue, future
         disbursementDate: ''
     });
 
@@ -45,6 +48,7 @@ const CollectionsPage = () => {
             const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
             const queryParams = new URLSearchParams({
                 parent_membership_id: membershipId,
+                ...(filters.status ? { status: filters.status } : {}), // Send status including 'all'
                 ...(filters.startDate ? { start_date: filters.startDate } : {}),
                 ...(filters.endDate ? { end_date: filters.endDate } : {}),
                 ...(filters.subscriberName ? { subscriber_name: filters.subscriberName } : {}),
@@ -66,9 +70,16 @@ const CollectionsPage = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                setReceivables(data.results || []);
+                console.log("✅ API Response:", data);
+                // Handle different response structures
+                const receivablesData = data.results || data.data || data || [];
+                console.log("📊 Receivables data:", receivablesData);
+                console.log("📊 Receivables count:", Array.isArray(receivablesData) ? receivablesData.length : 0);
+                setReceivables(Array.isArray(receivablesData) ? receivablesData : []);
             } else {
-                throw new Error('Failed to fetch receivables');
+                const errorData = await res.json().catch(() => ({ message: 'Failed to fetch receivables' }));
+                console.error("❌ API Error:", errorData);
+                throw new Error(errorData.message || 'Failed to fetch receivables');
             }
         } catch (error) {
             console.error('Error fetching receivables:', error);
@@ -102,43 +113,81 @@ const CollectionsPage = () => {
         }
     };
 
+    // Fetch companies for PDF
+    const fetchCompanies = useCallback(async () => {
+        if (!user?.results?.token) return;
+
+        try {
+            const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
+            const url = `${API_BASE_URL}/dc/companies?parent_membership_id=${membershipId}`;
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${user.results.token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setCompanies(data.results || []);
+            }
+        } catch (error) {
+            console.error('Error fetching companies:', error);
+        }
+    }, [user]);
+
     useEffect(() => {
         fetchReceivables();
         fetchLedgerAccounts();
-    }, [user, filters]);
+        fetchCompanies();
+    }, [user, filters, fetchCompanies]);
 
-    // Filter receivables by status - User perspective focused
+    // Filter receivables - Backend handles status/date filtering, frontend only handles client-side filters
     const getFilteredReceivables = () => {
-        const today = new Date().toISOString().split('T')[0];
-        let filtered = receivables;
+        console.log("🔍 Filtering receivables. Total receivables:", receivables.length);
+        let filtered = receivables; // Backend already filtered by status and date range
 
-        // Default behavior: Show only today's due and past unpaid (no future)
-        if (filters.status === 'all' || !filters.status) {
-            filtered = filtered.filter(r =>
-                (r.due_date <= today) && !r.is_paid
-            );
-        } else if (filters.status === 'today') {
-            filtered = filtered.filter(r => r.due_date === today && !r.is_paid);
-        } else if (filters.status === 'pending') {
-            filtered = filtered.filter(r => r.due_date < today && !r.is_paid);
-        } else if (filters.status === 'overdue') {
-            filtered = filtered.filter(r => r.due_date < today && !r.is_paid);
-        }
-
-        // If date range is specified, show future dues too
-        if (filters.startDate || filters.endDate) {
-            filtered = receivables.filter(r => {
-                if (filters.startDate && filters.endDate) {
-                    return r.due_date >= filters.startDate && r.due_date <= filters.endDate;
-                } else if (filters.startDate) {
-                    return r.due_date >= filters.startDate;
-                } else if (filters.endDate) {
-                    return r.due_date <= filters.endDate;
-                }
-                return true;
+        // Apply subscriber name filter (client-side search)
+        if (filters.subscriberName) {
+            const searchTerm = filters.subscriberName.toLowerCase();
+            filtered = filtered.filter(r => {
+                // Support both old (name/firstname) and new (dc_cust_name) field names
+                const subscriberName = (
+                    r.subscriber?.name ||
+                    r.subscriber?.firstname ||
+                    r.subscriber?.dc_cust_name ||
+                    ''
+                ).toLowerCase();
+                return subscriberName.includes(searchTerm);
             });
+            console.log("🔍 After subscriber filter:", filtered.length);
         }
 
+        // Apply amount filter (exact match - backend uses >=, so we do exact match here if needed)
+        if (filters.amount) {
+            const amountFilter = parseFloat(filters.amount);
+            if (!isNaN(amountFilter)) {
+                filtered = filtered.filter(r => {
+                    const dueAmount = parseFloat(r.due_amount || r.amount || 0);
+                    // Allow exact match or within 0.01 for floating point comparison
+                    return Math.abs(dueAmount - amountFilter) < 0.01;
+                });
+                console.log("🔍 After amount filter:", filtered.length);
+            }
+        }
+
+        // Apply disbursement date filter (client-side since it's nested in loan)
+        if (filters.disbursementDate) {
+            filtered = filtered.filter(r => {
+                const loanDisbursementDate = r.loan?.loan_disbursement_date || r.loan?.disbursement_date;
+                if (!loanDisbursementDate) return false;
+                return loanDisbursementDate === filters.disbursementDate;
+            });
+            console.log("🔍 After disbursement date filter:", filtered.length);
+        }
+
+        console.log("✅ Final filtered count:", filtered.length);
         return filtered;
     };
 
@@ -188,8 +237,8 @@ const CollectionsPage = () => {
 
         // Open route modal with subscriber data
         const subscriberData = {
-            name: subscriber.name || subscriber.firstname || 'Subscriber',
-            phone: subscriber.phone || '',
+            name: subscriber.name || subscriber.firstname || subscriber.dc_cust_name || 'Subscriber',
+            phone: subscriber.phone || subscriber.dc_cust_phone || '',
             latitude: latitude,
             longitude: longitude
         };
@@ -267,6 +316,39 @@ const CollectionsPage = () => {
                         <p className="text-sm text-gray-600 mt-1">Manage loan collections and payments</p>
                     </div>
                     <div className="flex gap-2">
+                        {filteredReceivables.length > 0 && companies.length > 0 && (
+                            <PDFDownloadLink
+                                document={
+                                    <CollectionsReportPDF
+                                        receivables={filteredReceivables}
+                                        companyData={{
+                                            company_name: companies[0]?.company_name || 'Daily Collection Company',
+                                            company_logo_base64format: companies[0]?.company_logo_base64format || companies[0]?.company_logo || '',
+                                            company_logo: companies[0]?.company_logo_base64format || companies[0]?.company_logo || '',
+                                            logo_base64format: companies[0]?.company_logo_base64format || companies[0]?.company_logo || '',
+                                            contact_no: companies[0]?.contact_no || '',
+                                            address: companies[0]?.address || '',
+                                            companyName: companies[0]?.company_name || 'Daily Collection Company',
+                                            name: companies[0]?.company_name || 'Daily Collection Company',
+                                            phone: companies[0]?.contact_no || '',
+                                            email: companies[0]?.email || '',
+                                        }}
+                                        filters={filters}
+                                    />
+                                }
+                                fileName={`collections-report-${filters.status || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`}
+                            >
+                                {({ loading }) => (
+                                    <button
+                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                                        disabled={loading}
+                                    >
+                                        <FiDownload className="w-4 h-4" />
+                                        {loading ? 'Generating PDF...' : 'Download PDF'}
+                                    </button>
+                                )}
+                            </PDFDownloadLink>
+                        )}
                         <button
                             onClick={() => setFilters({
                                 startDate: '',
@@ -306,9 +388,9 @@ const CollectionsPage = () => {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="all">Today's Due + Overdue</option>
-                                <option value="today">Today's Due Only</option>
-                                <option value="pending">Overdue Only</option>
-                                <option value="overdue">All Overdue</option>
+                                <option value="today">Today's Due</option>
+                                <option value="overdue">Over Due</option>
+                                <option value="future">Future Due</option>
                             </select>
                         </div>
                         <div>
@@ -370,8 +452,9 @@ const CollectionsPage = () => {
                                 <p className="text-sm text-gray-600 mt-1">
                                     {filters.status === 'all' ? "Showing today's due and overdue amounts" :
                                         filters.status === 'today' ? "Showing today's due amounts only" :
-                                            filters.status === 'pending' ? "Showing overdue amounts only" :
-                                                "Showing filtered results"}
+                                            filters.status === 'overdue' ? "Showing overdue (unpaid history) amounts only" :
+                                                filters.status === 'future' ? "Showing future due amounts only" :
+                                                    "Showing filtered results"}
                                 </p>
                             </div>
                             {filteredReceivables.length > 0 && (
@@ -398,85 +481,130 @@ const CollectionsPage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {filteredReceivables.map((receivable) => {
-                                    const status = getStatusBadge(receivable);
-                                    return (
-                                        <tr key={receivable.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                                        <FiUser className="w-4 h-4 text-gray-600" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-medium text-gray-900">
-                                                            {receivable.subscriber?.name || 'N/A'}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500">
-                                                            {receivable.subscriber?.phone || ''}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {receivable.product?.product_name || 'N/A'}
-                                                </div>
-                                                <div className="text-sm text-gray-500">
-                                                    {receivable.loan?.payment_method || ''}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <span className="text-sm font-semibold text-gray-900">
-                                                    {formatAmount(receivable.due_amount || receivable.amount)}
-                                                </span>
-                                                {receivable.due_amount && receivable.amount && receivable.due_amount !== receivable.amount && (
-                                                    <div className="text-xs text-gray-500">
-                                                        Total: {formatAmount(receivable.amount)}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="text-sm text-gray-600">
-                                                    {new Date(receivable.due_date).toLocaleDateString('en-GB')}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.color}`}>
-                                                    {status.text}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <FiRefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
+                                                <p className="text-gray-500">Loading receivables...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : error ? (
+                                    <tr>
+                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <FiAlertCircle className="w-8 h-8 text-red-400" />
+                                                <p className="text-red-500">Error: {error}</p>
                                                 <button
-                                                    onClick={() => handleNavigate(receivable)}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center mx-auto gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-                                                    title="Get directions to subscriber location"
+                                                    onClick={fetchReceivables}
+                                                    className="mt-2 text-sm text-blue-600 hover:text-blue-800"
                                                 >
-                                                    <FiMapPin className="w-4 h-4" />
-                                                    <span className="text-xs">Route</span>
+                                                    Try again
                                                 </button>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                {!receivable.is_paid && (
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredReceivables.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <FiSearch className="w-8 h-8 text-gray-400" />
+                                                <p className="text-gray-500">No receivables found</p>
+                                                <p className="text-sm text-gray-400">
+                                                    {receivables.length === 0
+                                                        ? "No receivables match the current filters. Try adjusting your filters or check if there are any receivables in the system."
+                                                        : "No receivables match the current filters. Try adjusting your filters."}
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredReceivables.map((receivable) => {
+                                        const status = getStatusBadge(receivable);
+                                        return (
+                                            <tr key={receivable.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                                                            <FiUser className="w-4 h-4 text-gray-600" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-medium text-gray-900">
+                                                                {receivable.subscriber?.name ||
+                                                                    receivable.subscriber?.firstname ||
+                                                                    receivable.subscriber?.dc_cust_name ||
+                                                                    'N/A'}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500">
+                                                                {receivable.subscriber?.phone ||
+                                                                    receivable.subscriber?.dc_cust_phone ||
+                                                                    ''}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {receivable.product?.product_name || 'N/A'}
+                                                    </div>
+                                                    <div className="text-sm text-gray-500">
+                                                        {receivable.loan?.payment_method || ''}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <span className="text-sm font-semibold text-gray-900">
+                                                        {formatAmount(receivable.due_amount || receivable.amount)}
+                                                    </span>
+                                                    {receivable.due_amount && receivable.amount && receivable.due_amount !== receivable.amount && (
+                                                        <div className="text-xs text-gray-500">
+                                                            Total: {formatAmount(receivable.amount)}
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="text-sm text-gray-600">
+                                                        {receivable.due_date ? new Date(receivable.due_date).toLocaleDateString('en-GB') : 'N/A'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.color}`}>
+                                                        {status.text}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
                                                     <button
-                                                        onClick={() => {
-                                                            setSelectedReceivable(receivable);
-                                                            setPaymentForm({
-                                                                amount: receivable.due_amount || receivable.amount || 0,
-                                                                paymentMethod: '',
-                                                                paymentDate: new Date().toISOString().split('T')[0],
-                                                                notes: ''
-                                                            });
-                                                            setShowPaymentModal(true);
-                                                        }}
-                                                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                                                        onClick={() => handleNavigate(receivable)}
+                                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center mx-auto gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                                        title="Get directions to subscriber location"
                                                     >
-                                                        Collect
+                                                        <FiMapPin className="w-4 h-4" />
+                                                        <span className="text-xs">Route</span>
                                                     </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {!receivable.is_paid && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedReceivable(receivable);
+                                                                setPaymentForm({
+                                                                    amount: receivable.due_amount || receivable.amount || 0,
+                                                                    paymentMethod: '',
+                                                                    paymentDate: new Date().toISOString().split('T')[0],
+                                                                    notes: ''
+                                                                });
+                                                                setShowPaymentModal(true);
+                                                            }}
+                                                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                                                        >
+                                                            Collect
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
                             </tbody>
                         </table>
                     </div>

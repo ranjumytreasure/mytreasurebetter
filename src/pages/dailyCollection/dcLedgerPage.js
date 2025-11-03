@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDcLedgerContext } from '../../context/dailyCollection/dcLedgerContext';
-import { FiPlus, FiDollarSign, FiTrendingUp, FiTrendingDown, FiCalendar, FiFilter, FiRefreshCw } from 'react-icons/fi';
+import DayBookTab from './DayBookTab';
+import { FiPlus, FiDollarSign, FiTrendingUp, FiTrendingDown, FiCalendar, FiFilter, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const DcLedgerPage = () => {
     const {
         accounts,
         entries,
         summary,
+        dayBook,
         isLoading,
         error,
         fetchAccounts,
@@ -14,6 +16,7 @@ const DcLedgerPage = () => {
         fetchEntries,
         createEntry,
         fetchSummary,
+        fetchDayBook,
         clearError
     } = useDcLedgerContext();
 
@@ -37,7 +40,8 @@ const DcLedgerPage = () => {
         category: '',
         subcategory: '',
         amount: '',
-        description: ''
+        description: '',
+        payment_date: new Date().toISOString().split('T')[0]
     });
 
     useEffect(() => {
@@ -49,7 +53,9 @@ const DcLedgerPage = () => {
         if (activeTab === 'entries') {
             fetchEntries(filters);
         }
-    }, [activeTab, fetchEntries, filters]);
+        // Day book is loaded separately by DayBookTab component
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab, filters]);
 
     const handleCreateAccount = async (e) => {
         e.preventDefault();
@@ -72,7 +78,8 @@ const DcLedgerPage = () => {
                 category: '',
                 subcategory: '',
                 amount: '',
-                description: ''
+                description: '',
+                payment_date: new Date().toISOString().split('T')[0]
             });
             fetchEntries(filters);
             fetchSummary();
@@ -194,6 +201,15 @@ const DcLedgerPage = () => {
                                     }`}
                             >
                                 Ledger Entries
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('daybook')}
+                                className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === 'daybook'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-600 hover:text-gray-800'
+                                    }`}
+                            >
+                                Day Book
                             </button>
                         </div>
                     </div>
@@ -419,6 +435,11 @@ const DcLedgerPage = () => {
                     </>
                 )}
 
+                {/* Day Book Tab */}
+                {activeTab === 'daybook' && (
+                    <DayBookTab dayBook={dayBook} fetchDayBook={fetchDayBook} />
+                )}
+
                 {/* Add Account Modal */}
                 {showAccountForm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -537,6 +558,19 @@ const DcLedgerPage = () => {
                                         placeholder="0.00"
                                         required
                                     />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Payment Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={entryForm.payment_date}
+                                        onChange={(e) => setEntryForm({ ...entryForm, payment_date: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">This date will be used for day book calculation</p>
                                 </div>
                                 <div className="mb-6">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">

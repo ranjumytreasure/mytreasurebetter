@@ -1,31 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { useDailyCollectionContext } from '../../context/dailyCollection/DailyCollectionContext';
-import { useCompanySubscriberContext } from '../../context/companysubscriber_context';
+import { useDcSubscriberContext } from '../../context/dailyCollection/DcSubscriberContext';
+import { useUserContext } from '../../context/user_context';
 import LoanDisbursementForm from '../../components/dailyCollection/LoanDisbursementForm';
 import LoanDetails from '../../components/dailyCollection/LoanDetails';
-import { FiPlus, FiEye, FiDollarSign, FiCalendar, FiUser, FiCheckCircle, FiClock } from 'react-icons/fi';
+import { FiPlus, FiEye, FiDollarSign, FiCalendar, FiUser, FiCheckCircle, FiClock, FiDownload, FiImage, FiX, FiFilter, FiSearch } from 'react-icons/fi';
+import { API_BASE_URL } from '../../utils/apiConfig';
 
 const LoansPage = () => {
     const { loans, products, isLoading, error, fetchLoans, fetchProducts, clearError } = useDailyCollectionContext();
-    const { companySubscribers } = useCompanySubscriberContext();
+    const { subscribers: dcSubscribers, fetchSubscribers } = useDcSubscriberContext();
+    const { user } = useUserContext();
 
     const [activeTab, setActiveTab] = useState('ACTIVE');
     const [showLoanForm, setShowLoanForm] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState(null);
     const [showLoanDetails, setShowLoanDetails] = useState(false);
+    const [imagePreview, setImagePreview] = useState(false);
+    const [previewImageUrl, setPreviewImageUrl] = useState(null);
+    const [filters, setFilters] = useState({
+        name: '',
+        phoneNumber: '',
+        principal: ''
+    });
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         console.log('=== LOANS PAGE INITIALIZATION ===');
-        console.log('Fetching products and loans...');
+        console.log('Fetching products, loans, and DC subscribers...');
         fetchProducts();
         fetchLoans();
-    }, [fetchProducts, fetchLoans]);
+        fetchSubscribers();
+    }, [fetchProducts, fetchLoans, fetchSubscribers]);
 
     const filteredLoans = loans.filter(loan => {
+        // Status filter
         const loanStatus = loan.status?.toUpperCase();
         const activeTabStatus = activeTab?.toUpperCase();
-        console.log(`Comparing loan status "${loanStatus}" with active tab "${activeTabStatus}"`);
-        return loanStatus === activeTabStatus;
+        if (loanStatus !== activeTabStatus) {
+            return false;
+        }
+
+        // Name filter (case-insensitive)
+        if (filters.name.trim()) {
+            const subscriberName = loan.subscriber?.dc_cust_name || '';
+            if (!subscriberName.toLowerCase().includes(filters.name.toLowerCase().trim())) {
+                return false;
+            }
+        }
+
+        // Phone number filter
+        if (filters.phoneNumber.trim()) {
+            const phoneNumber = loan.subscriber?.dc_cust_phone || '';
+            if (!phoneNumber.includes(filters.phoneNumber.trim())) {
+                return false;
+            }
+        }
+
+        // Principal filter (numeric comparison)
+        if (filters.principal.trim()) {
+            const principalValue = parseFloat(filters.principal.trim());
+            if (isNaN(principalValue)) {
+                return false;
+            }
+            const loanPrincipal = parseFloat(loan.principal_amount || 0);
+            if (loanPrincipal !== principalValue) {
+                return false;
+            }
+        }
+
+        return true;
     });
 
     // Debug logging for loans data
@@ -70,7 +114,12 @@ const LoansPage = () => {
                     id: loan.id,
                     status: loan.status,
                     statusType: typeof loan.status,
-                    subscriber: loan.subscriber?.name || loan.subscriber?.firstname,
+                    subscriber: loan.subscriber?.dc_cust_name || loan.subscriber?.name || loan.subscriber?.firstname,
+                    subscriberPhoto: loan.subscriber?.dc_cust_photo,
+                    subscriberPhotoS3: loan.subscriber?.dc_cust_photo_s3_image,
+                    subscriberKeys: loan.subscriber ? Object.keys(loan.subscriber) : null,
+                    loanAgreementDoc: loan.loan_agreement_doc,
+                    loanAgreementDocS3: loan.loan_agreement_doc_s3_image,
                     principal: loan.principal_amount,
                     product: loan.product,
                     productName: loan.product?.product_name,
@@ -91,6 +140,27 @@ const LoansPage = () => {
     const handleCloseLoanForm = () => {
         setShowLoanForm(false);
         fetchLoans(); // Refresh list
+    };
+
+    const handleDownloadAgreement = async (loan) => {
+        try {
+            // Use backend-prepared S3 signed URL if available (same pattern as company_logo_s3_image)
+            let imageUrl = loan.loan_agreement_doc_s3_image || loan.loan_agreement_doc;
+
+            if (!imageUrl) {
+                alert('No loan agreement document found');
+                return;
+            }
+
+            // If we have a signed URL, show it in preview modal (same as SubscribersPage)
+            if (imageUrl) {
+                setPreviewImageUrl(imageUrl);
+                setImagePreview(true);
+            }
+        } catch (error) {
+            console.error('❌ Error opening agreement:', error);
+            alert(`Error opening agreement document: ${error.message || 'Please try again later.'}`);
+        }
     };
 
     const stats = {
@@ -201,6 +271,129 @@ const LoansPage = () => {
                     </div>
                 </div>
 
+                {/* Filter Section */}
+                <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                        >
+                            <FiFilter className="w-5 h-5" />
+                            Filters
+                            {(filters.name || filters.phoneNumber || filters.principal) && (
+                                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {[filters.name, filters.phoneNumber, filters.principal].filter(Boolean).length}
+                                </span>
+                            )}
+                        </button>
+                        {((filters.name || filters.phoneNumber || filters.principal)) && (
+                            <button
+                                onClick={() => setFilters({ name: '', phoneNumber: '', principal: '' })}
+                                className="text-sm text-gray-600 hover:text-gray-800 underline"
+                            >
+                                Clear All
+                            </button>
+                        )}
+                    </div>
+
+                    {showFilters && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Name Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Filter by Name
+                                </label>
+                                <div className="relative">
+                                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter subscriber name..."
+                                        value={filters.name}
+                                        onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Phone Number Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Filter by Phone Number
+                                </label>
+                                <div className="relative">
+                                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter phone number..."
+                                        value={filters.phoneNumber}
+                                        onChange={(e) => setFilters({ ...filters, phoneNumber: e.target.value })}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Principal Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Filter by Principal Amount
+                                </label>
+                                <div className="relative">
+                                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <input
+                                        type="number"
+                                        placeholder="Enter exact principal amount..."
+                                        value={filters.principal}
+                                        onChange={(e) => setFilters({ ...filters, principal: e.target.value })}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Active Filters Display */}
+                    {((filters.name || filters.phoneNumber || filters.principal)) && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                            <p className="text-sm text-gray-600 mb-2">Active filters:</p>
+                            <div className="flex flex-wrap gap-2">
+                                {filters.name && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Name: {filters.name}
+                                        <button
+                                            onClick={() => setFilters({ ...filters, name: '' })}
+                                            className="ml-2 hover:text-blue-900"
+                                        >
+                                            <FiX className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                )}
+                                {filters.phoneNumber && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Phone: {filters.phoneNumber}
+                                        <button
+                                            onClick={() => setFilters({ ...filters, phoneNumber: '' })}
+                                            className="ml-2 hover:text-blue-900"
+                                        >
+                                            <FiX className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                )}
+                                {filters.principal && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Principal: ₹{filters.principal}
+                                        <button
+                                            onClick={() => setFilters({ ...filters, principal: '' })}
+                                            className="ml-2 hover:text-blue-900"
+                                        >
+                                            <FiX className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* Error State */}
                 {error && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -304,84 +497,137 @@ const LoansPage = () => {
                                         <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Outstanding</th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Loan Disbursement Date</th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Loan Due Start Date</th>
+                                        <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Loan Agreement</th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Status</th>
                                         <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {filteredLoans.map((loan) => (
-                                        <tr key={loan.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    {/* Subscriber Image or Initials */}
-                                                    {loan.subscriber?.image ? (
-                                                        <img
-                                                            src={loan.subscriber.image}
-                                                            alt={loan.subscriber?.name || loan.subscriber?.firstname}
-                                                            className="w-10 h-10 rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                                            {(loan.subscriber?.name || loan.subscriber?.firstname || 'U').charAt(0).toUpperCase()}
+                                    {filteredLoans.map((loan) => {
+                                        // Debug subscriber data for each loan
+                                        const hasSubscriber = !!loan.subscriber;
+                                        const imageUrl = loan.subscriber?.dc_cust_photo_s3_image || loan.subscriber?.dc_cust_photo;
+
+                                        if (hasSubscriber && !imageUrl) {
+                                            console.warn(`⚠️ Loan ${loan.id}: Subscriber exists but no image URL found:`, {
+                                                subscriber: loan.subscriber,
+                                                dc_cust_photo: loan.subscriber?.dc_cust_photo,
+                                                dc_cust_photo_s3_image: loan.subscriber?.dc_cust_photo_s3_image,
+                                                subscriberKeys: Object.keys(loan.subscriber || {})
+                                            });
+                                        }
+
+                                        return (
+                                            <tr key={loan.id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        {/* Subscriber Image - Try S3 signed URL first, fallback to original, then initials */}
+                                                        {imageUrl ? (
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt={loan.subscriber?.dc_cust_name || 'Subscriber'}
+                                                                className="w-10 h-10 rounded-full object-cover"
+                                                                onError={(e) => {
+                                                                    console.error(`❌ Failed to load subscriber image for loan ${loan.id}:`, imageUrl);
+                                                                    e.target.style.display = 'none';
+                                                                    // Show initials fallback
+                                                                    const fallback = e.target.parentElement.querySelector('.subscriber-fallback');
+                                                                    if (fallback) fallback.style.display = 'flex';
+                                                                }}
+                                                                onLoad={() => {
+                                                                    console.log(`✅ Successfully loaded subscriber image for loan ${loan.id}:`, imageUrl);
+                                                                }}
+                                                            />
+                                                        ) : null}
+                                                        <div
+                                                            className={`w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 subscriber-fallback ${imageUrl ? 'hidden' : ''}`}
+                                                        >
+                                                            <span className="text-blue-600 font-bold text-sm">
+                                                                {(loan.subscriber?.dc_cust_name || 'U').charAt(0).toUpperCase()}
+                                                            </span>
                                                         </div>
-                                                    )}
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">
-                                                            {loan.subscriber?.name || loan.subscriber?.firstname || 'N/A'}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">{loan.subscriber?.phone || ''}</p>
+                                                        <div>
+                                                            <p className="font-medium text-gray-900">
+                                                                {loan.subscriber?.dc_cust_name || 'N/A'}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {loan.subscriber?.dc_cust_phone || ''}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        {loan.product?.product_name || loan['product.product_name'] || 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {loan.product?.product_name || loan['product.product_name'] || 'N/A'}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {loan.product?.frequency || loan['product.frequency'] || ''} | {loan.total_installments} cycles
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <p className="text-sm font-semibold text-gray-800">₹{parseFloat(loan.principal_amount).toFixed(2)}</p>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <p className={`text-sm font-semibold ${loan.status === 'ACTIVE' ? 'text-red-600' : 'text-green-600'}`}>
+                                                        ₹{parseFloat(loan.closing_balance).toFixed(2)}
                                                     </p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {loan.product?.frequency || loan['product.frequency'] || ''} | {loan.total_installments} cycles
-                                                    </p>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <p className="text-sm font-semibold text-gray-800">₹{parseFloat(loan.principal_amount).toFixed(2)}</p>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <p className={`text-sm font-semibold ${loan.status === 'ACTIVE' ? 'text-red-600' : 'text-green-600'}`}>
-                                                    ₹{parseFloat(loan.closing_balance).toFixed(2)}
-                                                </p>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
-                                                    <FiCalendar className="w-4 h-4" />
-                                                    {loan.loan_disbursement_date || 'N/A'}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
-                                                    <FiCalendar className="w-4 h-4" />
-                                                    {loan.loan_due_start_date || 'N/A'}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${loan.status === 'ACTIVE'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {loan.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button
-                                                    onClick={() => handleViewDetails(loan)}
-                                                    className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 ml-auto"
-                                                >
-                                                    <FiEye className="w-4 h-4" />
-                                                    View
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                                                        <FiCalendar className="w-4 h-4" />
+                                                        {loan.loan_disbursement_date || 'N/A'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                                                        <FiCalendar className="w-4 h-4" />
+                                                        {loan.loan_due_start_date || 'N/A'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {/* Loan Agreement - Show icon like subscriber documents in SubscribersPage */}
+                                                    {loan.loan_agreement_doc_s3_image ? (
+                                                        <button
+                                                            onClick={() => handleDownloadAgreement(loan)}
+                                                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                                                            title="View Loan Agreement"
+                                                        >
+                                                            <FiImage className="w-5 h-5" />
+                                                        </button>
+                                                    ) : loan.loan_agreement_doc ? (
+                                                        <button
+                                                            onClick={() => handleDownloadAgreement(loan)}
+                                                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                                                            title="View Loan Agreement"
+                                                        >
+                                                            <FiImage className="w-5 h-5" />
+                                                        </button>
+                                                    ) : (
+                                                        <span className="text-xs text-gray-400">No docs</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${loan.status === 'ACTIVE'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {loan.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button
+                                                        onClick={() => handleViewDetails(loan)}
+                                                        className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 ml-auto"
+                                                    >
+                                                        <FiEye className="w-4 h-4" />
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -393,23 +639,25 @@ const LoansPage = () => {
                                     {/* Header */}
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-3 flex-1">
-                                            {/* Subscriber Image or Initials */}
-                                            {loan.subscriber?.image ? (
+                                            {/* Subscriber Image - Exact same pattern as SubscribersPage */}
+                                            {loan.subscriber?.dc_cust_photo_s3_image ? (
                                                 <img
-                                                    src={loan.subscriber.image}
-                                                    alt={loan.subscriber?.name || loan.subscriber?.firstname}
+                                                    src={loan.subscriber.dc_cust_photo_s3_image}
+                                                    alt={loan.subscriber?.dc_cust_name || 'Subscriber'}
                                                     className="w-12 h-12 rounded-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                                    {(loan.subscriber?.name || loan.subscriber?.firstname || 'U').charAt(0).toUpperCase()}
+                                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-blue-600 font-bold text-lg">
+                                                        {(loan.subscriber?.dc_cust_name || 'U').charAt(0).toUpperCase()}
+                                                    </span>
                                                 </div>
                                             )}
                                             <div className="flex-1">
                                                 <h3 className="font-semibold text-gray-900">
-                                                    {loan.subscriber?.name || loan.subscriber?.firstname || 'N/A'}
+                                                    {loan.subscriber?.dc_cust_name || 'N/A'}
                                                 </h3>
-                                                <p className="text-xs text-gray-500">{loan.subscriber?.phone || ''}</p>
+                                                <p className="text-xs text-gray-500">{loan.subscriber?.dc_cust_phone || ''}</p>
                                             </div>
                                         </div>
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${loan.status === 'ACTIVE'
@@ -456,6 +704,19 @@ const LoansPage = () => {
                                         </div>
                                     </div>
 
+                                    {/* Loan Agreement Section */}
+                                    {(loan.loan_agreement_doc_s3_image || loan.loan_agreement_doc) && (
+                                        <div className="mb-3 pb-3 border-b border-gray-100">
+                                            <button
+                                                onClick={() => handleDownloadAgreement(loan)}
+                                                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                                            >
+                                                <FiImage className="w-4 h-4" />
+                                                View Loan Agreement
+                                            </button>
+                                        </div>
+                                    )}
+
                                     {/* Action Button */}
                                     <button
                                         onClick={() => handleViewDetails(loan)}
@@ -474,7 +735,7 @@ const LoansPage = () => {
                 {showLoanForm && (
                     <LoanDisbursementForm
                         products={products}
-                        subscribers={companySubscribers}
+                        subscribers={dcSubscribers}
                         onClose={handleCloseLoanForm}
                     />
                 )}
@@ -488,6 +749,33 @@ const LoansPage = () => {
                             setSelectedLoan(null);
                         }}
                     />
+                )}
+
+                {/* Image Preview Modal - Same as SubscribersPage */}
+                {imagePreview && previewImageUrl && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-xl font-bold text-gray-800">Loan Agreement Document</h3>
+                                <button
+                                    onClick={() => {
+                                        setImagePreview(false);
+                                        setPreviewImageUrl(null);
+                                    }}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <FiX className="w-6 h-6" />
+                                </button>
+                            </div>
+                            <div className="flex justify-center">
+                                <img
+                                    src={previewImageUrl}
+                                    alt="Loan Agreement"
+                                    className="max-w-full max-h-[70vh] object-contain rounded-lg"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

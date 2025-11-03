@@ -8,6 +8,7 @@ const initialState = {
     accounts: [],
     entries: [],
     summary: null,
+    dayBook: null,
     isLoading: false,
     error: null,
 };
@@ -32,6 +33,8 @@ function dcLedgerReducer(state, action) {
             };
         case 'SET_SUMMARY':
             return { ...state, summary: action.payload, isLoading: false };
+        case 'SET_DAY_BOOK':
+            return { ...state, dayBook: action.payload, isLoading: false };
         case 'SET_LOADING':
             return { ...state, isLoading: action.payload };
         case 'SET_ERROR':
@@ -222,6 +225,7 @@ export function DcLedgerProvider({ children }) {
                 description: entryData.description,
                 reference_id: entryData.reference_id,
                 reference_type: entryData.reference_type,
+                payment_date: entryData.payment_date || new Date().toISOString().split('T')[0], // Default to today if not provided
                 membershipId: membershipId,
             };
 
@@ -294,10 +298,67 @@ export function DcLedgerProvider({ children }) {
         dispatch({ type: 'CLEAR_ERROR' });
     };
 
+    // Fetch Day Book for a specific date
+    const fetchDayBook = useCallback(async (date = null, forceRecalculate = false) => {
+        console.log('=== FETCH DAY BOOK START ===');
+        console.log('Date:', date);
+        console.log('Force Recalculate:', forceRecalculate);
+
+        if (!user?.results?.token) {
+            return { success: false, error: "User not authenticated" };
+        }
+
+        const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
+        if (!membershipId) {
+            return { success: false, error: 'Membership ID not found' };
+        }
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+
+        try {
+            const queryParams = new URLSearchParams({
+                parent_membership_id: membershipId,
+                ...(date ? { date: date } : {}),
+                ...(forceRecalculate ? { force_recalculate: 'true' } : {}),
+            });
+
+            const url = `${API_BASE_URL}/dc/ledger/day-book?${queryParams.toString()}`;
+            console.log('Making request to:', url);
+
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${user.results.token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to fetch day book");
+            }
+
+            const data = await res.json();
+            console.log('✅ Day Book API Response:', data);
+
+            dispatch({ type: 'SET_DAY_BOOK', payload: data.results || null });
+            dispatch({ type: 'SET_LOADING', payload: false });
+            dispatch({ type: 'CLEAR_ERROR' });
+            return { success: true };
+        } catch (error) {
+            const errorMessage = error.message || "Unknown error occurred";
+            console.error('❌ Error fetching day book:', error);
+            dispatch({ type: 'SET_ERROR', payload: errorMessage });
+            dispatch({ type: 'SET_LOADING', payload: false });
+            return { success: false, error: errorMessage };
+        }
+    }, [user]);
+
     const value = {
         accounts: state.accounts,
         entries: state.entries,
         summary: state.summary,
+        dayBook: state.dayBook,
         isLoading: state.isLoading,
         error: state.error,
         fetchAccounts,
@@ -305,6 +366,7 @@ export function DcLedgerProvider({ children }) {
         fetchEntries,
         createEntry,
         fetchSummary,
+        fetchDayBook,
         clearError,
     };
 

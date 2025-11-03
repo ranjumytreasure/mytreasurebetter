@@ -52,6 +52,7 @@ const DailyCollectionPDFHeader = ({ companyData, reportTitle, reportDate }) => {
     const {
         // Daily Collection company fields
         company_logo,
+        company_logo_base64format,
         company_name,
         contact_no,
         address,
@@ -70,7 +71,8 @@ const DailyCollectionPDFHeader = ({ companyData, reportTitle, reportDate }) => {
     } = companyData || {};
 
     // Use daily collection fields first, then fallback to chit fund fields
-    const logo = company_logo || logo_base64format;
+    // Check for base64 format (for PDF) first, then fallback to regular logo
+    const logo = company_logo_base64format || company_logo || logo_base64format;
     const companyName = company_name || name || 'Daily Collection Company';
     const contact = contact_no || phone || 'N/A';
     const companyAddress = address || `${street_address || ''}, ${city || ''}, ${state || ''} - ${zipcode || ''}, ${country || ''}`;

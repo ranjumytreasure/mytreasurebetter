@@ -8,6 +8,7 @@ import { DailyCollectionProvider } from '../../context/dailyCollection/DailyColl
 import { DcLedgerProvider } from '../../context/dailyCollection/dcLedgerContext';
 import { AnalyticsProvider } from '../../context/dailyCollection/AnalyticsContext';
 import { CompanySubscriberProvider } from '../../context/companysubscriber_context';
+import { DcSubscriberProvider } from '../../context/dailyCollection/DcSubscriberContext';
 
 // Daily Collection Admin Components
 import DailyCollectionNavbar from './DailyCollectionNavbar';
@@ -53,60 +54,62 @@ const DailyCollectionAdminLayout = () => {
 
     return (
         <CompanySubscriberProvider>
-            <DailyCollectionProvider>
-                <DcLedgerProvider>
-                    <AnalyticsProvider>
-                        <div className="min-h-screen bg-gray-50">
-                            {/* Daily Collection Admin Navbar */}
-                            <DailyCollectionNavbar />
+            <DcSubscriberProvider>
+                <DailyCollectionProvider>
+                    <DcLedgerProvider>
+                        <AnalyticsProvider>
+                            <div className="min-h-screen bg-gray-50">
+                                {/* Daily Collection Admin Navbar */}
+                                <DailyCollectionNavbar />
 
-                            {/* Main Content Area */}
-                            <div className="min-h-[calc(100vh-56px)]">
-                                <Switch>
-                                    {/* Daily Collection User Routes */}
-                                    <PrivateRoute exact path="/daily-collection/user" component={DailyCollectionHome} />
-                                    <PrivateRoute exact path="/daily-collection/user/home" component={DailyCollectionHome} />
-                                    <PrivateRoute exact path="/daily-collection/user/dashboard" component={DashboardPage} />
-                                    <PrivateRoute exact path="/daily-collection/user/companies" component={CompanyManagement} />
-                                    <PrivateRoute exact path="/daily-collection/user/company" component={CompanyManagement} />
-                                    <PrivateRoute exact path="/daily-collection/user/subscribers" component={SubscribersPage} />
-                                    <PrivateRoute exact path="/daily-collection/user/products" component={ProductManagement} />
-                                    <PrivateRoute exact path="/daily-collection/user/loans" component={LoansPage} />
-                                    <PrivateRoute exact path="/daily-collection/user/ledger" component={DcLedgerPage} />
-                                    <PrivateRoute exact path="/daily-collection/user/collections" component={CollectionsPage} />
-                                    <PrivateRoute exact path="/daily-collection/user/reports" component={ReportsPage} />
+                                {/* Main Content Area */}
+                                <div className="min-h-[calc(100vh-56px)]">
+                                    <Switch>
+                                        {/* Daily Collection User Routes */}
+                                        <PrivateRoute exact path="/daily-collection/user" component={DailyCollectionHome} />
+                                        <PrivateRoute exact path="/daily-collection/user/home" component={DailyCollectionHome} />
+                                        <PrivateRoute exact path="/daily-collection/user/dashboard" component={DashboardPage} />
+                                        <PrivateRoute exact path="/daily-collection/user/companies" component={CompanyManagement} />
+                                        <PrivateRoute exact path="/daily-collection/user/company" component={CompanyManagement} />
+                                        <PrivateRoute exact path="/daily-collection/user/subscribers" component={SubscribersPage} />
+                                        <PrivateRoute exact path="/daily-collection/user/products" component={ProductManagement} />
+                                        <PrivateRoute exact path="/daily-collection/user/loans" component={LoansPage} />
+                                        <PrivateRoute exact path="/daily-collection/user/ledger" component={DcLedgerPage} />
+                                        <PrivateRoute exact path="/daily-collection/user/collections" component={CollectionsPage} />
+                                        <PrivateRoute exact path="/daily-collection/user/reports" component={ReportsPage} />
 
-                                    {/* Default redirect to home */}
-                                    <Route path="/daily-collection/user">
-                                        <DailyCollectionHome />
-                                    </Route>
-                                </Switch>
-                            </div>
-
-                            {/* Footer */}
-                            <footer className="bg-white border-t border-gray-200 py-4">
-                                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                    <p className="text-center text-sm text-gray-500">
-                                        © 2024 Daily Collection Admin. Part of MyTreasure Finance Hub.
-                                    </p>
+                                        {/* Default redirect to home */}
+                                        <Route path="/daily-collection/user">
+                                            <DailyCollectionHome />
+                                        </Route>
+                                    </Switch>
                                 </div>
-                            </footer>
 
-                            <ToastContainer
-                                position="top-right"
-                                autoClose={3000}
-                                hideProgressBar={false}
-                                newestOnTop={false}
-                                closeOnClick
-                                rtl={false}
-                                pauseOnFocusLoss
-                                draggable
-                                pauseOnHover
-                            />
-                        </div>
-                    </AnalyticsProvider>
-                </DcLedgerProvider>
-            </DailyCollectionProvider>
+                                {/* Footer */}
+                                <footer className="bg-white border-t border-gray-200 py-4">
+                                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <p className="text-center text-sm text-gray-500">
+                                            © 2024 Daily Collection Admin. Part of MyTreasure Finance Hub.
+                                        </p>
+                                    </div>
+                                </footer>
+
+                                <ToastContainer
+                                    position="top-right"
+                                    autoClose={3000}
+                                    hideProgressBar={false}
+                                    newestOnTop={false}
+                                    closeOnClick
+                                    rtl={false}
+                                    pauseOnFocusLoss
+                                    draggable
+                                    pauseOnHover
+                                />
+                            </div>
+                        </AnalyticsProvider>
+                    </DcLedgerProvider>
+                </DailyCollectionProvider>
+            </DcSubscriberProvider>
         </CompanySubscriberProvider>
     );
 };

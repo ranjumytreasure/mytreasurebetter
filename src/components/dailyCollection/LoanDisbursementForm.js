@@ -3,8 +3,9 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useDailyCollectionContext } from '../../context/dailyCollection/DailyCollectionContext';
 import { useUserContext } from '../../context/user_context';
 import { API_BASE_URL } from '../../utils/apiConfig';
-import { FiX, FiSearch, FiUser, FiDollarSign, FiCalendar, FiChevronRight, FiChevronLeft, FiCheck, FiDownload, FiPrinter, FiPhone, FiMail, FiTrendingUp, FiClock, FiPercent, FiShare2 } from 'react-icons/fi';
+import { FiX, FiSearch, FiUser, FiDollarSign, FiCalendar, FiChevronRight, FiChevronLeft, FiCheck, FiDownload, FiPrinter, FiPhone, FiMail, FiTrendingUp, FiClock, FiPercent, FiShare2, FiUpload, FiFile } from 'react-icons/fi';
 import LoanAgreementPDF from './PDF/LoanAgreementPDF';
+import { uploadImage } from '../../utils/uploadImage';
 
 const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
     const { disburseLoan } = useDailyCollectionContext();
@@ -30,6 +31,10 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
     const [disbursedLoan, setDisbursedLoan] = useState(null);
     const [ledgerAccounts, setLedgerAccounts] = useState([]);
     const [companies, setCompanies] = useState([]);
+    const [agreementFile, setAgreementFile] = useState(null);
+    const [agreementPreview, setAgreementPreview] = useState(null);
+    const [isUploadingAgreement, setIsUploadingAgreement] = useState(false);
+    const [agreementUploaded, setAgreementUploaded] = useState(false);
     const printRef = useRef();
 
     // Fetch ledger accounts and companies on component mount
@@ -88,8 +93,10 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
         fetchCompanies();
     }, [user]);
 
-    // Get selected data
-    const selectedSubscriber = subscribers.find(s => s.id === formData.subscriber_id);
+    // Get selected data - Handle both DC subscribers (dc_cust_id) and legacy subscribers (id)
+    const selectedSubscriber = subscribers.find(s =>
+        s.dc_cust_id === formData.subscriber_id || s.id === formData.subscriber_id
+    );
     const selectedProduct = products.find(p => p.id === formData.product_id);
 
     // Calculate cash in hand (loan amount - interest deduction)
@@ -109,15 +116,17 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
         return (parseFloat(formData.loan_amount) / selectedProduct.duration).toFixed(2);
     }, [formData.loan_amount, selectedProduct]);
 
-    // Filter subscribers based on search
+    // Filter subscribers based on search - Handle both DC subscribers and legacy subscribers
     const filteredSubscribers = useMemo(() => {
         if (!searchTerm) return subscribers;
 
         const term = searchTerm.toLowerCase();
-        return subscribers.filter(sub =>
-            (sub.name || sub.firstname || '').toLowerCase().includes(term) ||
-            (sub.phone || '').includes(term)
-        );
+        return subscribers.filter(sub => {
+            // DC subscriber fields
+            const name = sub.dc_cust_name || sub.name || sub.firstname || '';
+            const phone = sub.dc_cust_phone || sub.phone || '';
+            return name.toLowerCase().includes(term) || phone.includes(term);
+        });
     }, [subscribers, searchTerm]);
 
     // Day names
@@ -148,6 +157,78 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
                 ? prev.exclude_days.filter(d => d !== dayNumber)
                 : [...prev.exclude_days, dayNumber]
         }));
+    };
+
+    // Handle agreement file selection
+    const handleAgreementFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                setErrors({ general: 'File size must be less than 10MB' });
+                return;
+            }
+
+            setAgreementFile(file);
+
+            // Create preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setAgreementPreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                setAgreementPreview(null);
+            }
+
+            setErrors({});
+        }
+    };
+
+    // Handle upload signed agreement
+    const handleUploadAgreement = async () => {
+        if (!agreementFile || !disbursedLoan?.loan?.id) {
+            setErrors({ general: 'Please select a file to upload' });
+            return;
+        }
+
+        setIsUploadingAgreement(true);
+        setErrors({});
+
+        try {
+            // Upload the file
+            const imageUrl = await uploadImage(agreementFile, API_BASE_URL);
+
+            if (!imageUrl) {
+                throw new Error('Failed to upload agreement document');
+            }
+
+            // Update loan with agreement document
+            const response = await fetch(`${API_BASE_URL}/dc/loans/${disbursedLoan.loan.id}/agreement`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${user?.results?.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    loan_agreement_doc: imageUrl
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save agreement document');
+            }
+
+            setAgreementUploaded(true);
+            setSuccessMessage('Signed agreement uploaded and saved successfully!');
+        } catch (error) {
+            console.error('Error uploading agreement:', error);
+            setErrors({ general: error.message || 'Failed to upload agreement. Please try again.' });
+        } finally {
+            setIsUploadingAgreement(false);
+        }
     };
 
     // Generate receivables for Step 2 with proper carry-forward logic
@@ -388,8 +469,8 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
         const loanDetails = `
 🏦 *Loan Agreement - MyTreasure Finance Hub*
 
-👤 *Borrower:* ${selectedSubscriber?.name || selectedSubscriber?.firstname}
-📱 *Phone:* ${selectedSubscriber?.phone}
+👤 *Borrower:* ${selectedSubscriber?.dc_cust_name || selectedSubscriber?.name || selectedSubscriber?.firstname}
+📱 *Phone:* ${selectedSubscriber?.dc_cust_phone || selectedSubscriber?.phone || ''}
 💰 *Loan Amount:* ₹${parseFloat(formData.loan_amount).toFixed(2)}
 📋 *Product:* ${selectedProduct?.product_name}
 📅 *Disbursement Date:* ${formData.disbursement_date}
@@ -494,42 +575,56 @@ MyTreasure Finance Hub Team
                                         <div className="p-4 text-center text-gray-500 text-sm">No subscribers found</div>
                                     ) : (
                                         filteredSubscribers.map((sub) => {
-                                            const stats = getRepaymentStats(sub.id);
-                                            const isSelected = formData.subscriber_id === sub.id;
+                                            // Handle both DC subscribers (dc_cust_id) and legacy subscribers (id)
+                                            const subscriberId = sub.dc_cust_id || sub.id;
+                                            const subscriberName = sub.dc_cust_name || sub.name || sub.firstname || 'N/A';
+                                            const subscriberPhone = sub.dc_cust_phone || sub.phone || '';
+                                            const stats = getRepaymentStats(subscriberId);
+                                            const isSelected = formData.subscriber_id === subscriberId;
 
                                             return (
                                                 <div
-                                                    key={sub.id}
+                                                    key={subscriberId}
                                                     onClick={() => {
-                                                        setFormData(prev => ({ ...prev, subscriber_id: sub.id }));
+                                                        setFormData(prev => ({ ...prev, subscriber_id: subscriberId }));
                                                         setErrors(prev => ({ ...prev, subscriber_id: '' }));
                                                     }}
                                                     className={`p-4 cursor-pointer border-b border-gray-100 hover:bg-blue-50 transition-colors ${isSelected ? 'bg-blue-100 border-blue-300' : ''}`}
                                                 >
                                                     <div className="flex items-start gap-4">
                                                         {/* Avatar */}
-                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-lg">
-                                                            {(sub.name || sub.firstname || 'U').charAt(0).toUpperCase()}
-                                                        </div>
+                                                        {sub.dc_cust_photo_s3_image ? (
+                                                            <img
+                                                                src={sub.dc_cust_photo_s3_image}
+                                                                alt={subscriberName}
+                                                                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-lg">
+                                                                {subscriberName.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
 
                                                         {/* Main Info */}
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center justify-between mb-2">
-                                                                <h3 className="font-semibold text-gray-900 text-lg">{sub.name || sub.firstname}</h3>
+                                                                <h3 className="font-semibold text-gray-900 text-lg">{subscriberName}</h3>
                                                                 {isSelected && (
                                                                     <FiCheck className="w-6 h-6 text-blue-600 flex-shrink-0" />
                                                                 )}
                                                             </div>
 
                                                             <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                                                <div className="flex items-center gap-1">
-                                                                    <FiPhone className="w-4 h-4" />
-                                                                    <span>{sub.phone}</span>
-                                                                </div>
-                                                                {sub.email && (
+                                                                {subscriberPhone && (
+                                                                    <div className="flex items-center gap-1">
+                                                                        <FiPhone className="w-4 h-4" />
+                                                                        <span>{subscriberPhone}</span>
+                                                                    </div>
+                                                                )}
+                                                                {sub.dc_cust_address && (
                                                                     <div className="flex items-center gap-1">
                                                                         <FiMail className="w-4 h-4" />
-                                                                        <span>{sub.email}</span>
+                                                                        <span className="truncate max-w-xs">{sub.dc_cust_address}</span>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -597,17 +692,36 @@ MyTreasure Finance Hub Team
                             {selectedSubscriber && (
                                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                            {(selectedSubscriber.name || selectedSubscriber.firstname || 'U').charAt(0).toUpperCase()}
-                                        </div>
+                                        {/* Avatar - Handle both DC subscribers and legacy subscribers */}
+                                        {selectedSubscriber.dc_cust_photo_s3_image ? (
+                                            <img
+                                                src={selectedSubscriber.dc_cust_photo_s3_image}
+                                                alt={selectedSubscriber.dc_cust_name || selectedSubscriber.name || selectedSubscriber.firstname}
+                                                className="w-16 h-16 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                                {(selectedSubscriber.dc_cust_name || selectedSubscriber.name || selectedSubscriber.firstname || 'U').charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                         <div className="flex-1">
-                                            <h3 className="text-xl font-bold text-blue-900">{selectedSubscriber.name || selectedSubscriber.firstname}</h3>
+                                            <h3 className="text-xl font-bold text-blue-900">
+                                                {selectedSubscriber.dc_cust_name || selectedSubscriber.name || selectedSubscriber.firstname || 'N/A'}
+                                            </h3>
                                             <div className="flex items-center gap-4 text-blue-700 mt-1">
-                                                <div className="flex items-center gap-1">
-                                                    <FiPhone className="w-4 h-4" />
-                                                    <span>{selectedSubscriber.phone}</span>
-                                                </div>
-                                                {selectedSubscriber.email && (
+                                                {(selectedSubscriber.dc_cust_phone || selectedSubscriber.phone) && (
+                                                    <div className="flex items-center gap-1">
+                                                        <FiPhone className="w-4 h-4" />
+                                                        <span>{selectedSubscriber.dc_cust_phone || selectedSubscriber.phone}</span>
+                                                    </div>
+                                                )}
+                                                {selectedSubscriber.dc_cust_address && (
+                                                    <div className="flex items-center gap-1">
+                                                        <FiMail className="w-4 h-4" />
+                                                        <span className="truncate max-w-xs">{selectedSubscriber.dc_cust_address}</span>
+                                                    </div>
+                                                )}
+                                                {selectedSubscriber.email && !selectedSubscriber.dc_cust_address && (
                                                     <div className="flex items-center gap-1">
                                                         <FiMail className="w-4 h-4" />
                                                         <span>{selectedSubscriber.email}</span>
@@ -845,25 +959,41 @@ MyTreasure Finance Hub Team
                             {/* Subscriber & Loan Details Header */}
                             <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
                                 <div className="flex items-start gap-4">
-                                    {/* Subscriber Avatar */}
-                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                                        {(selectedSubscriber?.name || selectedSubscriber?.firstname || 'U').charAt(0).toUpperCase()}
-                                    </div>
+                                    {/* Subscriber Avatar - Handle both DC subscribers and legacy subscribers */}
+                                    {selectedSubscriber?.dc_cust_photo_s3_image ? (
+                                        <img
+                                            src={selectedSubscriber.dc_cust_photo_s3_image}
+                                            alt={selectedSubscriber.dc_cust_name || selectedSubscriber.name || selectedSubscriber.firstname}
+                                            className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                                            {(selectedSubscriber?.dc_cust_name || selectedSubscriber?.name || selectedSubscriber?.firstname || 'U').charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
 
                                     {/* Subscriber Info */}
                                     <div className="flex-1">
                                         <h3 className="text-xl font-bold text-blue-900 mb-2">
-                                            {selectedSubscriber?.name || selectedSubscriber?.firstname}
+                                            {selectedSubscriber?.dc_cust_name || selectedSubscriber?.name || selectedSubscriber?.firstname || 'N/A'}
                                         </h3>
                                         <div className="flex items-center gap-4 text-blue-700 mb-3">
-                                            <div className="flex items-center gap-1">
-                                                <FiPhone className="w-4 h-4" />
-                                                <span className="font-medium">{selectedSubscriber?.phone}</span>
-                                            </div>
-                                            {selectedSubscriber?.email && (
+                                            {(selectedSubscriber?.dc_cust_phone || selectedSubscriber?.phone) && (
+                                                <div className="flex items-center gap-1">
+                                                    <FiPhone className="w-4 h-4" />
+                                                    <span className="font-medium">{selectedSubscriber?.dc_cust_phone || selectedSubscriber?.phone}</span>
+                                                </div>
+                                            )}
+                                            {selectedSubscriber?.dc_cust_address && (
                                                 <div className="flex items-center gap-1">
                                                     <FiMail className="w-4 h-4" />
-                                                    <span className="font-medium">{selectedSubscriber?.email}</span>
+                                                    <span className="font-medium truncate max-w-xs">{selectedSubscriber.dc_cust_address}</span>
+                                                </div>
+                                            )}
+                                            {selectedSubscriber?.email && !selectedSubscriber?.dc_cust_address && (
+                                                <div className="flex items-center gap-1">
+                                                    <FiMail className="w-4 h-4" />
+                                                    <span className="font-medium">{selectedSubscriber.email}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -1078,11 +1208,11 @@ MyTreasure Finance Hub Team
                                         </div>
                                         <div>
                                             <span className="font-medium text-gray-600">Subscriber:</span>
-                                            <span className="ml-2 text-gray-800">{selectedSubscriber?.name || selectedSubscriber?.firstname}</span>
+                                            <span className="ml-2 text-gray-800">{selectedSubscriber?.dc_cust_name || selectedSubscriber?.name || selectedSubscriber?.firstname || 'N/A'}</span>
                                         </div>
                                         <div>
                                             <span className="font-medium text-gray-600">Phone:</span>
-                                            <span className="ml-2 text-gray-800">{selectedSubscriber?.phone}</span>
+                                            <span className="ml-2 text-gray-800">{selectedSubscriber?.dc_cust_phone || selectedSubscriber?.phone || 'N/A'}</span>
                                         </div>
                                         <div>
                                             <span className="font-medium text-gray-600">Product:</span>
@@ -1232,28 +1362,143 @@ MyTreasure Finance Hub Team
                                 </div>
                             </div>
 
+                            {/* Upload Signed Agreement Section */}
+                            {disbursedLoan && (
+                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                        <FiFile className="w-5 h-5 text-blue-600" />
+                                        Upload Signed Agreement
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        After the customer signs the printed agreement, please scan and upload it here.
+                                    </p>
+
+                                    {!agreementUploaded ? (
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Select Signed Agreement (PDF/Image)
+                                                </label>
+                                                <div className="flex items-center gap-4">
+                                                    <label className="flex-1 cursor-pointer">
+                                                        <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:bg-blue-50 transition-colors">
+                                                            {agreementPreview ? (
+                                                                <div className="space-y-2">
+                                                                    <img
+                                                                        src={agreementPreview}
+                                                                        alt="Agreement preview"
+                                                                        className="max-w-full max-h-48 mx-auto rounded-lg"
+                                                                    />
+                                                                    <p className="text-sm text-gray-600">{agreementFile?.name}</p>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="space-y-2">
+                                                                    <FiUpload className="w-8 h-8 text-blue-500 mx-auto" />
+                                                                    <p className="text-sm text-gray-600">Click to select file</p>
+                                                                    <p className="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,.png,.jpg,.jpeg"
+                                                            onChange={handleAgreementFileChange}
+                                                            className="hidden"
+                                                            disabled={isUploadingAgreement}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            {agreementFile && (
+                                                <button
+                                                    onClick={handleUploadAgreement}
+                                                    disabled={isUploadingAgreement}
+                                                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    {isUploadingAgreement ? (
+                                                        <>
+                                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                            Uploading...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FiUpload className="w-5 h-5" />
+                                                            Upload Signed Agreement
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                                            <div className="flex items-center gap-2 text-green-800">
+                                                <FiCheck className="w-5 h-5" />
+                                                <p className="font-medium">Signed agreement uploaded successfully!</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Action Buttons - Only show after database creation */}
                             {disbursedLoan && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 no-print">
                                     <PDFDownloadLink
                                         document={
-                                            <LoanAgreementPDF
-                                                loanData={{
-                                                    loan: disbursedLoan.loan,
-                                                    subscriber: selectedSubscriber,
-                                                    product: selectedProduct,
-                                                    receivables: generatedReceivables,
-                                                    cashInHand: cashInHand,
-                                                    perCycleDue: perCycleDue
-                                                }}
-                                                companyData={{
-                                                    companyName: companies?.[0]?.company_name || 'MyTreasure Finance Hub',
-                                                    phone: companies?.[0]?.phone || '',
-                                                    email: companies?.[0]?.email || '',
+                                            (() => {
+                                                // Prepare subscriber data with all fields
+                                                const pdfSubscriber = {
+                                                    ...selectedSubscriber,
+                                                    // Ensure base64 format is available for PDF
+                                                    dc_cust_photo_base64format: selectedSubscriber?.dc_cust_photo_base64format || selectedSubscriber?.dc_cust_photo || '',
+                                                    dc_cust_aadhaar_frontside_base64format: selectedSubscriber?.dc_cust_aadhaar_frontside_base64format || selectedSubscriber?.dc_cust_aadhaar_frontside || '',
+                                                    dc_cust_aadhaar_backside_base64format: selectedSubscriber?.dc_cust_aadhaar_backside_base64format || selectedSubscriber?.dc_cust_aadhaar_backside || '',
+                                                    dc_cust_name: selectedSubscriber?.dc_cust_name || selectedSubscriber?.name || selectedSubscriber?.firstname || 'N/A',
+                                                    dc_cust_dob: selectedSubscriber?.dc_cust_dob || selectedSubscriber?.dob || null,
+                                                    dc_cust_age: selectedSubscriber?.dc_cust_age || selectedSubscriber?.age || null,
+                                                    dc_cust_phone: selectedSubscriber?.dc_cust_phone || '',
+                                                    dc_cust_address: selectedSubscriber?.dc_cust_address || selectedSubscriber?.street_name || '',
+                                                    dc_nominee_name: selectedSubscriber?.dc_nominee_name || selectedSubscriber?.nominee || '',
+                                                    dc_nominee_phone: selectedSubscriber?.dc_nominee_phone || ''
+                                                };
+
+                                                // Prepare company data with base64 logo
+                                                const pdfCompany = {
+                                                    company_name: companies?.[0]?.company_name || 'MyTreasure Finance Hub',
+                                                    company_logo_base64format: companies?.[0]?.company_logo_base64format || companies?.[0]?.company_logo || '',
+                                                    company_logo: companies?.[0]?.company_logo_base64format || companies?.[0]?.company_logo || '',
+                                                    logo_base64format: companies?.[0]?.company_logo_base64format || companies?.[0]?.company_logo || '',
+                                                    contact_no: companies?.[0]?.contact_no || '',
                                                     address: companies?.[0]?.address || '',
+                                                    companyName: companies?.[0]?.company_name || 'MyTreasure Finance Hub',
+                                                    name: companies?.[0]?.company_name || 'MyTreasure Finance Hub',
+                                                    phone: companies?.[0]?.contact_no || '',
+                                                    email: companies?.[0]?.email || '',
                                                     district: companies?.[0]?.district || ''
-                                                }}
-                                            />
+                                                };
+
+                                                console.log('📄 PDF Data Debug:', {
+                                                    subscriber: pdfSubscriber,
+                                                    company: pdfCompany,
+                                                    subscriberPhoto: pdfSubscriber.dc_cust_photo_base64format ? 'Present' : 'Missing',
+                                                    companyLogo: pdfCompany.company_logo_base64format ? 'Present' : 'Missing'
+                                                });
+
+                                                return (
+                                                    <LoanAgreementPDF
+                                                        loanData={{
+                                                            loan: disbursedLoan.loan,
+                                                            subscriber: pdfSubscriber,
+                                                            product: selectedProduct,
+                                                            receivables: generatedReceivables,
+                                                            cashInHand: cashInHand,
+                                                            perCycleDue: perCycleDue
+                                                        }}
+                                                        companyData={pdfCompany}
+                                                    />
+                                                );
+                                            })()
                                         }
                                         fileName={`loan-agreement-${disbursedLoan?.loan?.id || 'temp'}.pdf`}
                                         className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
