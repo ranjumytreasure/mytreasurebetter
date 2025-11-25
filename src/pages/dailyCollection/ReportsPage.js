@@ -16,6 +16,8 @@ import {
     exportLoanSummaryToExcel,
     exportDemandReportToExcel,
     exportOutstandingReportToExcel,
+    exportDailyCollectionToExcel,
+    formatCurrencyForExcel,
     generateDailyCollectionReportFilename
 } from '../../utils/dailyCollectionExportUtils';
 import {
@@ -258,7 +260,59 @@ const ReportsPage = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Report generated successfully:', data);
-                setSelectedReport(data.results);
+                console.log('Full response data:', JSON.stringify(data, null, 2));
+                
+                // Handle different response structures
+                let reportData = data.results || data.data || data;
+                
+                // For outstanding report, ensure customers array exists
+                if (reportType === 'outstanding-report') {
+                    console.log('Outstanding report data structure:', reportData);
+                    console.log('Customers array:', reportData.customers);
+                    console.log('Customers length:', reportData.customers?.length);
+                    
+                    // If customers is missing or empty, try to extract from loans
+                    if (!reportData.customers || reportData.customers.length === 0) {
+                        console.warn('No customers found in outstanding report, checking loans...');
+                        if (reportData.loans && Array.isArray(reportData.loans) && reportData.loans.length > 0) {
+                            console.log('Found loans, grouping by customer...');
+                            // Group loans by customer
+                            const customerMap = {};
+                            reportData.loans.forEach(loan => {
+                                const customerId = loan.subscriber_id || loan.customerId || loan.customer_name || 'unknown';
+                                if (!customerMap[customerId]) {
+                                    customerMap[customerId] = {
+                                        customerName: loan.customer_name || loan.customerName || loan.subscriber?.dc_cust_name || 'N/A',
+                                        customerPhone: loan.customer_phone || loan.customerPhone || loan.subscriber?.dc_cust_phone || 'N/A',
+                                        totalOutstanding: 0,
+                                        totalFutureDue: 0,
+                                        loans: []
+                                    };
+                                }
+                                const outstanding = parseFloat(loan.outstanding_amount || loan.outstandingAmount || loan.closing_balance || 0);
+                                const futureDue = parseFloat(loan.future_due || loan.futureDue || 0);
+                                customerMap[customerId].totalOutstanding += outstanding;
+                                customerMap[customerId].totalFutureDue += futureDue;
+                                customerMap[customerId].loans.push({
+                                    productName: loan.product_name || loan.productName || loan.product?.product_name || 'N/A',
+                                    principalAmount: parseFloat(loan.principal_amount || loan.principalAmount || 0),
+                                    outstandingAmount: outstanding,
+                                    futureDue: futureDue,
+                                    remainingInstallments: loan.remaining_installments || loan.remainingInstallments || 0
+                                });
+                            });
+                            reportData.customers = Object.values(customerMap);
+                            console.log('Grouped customers:', reportData.customers);
+                        }
+                    }
+                }
+                
+                // Ensure reportType is set
+                if (!reportData.reportType && !reportData.id) {
+                    reportData.reportType = reportType;
+                }
+                
+                setSelectedReport(reportData);
             } else {
                 console.error('API Error:', response.status, response.statusText);
                 const errorData = await response.json();
@@ -291,32 +345,97 @@ const ReportsPage = () => {
         }
     };
 
-    const handleExportReport = async (format) => {
-        if (!selectedReport) return;
+    const handleExportReport = async (format, report = null) => {
+        // Use provided report or fallback to selectedReport
+        const reportToExport = report || selectedReport;
+        
+        if (!reportToExport) {
+            alert('Please select a report to export');
+            return;
+        }
 
         try {
             setIsLoading(true);
             console.log('Starting export:', format);
+            console.log('Report to export:', reportToExport);
 
             // Get the report data
-            const reportData = selectedReport.data || selectedReport;
-            const reportType = selectedReport.reportType || selectedReport.id || 'loan-summary';
+            const reportData = reportToExport.data || reportToExport;
+            const reportType = reportToExport.reportType || reportToExport.id || 'loan-summary';
+
+            console.log('Report Type:', reportType);
+            console.log('Report Data:', reportData);
 
             // Generate filename using daily collection utility
-            const filename = generateDailyCollectionReportFilename(reportType, format);
+            const filename = generateDailyCollectionReportFilename(reportType, format === 'excel' ? 'xlsx' : format);
 
             if (format === 'excel' || format === 'xlsx') {
-                console.log('Exporting to Excel/CSV...');
+                console.log('Exporting to Excel...');
 
                 // Use specific export functions based on report type
                 if (reportType === 'loan-summary') {
+                    console.log('Exporting loan summary report');
                     exportLoanSummaryToExcel(reportData, filename);
-                } else if (reportType === 'demand-report' && reportData.receivables) {
-                    exportDemandReportToExcel(reportData.receivables, filename);
-                } else if (reportType === 'outstanding-report' && reportData.customers) {
-                    exportOutstandingReportToExcel(reportData.customers, filename);
+                } else if (reportType === 'demand-report') {
+                    console.log('Exporting demand report');
+                    if (reportData.receivables && Array.isArray(reportData.receivables)) {
+                        // Pass full report data to include summary
+                        exportDemandReportToExcel(reportData, filename);
+                    } else {
+                        console.warn('No receivables data found, using fallback');
+                        exportToCSV(reportData, filename.replace('.xlsx', '.csv'));
+                    }
+                } else if (reportType === 'outstanding-report') {
+                    console.log('Exporting outstanding report');
+                    if (reportData.customers && Array.isArray(reportData.customers)) {
+                        // Pass full report data to include summary
+                        exportOutstandingReportToExcel(reportData, filename);
+                    } else {
+                        console.warn('No customers data found, using fallback');
+                        exportToCSV(reportData, filename.replace('.xlsx', '.csv'));
+                    }
+                } else if (reportType === 'overdue-report') {
+                    console.log('Exporting overdue report');
+                    if (reportData.loans && Array.isArray(reportData.loans)) {
+                        // Export overdue report with summary and detailed loans
+                        const allData = [];
+                        
+                        // Add summary section
+                        if (reportData.totalOverdueLoans !== undefined || reportData.totalOverdueAmount !== undefined) {
+                            const summary = [
+                                { 'Metric': 'Total Overdue Loans', 'Value': reportData.totalOverdueLoans || 0 },
+                                { 'Metric': 'Total Amount Not Collected', 'Value': formatCurrencyForExcel(reportData.totalOverdueAmount || 0) },
+                                { 'Metric': 'Average Overdue Days', 'Value': reportData.averageOverdueDays || 0 },
+                                { 'Metric': 'Total Overdue Installments', 'Value': reportData.totalOverdueReceivables || 0 }
+                            ];
+                            allData.push(...summary);
+                            allData.push({ 'Metric': '---', 'Value': '---' });
+                        }
+                        
+                        // Add detailed overdue loans
+                        const overdueLoans = reportData.loans.map(loan => ({
+                            'Customer': loan.customerName || '',
+                            'Phone': loan.customerPhone || '',
+                            'Product': loan.productName || '',
+                            'Principal Amount': formatCurrencyForExcel(loan.principalAmount || 0),
+                            'Collected Amount': formatCurrencyForExcel(loan.collectedAmount || 0),
+                            'Overdue Amount': formatCurrencyForExcel(loan.overdueAmount || 0),
+                            'Due Date': loan.dueDate || 'N/A',
+                            'Latest Due Date': loan.latestDueDate || 'N/A',
+                            'Overdue Days': loan.overdueDays || 0,
+                            'Loan Mode': loan.loanMode || 'N/A',
+                            'Overdue Installments': loan.overdueReceivables || 0
+                        }));
+                        
+                        allData.push(...overdueLoans);
+                        exportDailyCollectionToExcel(allData, filename);
+                    } else {
+                        console.warn('No loans data found, using fallback');
+                        exportToCSV(reportData, filename.replace('.xlsx', '.csv'));
+                    }
                 } else {
                     // Fallback to generic CSV export
+                    console.log('Using fallback CSV export');
                     exportToCSV(reportData, filename.replace('.xlsx', '.csv'));
                 }
                 alert('Excel file downloaded successfully!');
@@ -397,16 +516,34 @@ const ReportsPage = () => {
         console.log('Data keys:', Object.keys(data || {}));
 
         if (reportType === 'loan-summary') {
-            const formattedData = [
-                { metric: 'Total Loans', value: data.totalLoans || 0 },
-                { metric: 'Active Loans', value: data.activeLoans || 0 },
-                { metric: 'Completed Loans', value: data.completedLoans || 0 },
-                { metric: 'Overdue Loans', value: data.loans || 0 },
-                { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
-                { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
-            ];
-            console.log('Formatted loan-summary data:', formattedData);
-            return formattedData;
+            // Return loan details for PDF table, not just summary metrics
+            if (data.loans && Array.isArray(data.loans) && data.loans.length > 0) {
+                const loanDetails = data.loans.map(loan => ({
+                    customerName: loan.customerName || loan.customer_name || 'N/A',
+                    customerPhone: loan.customerPhone || loan.customer_phone || 'N/A',
+                    productName: loan.productName || loan.product_name || 'N/A',
+                    principalAmount: formatCurrencyForPDF(loan.principalAmount || loan.principal_amount || 0),
+                    cashInHand: formatCurrencyForPDF(loan.cashInHand || loan.cash_in_hand || 0),
+                    collectedAmount: formatCurrencyForPDF(loan.collectedAmount || loan.collected_amount || 0),
+                    outstanding: formatCurrencyForPDF(loan.closingBalance || loan.closing_balance || 0),
+                    status: loan.status || 'N/A',
+                    disbursementDate: loan.disbursementDate || loan.disbursement_date || 'N/A'
+                }));
+                console.log('Formatted loan-summary data (loan details):', loanDetails);
+                return loanDetails;
+            } else {
+                // Fallback to summary if no loans
+                const formattedData = [
+                    { metric: 'Total Loans', value: data.totalLoans || 0 },
+                    { metric: 'Active Loans', value: data.activeLoans || 0 },
+                    { metric: 'Completed Loans', value: data.completedLoans || 0 },
+                    { metric: 'Overdue Loans', value: data.overdueLoans || 0 },
+                    { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
+                    { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
+                ];
+                console.log('Formatted loan-summary data (summary fallback):', formattedData);
+                return formattedData;
+            }
         } else if (reportType === 'demand-report' && data.receivables) {
             return data.receivables.map(rec => ({
                 customerName: rec.customerName || '',
@@ -417,12 +554,40 @@ const ReportsPage = () => {
                 closingBalance: formatCurrencyForPDF(rec.closingBalance || 0)
             }));
         } else if (reportType === 'outstanding-report' && data.customers) {
-            return data.customers.map(customer => ({
-                customerName: customer.customerName || '',
-                customerPhone: customer.customerPhone || '',
-                totalOutstanding: formatCurrencyForPDF(customer.totalOutstanding || 0),
-                totalFutureDue: formatCurrencyForPDF(customer.totalFutureDue || 0)
-            }));
+            // Flatten customer data with loan details for PDF
+            const flattenedData = [];
+            data.customers.forEach(customer => {
+                if (customer.loans && customer.loans.length > 0) {
+                    // Add a row for each loan
+                    customer.loans.forEach(loan => {
+                        flattenedData.push({
+                            customerName: customer.customerName || '',
+                            customerPhone: customer.customerPhone || '',
+                            productName: loan.productName || 'N/A',
+                            principalAmount: formatCurrencyForPDF(loan.principalAmount || 0),
+                            outstandingAmount: formatCurrencyForPDF(loan.outstandingAmount || 0),
+                            futureDue: formatCurrencyForPDF(loan.futureDue || 0),
+                            remainingInstallments: loan.remainingInstallments || 0,
+                            totalOutstanding: formatCurrencyForPDF(customer.totalOutstanding || 0),
+                            totalFutureDue: formatCurrencyForPDF(customer.totalFutureDue || 0)
+                        });
+                    });
+                } else {
+                    // If no loans, still add customer summary
+                    flattenedData.push({
+                        customerName: customer.customerName || '',
+                        customerPhone: customer.customerPhone || '',
+                        productName: 'N/A',
+                        principalAmount: 'N/A',
+                        outstandingAmount: formatCurrencyForPDF(customer.totalOutstanding || 0),
+                        futureDue: formatCurrencyForPDF(customer.totalFutureDue || 0),
+                        remainingInstallments: 0,
+                        totalOutstanding: formatCurrencyForPDF(customer.totalOutstanding || 0),
+                        totalFutureDue: formatCurrencyForPDF(customer.totalFutureDue || 0)
+                    });
+                }
+            });
+            return flattenedData;
         } else if (reportType === 'overdue-report' && data.loans) {
             return data.loans.map(loan => ({
                 customerName: loan.customerName || '',
@@ -457,8 +622,11 @@ const ReportsPage = () => {
             return [
                 { title: 'Customer', value: 'customerName' },
                 { title: 'Phone', value: 'customerPhone' },
-                { title: 'Outstanding', value: 'totalOutstanding' },
-                { title: 'Future Due', value: 'totalFutureDue' }
+                { title: 'Product', value: 'productName' },
+                { title: 'Principal Amount', value: 'principalAmount' },
+                { title: 'Outstanding', value: 'outstandingAmount' },
+                { title: 'Future Due', value: 'futureDue' },
+                { title: 'Remaining Installments', value: 'remainingInstallments' }
             ];
         } else if (reportType === 'overdue-report') {
             return [
@@ -599,7 +767,7 @@ const ReportsPage = () => {
                                         key={report.id}
                                         report={report}
                                         onView={() => setSelectedReport(report)}
-                                        onExport={handleExportReport}
+                                        onExport={(format) => handleExportReport(format, report)}
                                         companies={companies}
                                         user={user}
                                     />
@@ -614,7 +782,7 @@ const ReportsPage = () => {
                     <ReportViewer
                         report={selectedReport}
                         onClose={() => setSelectedReport(null)}
-                        onExport={handleExportReport}
+                        onExport={(format) => handleExportReport(format, selectedReport)}
                         companies={companies}
                         user={user}
                     />
@@ -755,16 +923,34 @@ const ReportItem = ({ report, onView, onExport, companies, user }) => {
 
         try {
             if (reportType === 'loan-summary') {
-                const formattedData = [
-                    { metric: 'Total Loans', value: data.totalLoans || 0 },
-                    { metric: 'Active Loans', value: data.activeLoans || 0 },
-                    { metric: 'Completed Loans', value: data.completedLoans || 0 },
-                    { metric: 'Overdue Loans', value: data.overdueLoans || 0 },
-                    { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
-                    { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
-                ];
-                console.log('Formatted loan-summary data:', formattedData);
-                return formattedData;
+                // Return loan details for PDF table, not just summary metrics
+                if (data.loans && Array.isArray(data.loans) && data.loans.length > 0) {
+                    const loanDetails = data.loans.map(loan => ({
+                        customerName: loan.customerName || loan.customer_name || 'N/A',
+                        customerPhone: loan.customerPhone || loan.customer_phone || 'N/A',
+                        productName: loan.productName || loan.product_name || 'N/A',
+                        principalAmount: formatCurrencyForPDF(loan.principalAmount || loan.principal_amount || 0),
+                        cashInHand: formatCurrencyForPDF(loan.cashInHand || loan.cash_in_hand || 0),
+                        collectedAmount: formatCurrencyForPDF(loan.collectedAmount || loan.collected_amount || 0),
+                        outstanding: formatCurrencyForPDF(loan.closingBalance || loan.closing_balance || 0),
+                        status: loan.status || 'N/A',
+                        disbursementDate: loan.disbursementDate || loan.disbursement_date || 'N/A'
+                    }));
+                    console.log('Formatted loan-summary data (loan details):', loanDetails);
+                    return loanDetails;
+                } else {
+                    // Fallback to summary if no loans
+                    const formattedData = [
+                        { metric: 'Total Loans', value: data.totalLoans || 0 },
+                        { metric: 'Active Loans', value: data.activeLoans || 0 },
+                        { metric: 'Completed Loans', value: data.completedLoans || 0 },
+                        { metric: 'Overdue Loans', value: data.overdueLoans || 0 },
+                        { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
+                        { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
+                    ];
+                    console.log('Formatted loan-summary data (summary fallback):', formattedData);
+                    return formattedData;
+                }
             } else if (reportType === 'demand-report' && Array.isArray(data.receivables)) {
                 return data.receivables.map(rec => {
                     if (!rec || typeof rec !== 'object') return null;
@@ -778,15 +964,38 @@ const ReportItem = ({ report, onView, onExport, companies, user }) => {
                     };
                 }).filter(item => item !== null);
             } else if (reportType === 'outstanding-report' && Array.isArray(data.customers)) {
-                return data.customers.map(customer => {
-                    if (!customer || typeof customer !== 'object') return null;
-                    return {
-                        customerName: customer.customerName || '',
-                        customerPhone: customer.customerPhone || '',
-                        totalOutstanding: formatCurrencyForPDF(customer.totalOutstanding || 0),
-                        totalFutureDue: formatCurrencyForPDF(customer.totalFutureDue || 0)
-                    };
-                }).filter(item => item !== null);
+                // Flatten customer data with loan details for PDF
+                const flattenedData = [];
+                data.customers.forEach(customer => {
+                    if (!customer || typeof customer !== 'object') return;
+                    
+                    if (customer.loans && Array.isArray(customer.loans) && customer.loans.length > 0) {
+                        // Add a row for each loan
+                        customer.loans.forEach(loan => {
+                            flattenedData.push({
+                                customerName: customer.customerName || '',
+                                customerPhone: customer.customerPhone || '',
+                                productName: loan.productName || 'N/A',
+                                principalAmount: formatCurrencyForPDF(loan.principalAmount || 0),
+                                outstandingAmount: formatCurrencyForPDF(loan.outstandingAmount || 0),
+                                futureDue: formatCurrencyForPDF(loan.futureDue || 0),
+                                remainingInstallments: loan.remainingInstallments || 0
+                            });
+                        });
+                    } else {
+                        // If no loans, still add customer summary
+                        flattenedData.push({
+                            customerName: customer.customerName || '',
+                            customerPhone: customer.customerPhone || '',
+                            productName: 'N/A',
+                            principalAmount: 'N/A',
+                            outstandingAmount: formatCurrencyForPDF(customer.totalOutstanding || 0),
+                            futureDue: formatCurrencyForPDF(customer.totalFutureDue || 0),
+                            remainingInstallments: 0
+                        });
+                    }
+                });
+                return flattenedData.filter(item => item !== null);
             } else if (reportType === 'overdue-report' && Array.isArray(data.loans)) {
                 return data.loans.map(loan => {
                     if (!loan || typeof loan !== 'object') return null;
@@ -830,8 +1039,11 @@ const ReportItem = ({ report, onView, onExport, companies, user }) => {
             return [
                 { title: 'Customer', value: 'customerName' },
                 { title: 'Phone', value: 'customerPhone' },
-                { title: 'Outstanding', value: 'totalOutstanding' },
-                { title: 'Future Due', value: 'totalFutureDue' }
+                { title: 'Product', value: 'productName' },
+                { title: 'Principal Amount', value: 'principalAmount' },
+                { title: 'Outstanding', value: 'outstandingAmount' },
+                { title: 'Future Due', value: 'futureDue' },
+                { title: 'Remaining Installments', value: 'remainingInstallments' }
             ];
         } else if (reportType === 'overdue-report') {
             return [
@@ -908,12 +1120,41 @@ const ReportItem = ({ report, onView, onExport, companies, user }) => {
                     <ErrorBoundary>
                         <PDFDownloadLink
                             document={
-                                <Mypdf
-                                    tableData={Array.isArray(pdfData.tableData) ? pdfData.tableData : []}
-                                    tableHeaders={Array.isArray(pdfData.tableHeaders) ? pdfData.tableHeaders : []}
-                                    heading={pdfData.heading || "Report"}
-                                    companyData={pdfData.companyData || {}}
-                                />
+                                reportType === 'loan-summary' ? (
+                                    <LoanSummaryReportPDF
+                                        tableData={Array.isArray(pdfData.tableData) ? pdfData.tableData : []}
+                                        tableHeaders={Array.isArray(pdfData.tableHeaders) ? pdfData.tableHeaders : []}
+                                        heading={pdfData.heading || "Report"}
+                                        companyData={pdfData.companyData || {}}
+                                        reportDate={new Date().toLocaleDateString()}
+                                        summaryData={reportData || {}}
+                                    />
+                                ) : reportType === 'demand-report' ? (
+                                    <DemandReportPDF
+                                        tableData={Array.isArray(pdfData.tableData) ? pdfData.tableData : []}
+                                        tableHeaders={Array.isArray(pdfData.tableHeaders) ? pdfData.tableHeaders : []}
+                                        heading={pdfData.heading || "Report"}
+                                        companyData={pdfData.companyData || {}}
+                                        reportDate={new Date().toLocaleDateString()}
+                                        summaryData={reportData || {}}
+                                    />
+                                ) : reportType === 'outstanding-report' ? (
+                                    <OutstandingReportPDF
+                                        tableData={Array.isArray(pdfData.tableData) ? pdfData.tableData : []}
+                                        tableHeaders={Array.isArray(pdfData.tableHeaders) ? pdfData.tableHeaders : []}
+                                        heading={pdfData.heading || "Report"}
+                                        companyData={pdfData.companyData || {}}
+                                        reportDate={new Date().toLocaleDateString()}
+                                        summaryData={reportData || {}}
+                                    />
+                                ) : (
+                                    <Mypdf
+                                        tableData={Array.isArray(pdfData.tableData) ? pdfData.tableData : []}
+                                        tableHeaders={Array.isArray(pdfData.tableHeaders) ? pdfData.tableHeaders : []}
+                                        heading={pdfData.heading || "Report"}
+                                        companyData={pdfData.companyData || {}}
+                                    />
+                                )
                             }
                             fileName={generateFileName()}
                         >
@@ -978,14 +1219,31 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
 
         try {
             if (reportType === 'loan-summary') {
-                return [
-                    { metric: 'Total Loans', value: data.totalLoans || 0 },
-                    { metric: 'Active Loans', value: data.activeLoans || 0 },
-                    { metric: 'Completed Loans', value: data.completedLoans || 0 },
-                    { metric: 'Overdue Loans', value: data.overdueLoans || 0 },
-                    { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
-                    { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
-                ];
+                // Return loan details for PDF table, not just summary metrics
+                if (data.loans && Array.isArray(data.loans) && data.loans.length > 0) {
+                    const loanDetails = data.loans.map(loan => ({
+                        customerName: loan.customerName || loan.customer_name || 'N/A',
+                        customerPhone: loan.customerPhone || loan.customer_phone || 'N/A',
+                        productName: loan.productName || loan.product_name || 'N/A',
+                        principalAmount: formatCurrencyForPDF(loan.principalAmount || loan.principal_amount || 0),
+                        cashInHand: formatCurrencyForPDF(loan.cashInHand || loan.cash_in_hand || 0),
+                        collectedAmount: formatCurrencyForPDF(loan.collectedAmount || loan.collected_amount || 0),
+                        outstanding: formatCurrencyForPDF(loan.closingBalance || loan.closing_balance || 0),
+                        status: loan.status || 'N/A',
+                        disbursementDate: loan.disbursementDate || loan.disbursement_date || 'N/A'
+                    }));
+                    return loanDetails;
+                } else {
+                    // Fallback to summary if no loans
+                    return [
+                        { metric: 'Total Loans', value: data.totalLoans || 0 },
+                        { metric: 'Active Loans', value: data.activeLoans || 0 },
+                        { metric: 'Completed Loans', value: data.completedLoans || 0 },
+                        { metric: 'Overdue Loans', value: data.overdueLoans || 0 },
+                        { metric: 'Total Disbursed', value: formatCurrencyForPDF(data.totalDisbursed || 0) },
+                        { metric: 'Total Collected', value: formatCurrencyForPDF(data.totalCollected || 0) }
+                    ];
+                }
             } else if (reportType === 'demand-report' && Array.isArray(data.receivables)) {
                 return data.receivables.map(rec => {
                     if (!rec || typeof rec !== 'object') return null;
@@ -999,15 +1257,38 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
                     };
                 }).filter(item => item !== null);
             } else if (reportType === 'outstanding-report' && Array.isArray(data.customers)) {
-                return data.customers.map(customer => {
-                    if (!customer || typeof customer !== 'object') return null;
-                    return {
-                        customerName: customer.customerName || '',
-                        customerPhone: customer.customerPhone || '',
-                        totalOutstanding: formatCurrencyForPDF(customer.totalOutstanding || 0),
-                        totalFutureDue: formatCurrencyForPDF(customer.totalFutureDue || 0)
-                    };
-                }).filter(item => item !== null);
+                // Flatten customer data with loan details for PDF
+                const flattenedData = [];
+                data.customers.forEach(customer => {
+                    if (!customer || typeof customer !== 'object') return;
+                    
+                    if (customer.loans && Array.isArray(customer.loans) && customer.loans.length > 0) {
+                        // Add a row for each loan
+                        customer.loans.forEach(loan => {
+                            flattenedData.push({
+                                customerName: customer.customerName || '',
+                                customerPhone: customer.customerPhone || '',
+                                productName: loan.productName || 'N/A',
+                                principalAmount: formatCurrencyForPDF(loan.principalAmount || 0),
+                                outstandingAmount: formatCurrencyForPDF(loan.outstandingAmount || 0),
+                                futureDue: formatCurrencyForPDF(loan.futureDue || 0),
+                                remainingInstallments: loan.remainingInstallments || 0
+                            });
+                        });
+                    } else {
+                        // If no loans, still add customer summary
+                        flattenedData.push({
+                            customerName: customer.customerName || '',
+                            customerPhone: customer.customerPhone || '',
+                            productName: 'N/A',
+                            principalAmount: 'N/A',
+                            outstandingAmount: formatCurrencyForPDF(customer.totalOutstanding || 0),
+                            futureDue: formatCurrencyForPDF(customer.totalFutureDue || 0),
+                            remainingInstallments: 0
+                        });
+                    }
+                });
+                return flattenedData.filter(item => item !== null);
             } else if (reportType === 'overdue-report' && Array.isArray(data.loans)) {
                 return data.loans.map(loan => {
                     if (!loan || typeof loan !== 'object') return null;
@@ -1034,8 +1315,15 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
     const getTableHeaders = (reportType) => {
         if (reportType === 'loan-summary') {
             return [
-                { title: 'Metric', value: 'metric' },
-                { title: 'Value', value: 'value' }
+                { title: 'Customer', value: 'customerName' },
+                { title: 'Phone', value: 'customerPhone' },
+                { title: 'Product', value: 'productName' },
+                { title: 'Principal', value: 'principalAmount' },
+                { title: 'Cash in Hand', value: 'cashInHand' },
+                { title: 'Collected', value: 'collectedAmount' },
+                { title: 'Outstanding', value: 'outstanding' },
+                { title: 'Status', value: 'status' },
+                { title: 'Disbursement Date', value: 'disbursementDate' }
             ];
         } else if (reportType === 'demand-report') {
             return [
@@ -1050,8 +1338,11 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
             return [
                 { title: 'Customer', value: 'customerName' },
                 { title: 'Phone', value: 'customerPhone' },
-                { title: 'Outstanding', value: 'totalOutstanding' },
-                { title: 'Future Due', value: 'totalFutureDue' }
+                { title: 'Product', value: 'productName' },
+                { title: 'Principal Amount', value: 'principalAmount' },
+                { title: 'Outstanding', value: 'outstandingAmount' },
+                { title: 'Future Due', value: 'futureDue' },
+                { title: 'Remaining Installments', value: 'remainingInstallments' }
             ];
         } else if (reportType === 'overdue-report') {
             return [
@@ -1131,12 +1422,41 @@ const ReportViewer = ({ report, onClose, onExport, companies, user }) => {
                         <ErrorBoundary>
                             <PDFDownloadLink
                                 document={
-                                    <Mypdf
-                                        tableData={Array.isArray(tableData) ? tableData : []}
-                                        tableHeaders={Array.isArray(tableHeaders) ? tableHeaders : []}
-                                        heading={`${reportType.replace('-', ' ').toUpperCase()} Report`}
-                                        companyData={companyData || {}}
-                                    />
+                                    reportType === 'loan-summary' ? (
+                                        <LoanSummaryReportPDF
+                                            tableData={Array.isArray(tableData) ? tableData : []}
+                                            tableHeaders={Array.isArray(tableHeaders) ? tableHeaders : []}
+                                            heading={`${reportType.replace('-', ' ').toUpperCase()} Report`}
+                                            companyData={companyData || {}}
+                                            reportDate={new Date().toLocaleDateString()}
+                                            summaryData={reportData || {}}
+                                        />
+                                    ) : reportType === 'demand-report' ? (
+                                        <DemandReportPDF
+                                            tableData={Array.isArray(tableData) ? tableData : []}
+                                            tableHeaders={Array.isArray(tableHeaders) ? tableHeaders : []}
+                                            heading={`${reportType.replace('-', ' ').toUpperCase()} Report`}
+                                            companyData={companyData || {}}
+                                            reportDate={new Date().toLocaleDateString()}
+                                            summaryData={reportData || {}}
+                                        />
+                                    ) : reportType === 'outstanding-report' ? (
+                                        <OutstandingReportPDF
+                                            tableData={Array.isArray(tableData) ? tableData : []}
+                                            tableHeaders={Array.isArray(tableHeaders) ? tableHeaders : []}
+                                            heading={`${reportType.replace('-', ' ').toUpperCase()} Report`}
+                                            companyData={companyData || {}}
+                                            reportDate={new Date().toLocaleDateString()}
+                                            summaryData={reportData || {}}
+                                        />
+                                    ) : (
+                                        <Mypdf
+                                            tableData={Array.isArray(tableData) ? tableData : []}
+                                            tableHeaders={Array.isArray(tableHeaders) ? tableHeaders : []}
+                                            heading={`${reportType.replace('-', ' ').toUpperCase()} Report`}
+                                            companyData={companyData || {}}
+                                        />
+                                    )
                                 }
                                 fileName={`${reportType}-${new Date().toISOString().split('T')[0]}.pdf`}
                                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
@@ -1466,24 +1786,32 @@ const ReportContent = ({ report }) => {
                 </div>
 
                 {/* Customer-wise Outstanding */}
-                {data?.customers && data.customers.length > 0 && (
+                {data?.customers && data.customers.length > 0 ? (
                     <div className="mt-8">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer-wise Outstanding</h3>
                         <div className="space-y-6">
-                            {data.customers.map((customer, index) => (
-                                <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div>
-                                            <h4 className="font-semibold text-gray-900">{customer.customerName}</h4>
-                                            <p className="text-sm text-gray-600">{customer.customerPhone}</p>
+                            {data.customers.map((customer, index) => {
+                                // Safe data extraction
+                                const customerName = customer.customerName || customer.customer_name || customer.dc_cust_name || 'N/A';
+                                const customerPhone = customer.customerPhone || customer.customer_phone || customer.dc_cust_phone || 'N/A';
+                                const totalOutstanding = parseFloat(customer.totalOutstanding || customer.total_outstanding || 0);
+                                const totalFutureDue = parseFloat(customer.totalFutureDue || customer.total_future_due || 0);
+                                const customerLoans = customer.loans || [];
+                                
+                                return (
+                                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div>
+                                                <h4 className="font-semibold text-gray-900">{customerName}</h4>
+                                                <p className="text-sm text-gray-600">{customerPhone}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-gray-600">Outstanding: <span className="font-semibold">₹{totalOutstanding.toLocaleString()}</span></p>
+                                                <p className="text-sm text-gray-600">Future Due: <span className="font-semibold">₹{totalFutureDue.toLocaleString()}</span></p>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-600">Outstanding: <span className="font-semibold">₹{customer.totalOutstanding.toLocaleString()}</span></p>
-                                            <p className="text-sm text-gray-600">Future Due: <span className="font-semibold">₹{customer.totalFutureDue.toLocaleString()}</span></p>
-                                        </div>
-                                    </div>
 
-                                    {customer.loans && customer.loans.length > 0 && (
+                                        {customerLoans.length > 0 && (
                                         <div className="overflow-x-auto">
                                             <table className="min-w-full bg-gray-50 rounded-lg">
                                                 <thead>
@@ -1496,21 +1824,40 @@ const ReportContent = ({ report }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {customer.loans.map((loan, loanIndex) => (
-                                                        <tr key={loanIndex} className="bg-white">
-                                                            <td className="px-3 py-2 text-sm text-gray-900">{loan.productName}</td>
-                                                            <td className="px-3 py-2 text-sm text-gray-900">₹{parseFloat(loan.principalAmount || 0).toLocaleString()}</td>
-                                                            <td className="px-3 py-2 text-sm text-gray-900">₹{parseFloat(loan.outstandingAmount || 0).toLocaleString()}</td>
-                                                            <td className="px-3 py-2 text-sm text-gray-900">₹{parseFloat(loan.futureDue || 0).toLocaleString()}</td>
-                                                            <td className="px-3 py-2 text-sm text-gray-900">{loan.remainingInstallments}</td>
-                                                        </tr>
-                                                    ))}
+                                                    {customerLoans.map((loan, loanIndex) => {
+                                                        const productName = loan.productName || loan.product_name || 'N/A';
+                                                        const principalAmount = parseFloat(loan.principalAmount || loan.principal_amount || 0);
+                                                        const outstandingAmount = parseFloat(loan.outstandingAmount || loan.outstanding_amount || 0);
+                                                        const futureDue = parseFloat(loan.futureDue || loan.future_due || 0);
+                                                        const remainingInstallments = loan.remainingInstallments || loan.remaining_installments || 0;
+                                                        
+                                                        return (
+                                                            <tr key={loanIndex} className="bg-white">
+                                                                <td className="px-3 py-2 text-sm text-gray-900">{productName}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-900">₹{principalAmount.toLocaleString()}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-900">₹{outstandingAmount.toLocaleString()}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-900">₹{futureDue.toLocaleString()}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-900">{remainingInstallments}</td>
+                                                            </tr>
+                                                        );
+                                                    })}
                                                 </tbody>
                                             </table>
                                         </div>
                                     )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mt-8 text-center py-8 text-gray-500">
+                        <p className="text-lg">No customer data available</p>
+                        <p className="text-sm mt-2">Please check your filters or try generating the report again.</p>
+                        <div className="mt-4 text-xs text-gray-400">
+                            <p>Debug Info:</p>
+                            <p>Data keys: {data ? Object.keys(data).join(', ') : 'No data'}</p>
+                            <p>Customers: {data?.customers ? (Array.isArray(data.customers) ? data.customers.length : 'Not an array') : 'Missing'}</p>
                         </div>
                     </div>
                 )}

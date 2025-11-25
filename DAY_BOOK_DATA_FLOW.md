@@ -393,3 +393,6 @@ All data comes from `dc_ledger_entries` table - the Day Book is a calculated/cac
 ✅ **Fallback calculation** - Works even if data is missing  
 
 
+
+
+

@@ -52,7 +52,8 @@ const DetailModal = ({ detail, onClose }) => {
         <div className="detail-content">
             <div className="detail-table">
                 <div className="table-header">
-                    <div className="header-cell">Date</div>
+                    <div className="header-cell">Transacted Date</div>
+                    <div className="header-cell">Created At</div>
                     <div className="header-cell">Amount</div>
                     <div className="header-cell">Status</div>
                 </div>
@@ -60,7 +61,16 @@ const DetailModal = ({ detail, onClose }) => {
                     {data.map((item, index) => (
                         <div key={index} className="table-row">
                             <div className="table-cell date-cell">
-                                {new Date(item.date || item.createdAt).toLocaleDateString()}
+                                {item.transacted_date 
+                                    ? new Date(item.transacted_date).toLocaleDateString() 
+                                    : (item.transactedDate 
+                                        ? new Date(item.transactedDate).toLocaleDateString() 
+                                        : 'N/A')}
+                            </div>
+                            <div className="table-cell date-cell">
+                                {item.date || item.createdAt 
+                                    ? new Date(item.date || item.createdAt).toLocaleDateString() 
+                                    : 'N/A'}
                             </div>
                             <div className="table-cell amount-cell">
                                 ₹{(item.amount || item.receivableAmount || item.payment_amount || 0).toLocaleString()}

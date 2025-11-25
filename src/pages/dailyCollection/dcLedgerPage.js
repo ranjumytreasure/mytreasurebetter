@@ -49,6 +49,22 @@ const DcLedgerPage = () => {
         fetchSummary();
     }, [fetchAccounts, fetchSummary]);
 
+    // Listen for loan deletion events and refresh accounts (to update balances)
+    useEffect(() => {
+        const handleLoanDeleted = (event) => {
+            const { accountBalanceUpdates } = event.detail;
+            if (accountBalanceUpdates && accountBalanceUpdates.length > 0) {
+                console.log('🔄 Loan deleted - refreshing ledger accounts for updated balances');
+                fetchAccounts();
+            }
+        };
+
+        window.addEventListener('loanDeleted', handleLoanDeleted);
+        return () => {
+            window.removeEventListener('loanDeleted', handleLoanDeleted);
+        };
+    }, [fetchAccounts]);
+
     useEffect(() => {
         if (activeTab === 'entries') {
             fetchEntries(filters);
@@ -383,11 +399,12 @@ const DcLedgerPage = () => {
                                 <table className="w-full">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Payment Date</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Account</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Category</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Description</th>
                                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Created Date</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
@@ -395,7 +412,7 @@ const DcLedgerPage = () => {
                                             <tr key={entry.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4">
                                                     <span className="text-sm text-gray-600">
-                                                        {formatDate(entry.created_at)}
+                                                        {entry.payment_date ? formatDate(entry.payment_date) : formatDate(entry.created_at)}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -424,6 +441,11 @@ const DcLedgerPage = () => {
                                                         : 'text-red-600'
                                                         }`}>
                                                         {formatCurrency(entry.amount)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-sm text-gray-500">
+                                                        {formatDate(entry.created_at)}
                                                     </span>
                                                 </td>
                                             </tr>

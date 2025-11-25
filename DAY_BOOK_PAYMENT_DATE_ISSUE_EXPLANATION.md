@@ -183,3 +183,6 @@ Day Book Nov 4:
 **Result**: Day Book will correctly show payments on the date they were actually received, regardless of when they were entered into the system.
 
 
+
+
+

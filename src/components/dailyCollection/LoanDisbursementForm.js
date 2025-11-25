@@ -93,6 +93,44 @@ const LoanDisbursementForm = ({ products, subscribers, onClose }) => {
         fetchCompanies();
     }, [user]);
 
+    // Listen for loan deletion events and refresh ledger accounts (to update balances)
+    useEffect(() => {
+        const handleLoanDeleted = (event) => {
+            const { accountBalanceUpdates } = event.detail;
+            if (accountBalanceUpdates && accountBalanceUpdates.length > 0) {
+                console.log('🔄 Loan deleted - refreshing ledger accounts for updated balances');
+                // Refresh ledger accounts to get updated balances
+                const fetchLedgerAccounts = async () => {
+                    if (!user?.results?.token) return;
+                    const membershipId = user?.results?.userAccounts?.[0]?.parent_membership_id;
+                    if (!membershipId) return;
+                    try {
+                        const url = `${API_BASE_URL}/dc/ledger/accounts?parent_membership_id=${membershipId}`;
+                        const res = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                Authorization: `Bearer ${user.results.token}`,
+                                "Content-Type": "application/json",
+                            },
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            setLedgerAccounts(data.results || []);
+                        }
+                    } catch (error) {
+                        console.error('Error refreshing ledger accounts:', error);
+                    }
+                };
+                fetchLedgerAccounts();
+            }
+        };
+
+        window.addEventListener('loanDeleted', handleLoanDeleted);
+        return () => {
+            window.removeEventListener('loanDeleted', handleLoanDeleted);
+        };
+    }, [user]);
+
     // Get selected data - Handle both DC subscribers (dc_cust_id) and legacy subscribers (id)
     const selectedSubscriber = subscribers.find(s =>
         s.dc_cust_id === formData.subscriber_id || s.id === formData.subscriber_id

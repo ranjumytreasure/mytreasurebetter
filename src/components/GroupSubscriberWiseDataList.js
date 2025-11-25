@@ -60,6 +60,11 @@ const GroupSubscriberWiseDataList = ({ items }) => {
 
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('Payment data structure:', data.results.groupsWiseSubscriberResult);
+                        // Log first payment to see available fields
+                        if (data.results.groupsWiseSubscriberResult?.[0]?.payments?.[0]) {
+                            console.log('Sample payment object:', data.results.groupsWiseSubscriberResult[0].payments[0]);
+                        }
                         setSubscriberData(data.results.groupsWiseSubscriberResult);
                     }
                 }
@@ -322,56 +327,93 @@ const GroupSubscriberWiseDataList = ({ items }) => {
                                                                 {/* Expanded Payments */}
                                                                 {expandedRowIndex === index && item.payments?.length > 0 && (
                                                                     <tr>
-                                                                        <td colSpan="5" className="bg-gray-50 p-0">
+                                                                        <td colSpan="6" className="bg-gray-50 p-0">
                                                                             <div className="p-4">
                                                                                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                                                                     <div className="overflow-x-auto">
                                                                                         <table className="w-full">
                                                                                             <thead>
                                                                                                 <tr className="bg-gray-100">
-                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</th>
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Transacted Date</th>
+                                                                                                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Created At</th>
                                                                                                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Amount</th>
                                                                                                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Method</th>
                                                                                                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Download</th>
                                                                                                 </tr>
                                                                                             </thead>
                                                                                             <tbody>
-                                                                                                {item.payments.map((p) => (
-                                                                                                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-                                                                                                        <td className="px-3 py-2 text-sm text-gray-700">
-                                                                                                            {new Date(p.created_at).toLocaleDateString()}
-                                                                                                        </td>
-                                                                                                        <td className="px-3 py-2 text-sm font-medium text-gray-800">₹{p.payment_amount}</td>
-                                                                                                        <td className="px-3 py-2 text-sm text-gray-600">{p.payment_method}</td>
-                                                                                                        <td className="px-3 py-2">
-                                                                                                            <PDFDownloadLink
-                                                                                                                document={
-                                                                                                                    <ReceivableReceitPdf
-                                                                                                                        receivableData={{
-                                                                                                                            subscriberName: selectedSubscriber.name,
-                                                                                                                            paymentType: p.payment_type,
-                                                                                                                            paymentMethod: p.payment_method,
-                                                                                                                            groupName: groupName,
-                                                                                                                            auctionDate: new Date(p.created_at).toLocaleDateString(),
-                                                                                                                            paymentAmount: p.payment_amount,
-                                                                                                                        }}
-                                                                                                                        companyData={userCompany}
-                                                                                                                    />
-                                                                                                                }
-                                                                                                                fileName={`Bill_${selectedSubscriber.name}_${new Date(
-                                                                                                                    p.created_at
-                                                                                                                ).toISOString().slice(0, 10)}.pdf`}
-                                                                                                            >
-                                                                                                                {({ loading }) => (
-                                                                                                                    <button className="px-3 py-1 bg-custom-red text-white text-xs rounded-md border-none cursor-pointer flex items-center gap-1 hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md">
-                                                                                                                        <FiDownload size={12} />
-                                                                                                                        {loading ? "Preparing..." : "Download"}
-                                                                                                                    </button>
-                                                                                                                )}
-                                                                                                            </PDFDownloadLink>
-                                                                                                        </td>
-                                                                                                    </tr>
-                                                                                                ))}
+                                                                                                {(() => {
+                                                                                                    console.log('=== Receipt Details - All Payments ===');
+                                                                                                    console.log('Auction Date:', item.auct_date);
+                                                                                                    console.log('All payments for this auction:', item.payments);
+                                                                                                    console.log('Number of payments:', item.payments?.length);
+                                                                                                    return null;
+                                                                                                })()}
+                                                                                                {item.payments.map((p) => {
+                                                                                                    console.log('--- Individual Payment/Receipt Object ---');
+                                                                                                    console.log('Payment ID:', p.id);
+                                                                                                    console.log('Full payment object:', p);
+                                                                                                    console.log('Available fields:', Object.keys(p));
+                                                                                                    console.log('transacted_date:', p.transacted_date);
+                                                                                                    console.log('transactedDate:', p.transactedDate);
+                                                                                                    console.log('created_at:', p.created_at);
+                                                                                                    console.log('payment_amount:', p.payment_amount);
+                                                                                                    console.log('payment_method:', p.payment_method);
+                                                                                                    console.log('payment_type:', p.payment_type);
+                                                                                                    return (
+                                                                                                        <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                                                                                            <td className="px-3 py-2 text-sm text-gray-700">
+                                                                                                                {p.transacted_date
+                                                                                                                    ? new Date(p.transacted_date).toLocaleDateString()
+                                                                                                                    : (p.transactedDate
+                                                                                                                        ? new Date(p.transactedDate).toLocaleDateString()
+                                                                                                                        : 'N/A')}
+                                                                                                            </td>
+                                                                                                            <td className="px-3 py-2 text-sm text-gray-700">
+                                                                                                                {p.created_at ? new Date(p.created_at).toLocaleDateString() : 'N/A'}
+                                                                                                            </td>
+                                                                                                            <td className="px-3 py-2 text-sm font-medium text-gray-800">₹{p.payment_amount}</td>
+                                                                                                            <td className="px-3 py-2 text-sm text-gray-600">{p.payment_method}</td>
+                                                                                                            <td className="px-3 py-2">
+                                                                                                                <PDFDownloadLink
+                                                                                                                    document={
+                                                                                                                        <ReceivableReceitPdf
+                                                                                                                            receivableData={{
+                                                                                                                                subscriberName: selectedSubscriber.name,
+                                                                                                                                paymentType: p.payment_type,
+                                                                                                                                paymentMethod: p.payment_method,
+                                                                                                                                groupName: groupName,
+                                                                                                                                auctionDate: new Date(p.created_at).toLocaleDateString(),
+                                                                                                                                transactedDate: p.transacted_date
+                                                                                                                                    ? new Date(p.transacted_date).toLocaleDateString()
+                                                                                                                                    : (p.transactedDate
+                                                                                                                                        ? new Date(p.transactedDate).toLocaleDateString()
+                                                                                                                                        : null),
+                                                                                                                                transacted_date: p.transacted_date,
+                                                                                                                                createdAt: p.created_at
+                                                                                                                                    ? new Date(p.created_at).toLocaleDateString()
+                                                                                                                                    : null,
+                                                                                                                                created_at: p.created_at,
+                                                                                                                                paymentAmount: p.payment_amount,
+                                                                                                                            }}
+                                                                                                                            companyData={userCompany}
+                                                                                                                        />
+                                                                                                                    }
+                                                                                                                    fileName={`Bill_${selectedSubscriber.name}_${new Date(
+                                                                                                                        p.created_at
+                                                                                                                    ).toISOString().slice(0, 10)}.pdf`}
+                                                                                                                >
+                                                                                                                    {({ loading }) => (
+                                                                                                                        <button className="px-3 py-1 bg-custom-red text-white text-xs rounded-md border-none cursor-pointer flex items-center gap-1 hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md">
+                                                                                                                            <FiDownload size={12} />
+                                                                                                                            {loading ? "Preparing..." : "Download"}
+                                                                                                                        </button>
+                                                                                                                    )}
+                                                                                                                </PDFDownloadLink>
+                                                                                                            </td>
+                                                                                                        </tr>
+                                                                                                    );
+                                                                                                })}
                                                                                             </tbody>
                                                                                         </table>
                                                                                     </div>

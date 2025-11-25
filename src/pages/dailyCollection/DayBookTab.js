@@ -29,6 +29,32 @@ const DayBookTab = ({ dayBook, fetchDayBook }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Listen for loan deletion events and refresh day book if affected
+    useEffect(() => {
+        const handleLoanDeleted = (event) => {
+            const { affectedDates, cascadeFromDate } = event.detail;
+            const selectedDateStr = selectedDate;
+            
+            // Check if current selected date is affected or is after the cascade date
+            const isAffected = affectedDates?.includes(selectedDateStr) || 
+                              (cascadeFromDate && selectedDateStr >= cascadeFromDate);
+            
+            if (isAffected) {
+                console.log('🔄 Loan deleted - refreshing day book for', selectedDateStr);
+                setIsLoading(true);
+                // Force recalculate to ensure fresh data
+                fetchDayBook(selectedDateStr, true).finally(() => {
+                    setIsLoading(false);
+                });
+            }
+        };
+
+        window.addEventListener('loanDeleted', handleLoanDeleted);
+        return () => {
+            window.removeEventListener('loanDeleted', handleLoanDeleted);
+        };
+    }, [selectedDate, fetchDayBook]);
+
     const formatCurrency = (amount) => {
         return `₹${Number(amount || 0).toLocaleString("en-IN", {
             minimumFractionDigits: 2,

@@ -101,6 +101,8 @@ const ReceivableReceitPdf = ({ receivableData = {}, companyData = {} }) => {
                     <Field label="Payment Method" value={receivableData.paymentMethod} />
                     <Field label="Group Name" value={receivableData.groupName} />
                     <Field label="Auction Date" value={receivableData.auctionDate} />
+                    <Field label="Transacted Date" value={receivableData.transactedDate || receivableData.transacted_date || '-'} />
+                    <Field label="Created At" value={receivableData.createdAt || receivableData.created_at || '-'} />
                     <Field
                         label="Total Bill"
                         value={formatCurrency(receivableData.paymentAmount)}

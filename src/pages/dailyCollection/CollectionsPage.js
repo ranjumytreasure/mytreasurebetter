@@ -90,7 +90,7 @@ const CollectionsPage = () => {
     };
 
     // Fetch ledger accounts for payment methods
-    const fetchLedgerAccounts = async () => {
+    const fetchLedgerAccounts = useCallback(async () => {
         if (!user?.results?.token) return;
 
         try {
@@ -111,7 +111,7 @@ const CollectionsPage = () => {
         } catch (error) {
             console.error('Error fetching ledger accounts:', error);
         }
-    };
+    }, [user]);
 
     // Fetch companies for PDF
     const fetchCompanies = useCallback(async () => {
@@ -142,6 +142,22 @@ const CollectionsPage = () => {
         fetchLedgerAccounts();
         fetchCompanies();
     }, [user, filters, fetchCompanies]);
+
+    // Listen for loan deletion events and refresh ledger accounts (to update balances)
+    useEffect(() => {
+        const handleLoanDeleted = (event) => {
+            const { accountBalanceUpdates } = event.detail;
+            if (accountBalanceUpdates && accountBalanceUpdates.length > 0) {
+                console.log('🔄 Loan deleted - refreshing ledger accounts for updated balances');
+                fetchLedgerAccounts();
+            }
+        };
+
+        window.addEventListener('loanDeleted', handleLoanDeleted);
+        return () => {
+            window.removeEventListener('loanDeleted', handleLoanDeleted);
+        };
+    }, [fetchLedgerAccounts]);
 
     // Filter receivables - Backend handles status/date filtering, frontend only handles client-side filters
     const getFilteredReceivables = () => {
@@ -305,6 +321,22 @@ const CollectionsPage = () => {
     };
 
     const filteredReceivables = getFilteredReceivables();
+
+    // Calculate collection progress for each loan
+    const getLoanProgress = useCallback((loanId) => {
+        if (!loanId) return { paid: 0, total: 0 };
+        
+        // Get all receivables for this loan (from the full receivables list, not filtered)
+        const loanReceivables = receivables.filter(r => {
+            const rLoanId = r.loan_id || r.loan?.id;
+            return rLoanId === loanId;
+        });
+        
+        const total = loanReceivables.length;
+        const paid = loanReceivables.filter(r => r.is_paid).length;
+        
+        return { paid, total };
+    }, [receivables]);
 
     return (
         <div className="p-4 sm:p-6 lg:p-8">
@@ -473,6 +505,7 @@ const CollectionsPage = () => {
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Subscriber</th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Product</th>
+                                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Collection Progress</th>
                                     <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Amount</th>
                                     <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Due Date</th>
                                     <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Status</th>
@@ -483,7 +516,7 @@ const CollectionsPage = () => {
                             <tbody className="divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                        <td colSpan="8" className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center gap-2">
                                                 <FiRefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
                                                 <p className="text-gray-500">Loading receivables...</p>
@@ -492,7 +525,7 @@ const CollectionsPage = () => {
                                     </tr>
                                 ) : error ? (
                                     <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                        <td colSpan="8" className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center gap-2">
                                                 <FiAlertCircle className="w-8 h-8 text-red-400" />
                                                 <p className="text-red-500">Error: {error}</p>
@@ -507,7 +540,7 @@ const CollectionsPage = () => {
                                     </tr>
                                 ) : filteredReceivables.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                        <td colSpan="8" className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center gap-2">
                                                 <FiSearch className="w-8 h-8 text-gray-400" />
                                                 <p className="text-gray-500">No receivables found</p>
@@ -522,6 +555,8 @@ const CollectionsPage = () => {
                                 ) : (
                                     filteredReceivables.map((receivable) => {
                                         const status = getStatusBadge(receivable);
+                                        const loanId = receivable.loan_id || receivable.loan?.id;
+                                        const progress = getLoanProgress(loanId);
                                         return (
                                             <tr key={receivable.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4">
@@ -551,6 +586,20 @@ const CollectionsPage = () => {
                                                     <div className="text-sm text-gray-500">
                                                         {receivable.loan?.payment_method || ''}
                                                     </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {progress.total > 0 ? (
+                                                        <div className="flex flex-col items-center">
+                                                            <span className="text-sm font-medium text-gray-700">
+                                                                {progress.paid} / {progress.total} receivables
+                                                            </span>
+                                                            <span className="text-xs text-gray-500">
+                                                                completed
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-400">N/A</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <span className="text-sm font-semibold text-gray-900">

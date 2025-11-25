@@ -666,6 +666,21 @@ export function DailyCollectionProvider({ children }) {
             // Remove loan from state
             dispatch({ type: 'DELETE_LOAN', payload: loanId });
 
+            // Refresh loans list to ensure UI is up to date
+            await fetchLoans();
+
+            // Trigger day book refresh event for any open day book tabs
+            // This ensures UI updates immediately after loan deletion
+            const responseData = result.data || result.results || result;
+            window.dispatchEvent(new CustomEvent('loanDeleted', { 
+                detail: { 
+                    loanId, 
+                    affectedDates: responseData?.affectedDates || [],
+                    cascadeFromDate: responseData?.cascadeFromDate,
+                    accountBalanceUpdates: responseData?.accountBalanceUpdates || []
+                } 
+            }));
+
             return { success: true, data: result };
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;

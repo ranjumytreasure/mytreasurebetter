@@ -348,7 +348,7 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                 <div className="p-4 sm:p-6 space-y-4">
                     {dueData.map((transaction, index) => (
                         <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 sm:p-6 border-l-4 border-orange-500 shadow-md">
-                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 sm:gap-6">
                                 <div className="text-center sm:text-left">
                                     <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Auction Date</div>
                                     <div className="text-sm sm:text-base font-bold text-gray-900">
@@ -356,9 +356,21 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                                     </div>
                                 </div>
                                 <div className="text-center sm:text-left">
-                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Payment Date</div>
+                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Transacted Date</div>
                                     <div className="text-sm sm:text-base font-bold text-gray-900">
-                                        {transaction.date || transaction.createdAt ? new Date(transaction.date || transaction.createdAt).toLocaleString() : 'N/A'}
+                                        {transaction.transacted_date 
+                                            ? new Date(transaction.transacted_date).toLocaleDateString() 
+                                            : (transaction.transactedDate 
+                                                ? new Date(transaction.transactedDate).toLocaleDateString() 
+                                                : 'N/A')}
+                                    </div>
+                                </div>
+                                <div className="text-center sm:text-left">
+                                    <div className="text-xs sm:text-sm text-gray-600 mb-1 font-semibold">Created At</div>
+                                    <div className="text-sm sm:text-base font-bold text-gray-900">
+                                        {transaction.date || transaction.createdAt 
+                                            ? new Date(transaction.date || transaction.createdAt).toLocaleDateString() 
+                                            : 'N/A'}
                                     </div>
                                 </div>
                                 <div className="text-center sm:text-left">

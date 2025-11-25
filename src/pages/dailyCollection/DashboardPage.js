@@ -43,6 +43,19 @@ const DashboardPage = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('30'); // days
     const [refreshKey, setRefreshKey] = useState(0);
 
+    // Listen for loan deletion events and refresh dashboard
+    useEffect(() => {
+        const handleLoanDeleted = () => {
+            console.log('🔄 Loan deleted - refreshing dashboard');
+            setRefreshKey(prev => prev + 1); // Trigger dashboard refresh
+        };
+
+        window.addEventListener('loanDeleted', handleLoanDeleted);
+        return () => {
+            window.removeEventListener('loanDeleted', handleLoanDeleted);
+        };
+    }, []);
+
     // Fetch dashboard data
     useEffect(() => {
         const fetchDashboardData = async () => {
