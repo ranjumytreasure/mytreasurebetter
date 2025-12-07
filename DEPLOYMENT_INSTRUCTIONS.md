@@ -82,3 +82,9 @@ The duplicate index already exists in your database. Sequelize's `alter: true` i
 So the SQL script manually removes the duplicate and ensures the correct one exists.
 
 
+
+
+
+
+
+

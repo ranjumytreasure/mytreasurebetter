@@ -69,6 +69,10 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                     aValue = a.customerDue || 0;
                     bValue = b.customerDue || 0;
                     break;
+                case 'prizeMoney':
+                    aValue = a.prizeMoney || 0;
+                    bValue = b.prizeMoney || 0;
+                    break;
                 case 'auctionStatus':
                     aValue = a.auctionStatus || '';
                     bValue = b.auctionStatus || '';
@@ -189,6 +193,15 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                                 </th>
                                 <th
                                     className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                                    onClick={() => handleSort('prizeMoney')}
+                                >
+                                    <div className="flex items-center">
+                                        Prize Money
+                                        <SortIcon columnKey="prizeMoney" />
+                                    </div>
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
                                     onClick={() => handleSort('auctionStatus')}
                                 >
                                     <div className="flex items-center">
@@ -222,6 +235,9 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                                     )}
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
                                         ₹{transaction.customerDue}
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-green-600">
+                                        ₹{(transaction.prizeMoney || 0).toLocaleString()}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${transaction.auctionStatus === 'completed'
@@ -285,6 +301,13 @@ const CircleContentDisplay = ({ selectedCircle, groupDetails, auctionStatus, gro
                                         </span>
                                     </div>
                                 )}
+
+                                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                    <span className="text-sm text-gray-600 font-medium">Prize Money:</span>
+                                    <span className="text-base font-bold text-green-600">
+                                        ₹{(transaction.prizeMoney || 0).toLocaleString()}
+                                    </span>
+                                </div>
 
                                 <div className="flex justify-between items-center py-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg px-3">
                                     <span className="text-sm text-gray-700 font-bold">Total Due:</span>
